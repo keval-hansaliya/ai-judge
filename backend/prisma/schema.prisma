@@ -19,4 +19,38 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  battles   Battle[]
+}
+
+model Model {
+  id           Int      @id @default(autoincrement())
+  name         String
+  provider     String
+  modelId      String   @unique
+  elo          Int      @default(1000)
+  wins         Int      @default(0)
+  losses       Int      @default(0)
+  ties         Int      @default(0)
+  totalBattles Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  battlesA     Battle[] @relation("ModelA")
+  battlesB     Battle[] @relation("ModelB")
+}
+
+model Battle {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  user       User      @relation(fields: [userId], references: [id])
+  prompt     String
+  modelAId   Int
+  modelA     Model     @relation("ModelA", fields: [modelAId], references: [id])
+  modelBId   Int
+  modelB     Model     @relation("ModelB", fields: [modelBId], references: [id])
+  responseA  String?
+  responseB  String?
+  winner     String?   // "A", "B", "TIE"
+  votedAt    DateTime?
+  createdAt  DateTime  @default(now())
 }
