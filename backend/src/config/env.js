@@ -5,6 +5,7 @@ const requiredEnv = [
   "POSTGRES_URI",
   "DATABASE_URL",
   "JWT_SECRET",
+  "OPENROUTER_API_KEY",
   "PORT",
 ];
 
@@ -18,5 +19,6 @@ export const env = {
   POSTGRES_URI : process.env.POSTGRES_URI,
   DATABASE_URL : process.env.DATABASE_URL,
   JWT_SECRET : process.env.JWT_SECRET,
+  OPENROUTER_API_KEY : process.env.OPENROUTER_API_KEY,
   PORT : process.env.PORT,
 }
