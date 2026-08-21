@@ -101,7 +101,7 @@ export async function appendTurn(battleId, prompt) {
 /**
  * Streams initial battle with real-time token chunks for Model A and Model B via SSE
  */
-export async function createBattleStream(prompt, onChunkA, onChunkB, onDone, onError) {
+export async function createBattleStream(prompt, category = 'General', onChunkA, onChunkB, onDone, onError) {
   const token = await ensureAuth();
 
   const response = await fetch(`${API_BASE}/battles/stream`, {
@@ -110,7 +110,7 @@ export async function createBattleStream(prompt, onChunkA, onChunkB, onDone, onE
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify({ prompt })
+    body: JSON.stringify({ prompt, category })
   });
 
   if (!response.ok) {
@@ -226,10 +226,14 @@ export async function voteBattle(battleId, winner) {
 }
 
 /**
- * Fetches current Elo leaderboard
+ * Fetches current Elo leaderboard with optional category filter
  */
-export async function getLeaderboard() {
-  const res = await fetch(`${API_BASE}/leaderboard`);
+export async function getLeaderboard(category = 'All') {
+  const url = category && category !== 'All'
+    ? `${API_BASE}/leaderboard?category=${encodeURIComponent(category)}`
+    : `${API_BASE}/leaderboard`;
+
+  const res = await fetch(url);
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.message || 'Failed to fetch leaderboard');

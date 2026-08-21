@@ -6,7 +6,7 @@ import { generateResponse, streamResponse } from '../services/ai.service.js';
 import { calculateElo } from '../services/elo.service.js';
 
 export const createBattle = asyncHandler(async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, category = 'General' } = req.body;
 
   if (!prompt || typeof prompt !== 'string' || prompt.trim() === '') {
     throw new ApiError(400, "Prompt is required and must be a non-empty string");
@@ -47,6 +47,7 @@ export const createBattle = asyncHandler(async (req, res) => {
     data: {
       userId: req.user.id,
       prompt: prompt.trim(),
+      category: category || 'General',
       modelAId: modelA.id,
       modelBId: modelB.id,
       responseA,
@@ -72,7 +73,7 @@ export const createBattle = asyncHandler(async (req, res) => {
 });
 
 export const streamBattle = asyncHandler(async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, category = 'General' } = req.body;
 
   if (!prompt || typeof prompt !== 'string' || prompt.trim() === '') {
     throw new ApiError(400, "Prompt is required and must be a non-empty string");
@@ -96,7 +97,7 @@ export const streamBattle = asyncHandler(async (req, res) => {
     res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
   };
 
-  sendSSE('init', { prompt: prompt.trim() });
+  sendSSE('init', { prompt: prompt.trim(), category: category || 'General' });
 
   let fullA = "";
   let fullB = "";
@@ -121,6 +122,7 @@ export const streamBattle = asyncHandler(async (req, res) => {
       data: {
         userId: req.user.id,
         prompt: prompt.trim(),
+        category: category || 'General',
         modelAId: modelA.id,
         modelBId: modelB.id,
         responseA: fullA,

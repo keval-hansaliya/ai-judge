@@ -45,6 +45,7 @@ model Battle {
   userId     Int
   user       User      @relation(fields: [userId], references: [id])
   prompt     String
+  category   String    @default("General") // "General", "Coding", "Math", "Reasoning", "Creative"
   modelAId   Int
   modelA     Model     @relation("ModelA", fields: [modelAId], references: [id])
   modelBId   Int
