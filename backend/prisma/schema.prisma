@@ -51,6 +51,7 @@ model Battle {
   modelB     Model     @relation("ModelB", fields: [modelBId], references: [id])
   responseA  String?
   responseB  String?
+  turns      Json?     // Stores array of conversation turns [{ prompt, responseA, responseB }]
   winner     String?   // "A", "B", "TIE"
   votedAt    DateTime?
   createdAt  DateTime  @default(now())

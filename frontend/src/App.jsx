@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { createBattle, voteBattle, getLeaderboard } from './api.js';
+import { createBattle, appendTurn, voteBattle, getLeaderboard } from './api.js';
 import './App.css';
 
 function App() {
   const [activeTab, setActiveTab] = useState('arena'); // 'arena' | 'leaderboard'
   const [prompt, setPrompt] = useState('');
+  const [followUpPrompt, setFollowUpPrompt] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sendingFollowUp, setSendingFollowUp] = useState(false);
   const [voting, setVoting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -48,11 +50,36 @@ function App() {
 
     try {
       const battle = await createBattle(prompt.trim());
+      // Ensure turns structure
+      if (!battle.turns || !battle.turns.length) {
+        battle.turns = [{ turn: 1, prompt: battle.prompt, responseA: battle.responseA, responseB: battle.responseB }];
+      }
       setCurrentBattle(battle);
     } catch (err) {
       setError(err.message || 'Failed to start battle');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSendFollowUp = async (e) => {
+    e.preventDefault();
+    if (!followUpPrompt.trim() || !currentBattle || sendingFollowUp) return;
+
+    setSendingFollowUp(true);
+    setError(null);
+
+    try {
+      const res = await appendTurn(currentBattle.battleId, followUpPrompt.trim());
+      setCurrentBattle(prev => ({
+        ...prev,
+        turns: res.turns
+      }));
+      setFollowUpPrompt('');
+    } catch (err) {
+      setError(err.message || 'Failed to send follow-up prompt');
+    } finally {
+      setSendingFollowUp(false);
     }
   };
 
@@ -76,6 +103,7 @@ function App() {
     setCurrentBattle(null);
     setVoteResult(null);
     setPrompt('');
+    setFollowUpPrompt('');
   };
 
   return (
@@ -112,14 +140,14 @@ function App() {
       {/* TAB 1: ARENA BATTLE */}
       {activeTab === 'arena' && (
         <>
-          {/* Prompt Entry Form */}
+          {/* Initial Prompt Form */}
           {!currentBattle && !loading && (
             <form onSubmit={handleStartBattle} className="prompt-card">
               <label htmlFor="prompt-input">Enter a prompt to evaluate 2 anonymous AI models:</label>
               <textarea
                 id="prompt-input"
                 className="prompt-textarea"
-                placeholder="e.g. Write a quick python script to parse CSV data, or explain quantum physics..."
+                placeholder="e.g. Give 3 quick tips to stay fit and healthy..."
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 rows={3}
@@ -134,7 +162,7 @@ function App() {
             </form>
           )}
 
-          {/* Loading Indicator */}
+          {/* Loading Initial Battle */}
           {loading && (
             <div className="loading-state">
               <div className="spinner"></div>
@@ -142,61 +170,101 @@ function App() {
             </div>
           )}
 
-          {/* Battle Arena Cards */}
+          {/* Active Battle Conversation Thread */}
           {currentBattle && (
-            <>
-              <div className="prompt-card" style={{ padding: '16px 20px' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>PROMPT:</span>
-                <p style={{ marginTop: '4px', fontSize: '1.05rem' }}>{currentBattle.prompt}</p>
-              </div>
-
-              {/* Side-by-side response panels */}
-              <div className="battle-grid">
-                {/* Panel A */}
-                <div className="response-panel">
-                  <div className="panel-header">
-                    <span className="panel-title">
-                      🤖 {voteResult ? voteResult.modelA.name : 'Model A'}
-                    </span>
-                    {voteResult && (
-                      <span className="elo-badge">
-                        Elo: {voteResult.modelA.newElo}{' '}
-                        <span className={voteResult.modelA.newElo >= voteResult.modelA.oldElo ? 'elo-plus' : 'elo-minus'}>
-                          ({voteResult.modelA.newElo >= voteResult.modelA.oldElo ? '+' : ''}
-                          {voteResult.modelA.newElo - voteResult.modelA.oldElo})
-                        </span>
-                      </span>
-                    )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {currentBattle.turns.map((turnItem, idx) => (
+                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {/* Turn Prompt Header */}
+                  <div className="prompt-card" style={{ padding: '14px 20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span className="turn-badge">Turn #{turnItem.turn}</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>PROMPT</span>
+                    </div>
+                    <p style={{ marginTop: '6px', fontSize: '1.05rem' }}>{turnItem.prompt}</p>
                   </div>
-                  <div className="response-content">
-                    {currentBattle.responseA}
+
+                  {/* Side-by-side Response Panels for this turn */}
+                  <div className="battle-grid">
+                    {/* Model A Panel */}
+                    <div className="response-panel">
+                      <div className="panel-header">
+                        <span className="panel-title">
+                          🤖 {voteResult ? voteResult.modelA.name : 'Model A'}
+                        </span>
+                        {voteResult && idx === currentBattle.turns.length - 1 && (
+                          <span className="elo-badge">
+                            Elo: {voteResult.modelA.newElo}{' '}
+                            <span className={voteResult.modelA.newElo >= voteResult.modelA.oldElo ? 'elo-plus' : 'elo-minus'}>
+                              ({voteResult.modelA.newElo >= voteResult.modelA.oldElo ? '+' : ''}
+                              {voteResult.modelA.newElo - voteResult.modelA.oldElo})
+                            </span>
+                          </span>
+                        )}
+                      </div>
+                      <div className="response-content">
+                        {turnItem.responseA}
+                      </div>
+                    </div>
+
+                    {/* Model B Panel */}
+                    <div className="response-panel">
+                      <div className="panel-header">
+                        <span className="panel-title">
+                          🤖 {voteResult ? voteResult.modelB.name : 'Model B'}
+                        </span>
+                        {voteResult && idx === currentBattle.turns.length - 1 && (
+                          <span className="elo-badge">
+                            Elo: {voteResult.modelB.newElo}{' '}
+                            <span className={voteResult.modelB.newElo >= voteResult.modelB.oldElo ? 'elo-plus' : 'elo-minus'}>
+                              ({voteResult.modelB.newElo >= voteResult.modelB.oldElo ? '+' : ''}
+                              {voteResult.modelB.newElo - voteResult.modelB.oldElo})
+                            </span>
+                          </span>
+                        )}
+                      </div>
+                      <div className="response-content">
+                        {turnItem.responseB}
+                      </div>
+                    </div>
                   </div>
                 </div>
+              ))}
 
-                {/* Panel B */}
-                <div className="response-panel">
-                  <div className="panel-header">
-                    <span className="panel-title">
-                      🤖 {voteResult ? voteResult.modelB.name : 'Model B'}
-                    </span>
-                    {voteResult && (
-                      <span className="elo-badge">
-                        Elo: {voteResult.modelB.newElo}{' '}
-                        <span className={voteResult.modelB.newElo >= voteResult.modelB.oldElo ? 'elo-plus' : 'elo-minus'}>
-                          ({voteResult.modelB.newElo >= voteResult.modelB.oldElo ? '+' : ''}
-                          {voteResult.modelB.newElo - voteResult.modelB.oldElo})
-                        </span>
-                      </span>
-                    )}
-                  </div>
-                  <div className="response-content">
-                    {currentBattle.responseB}
-                  </div>
+              {/* Loading Follow-up State */}
+              {sendingFollowUp && (
+                <div className="loading-state">
+                  <div className="spinner"></div>
+                  <p>Generating follow-up responses from both models...</p>
                 </div>
-              </div>
+              )}
+
+              {/* Multi-turn Follow-up Input Box (Pre-Vote) */}
+              {!voteResult && !sendingFollowUp && (
+                <form onSubmit={handleSendFollowUp} className="followup-box">
+                  <label htmlFor="followup-input">Ask a follow-up question to continue the conversation:</label>
+                  <div className="followup-row">
+                    <input
+                      id="followup-input"
+                      type="text"
+                      className="followup-input"
+                      placeholder="e.g. Can you clarify point 2, or explain in simpler terms?"
+                      value={followUpPrompt}
+                      onChange={(e) => setFollowUpPrompt(e.target.value)}
+                    />
+                    <button
+                      type="submit"
+                      className="followup-btn"
+                      disabled={!followUpPrompt.trim()}
+                    >
+                      💬 Send Follow-up
+                    </button>
+                  </div>
+                </form>
+              )}
 
               {/* Voting Bar (Pre-Vote) */}
-              {!voteResult && (
+              {!voteResult && !sendingFollowUp && (
                 <div className="voting-bar">
                   <button
                     className="vote-btn"
@@ -240,7 +308,7 @@ function App() {
                   </button>
                 </div>
               )}
-            </>
+            </div>
           )}
         </>
       )}

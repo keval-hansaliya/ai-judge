@@ -10,9 +10,9 @@ const openRouterProvider = new OpenRouterProvider();
  * @param {string} prompt - The user prompt
  * @returns {Promise<string>} The generated text response
  */
-export const generateResponse = async (providerName, modelId, prompt) => {
+export const generateResponse = async (providerName, modelId, promptOrMessages) => {
   if (providerName.toLowerCase() === 'openrouter') {
-    return await openRouterProvider.generateResponse(modelId, prompt);
+    return await openRouterProvider.generateResponse(modelId, promptOrMessages);
   }
   
   throw new ApiError(400, `Unsupported AI provider: ${providerName}`);

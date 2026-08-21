@@ -74,7 +74,28 @@ export async function createBattle(prompt) {
   if (!res.ok) {
     throw new Error(data.message || 'Failed to create battle');
   }
-  return data.data; // { battleId, prompt, responseA, responseB }
+  return data.data; // { battleId, prompt, responseA, responseB, turns }
+}
+
+/**
+ * Sends a follow-up prompt to an ongoing battle
+ */
+export async function appendTurn(battleId, prompt) {
+  const token = await ensureAuth();
+  const res = await fetch(`${API_BASE}/battles/${battleId}/turn`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ prompt })
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to append turn');
+  }
+  return data.data; // { battleId, turns }
 }
 
 /**
