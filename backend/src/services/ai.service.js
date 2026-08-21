@@ -17,3 +17,11 @@ export const generateResponse = async (providerName, modelId, promptOrMessages) 
   
   throw new ApiError(400, `Unsupported AI provider: ${providerName}`);
 };
+
+export const streamResponse = async (providerName, modelId, promptOrMessages, onChunk) => {
+  if (providerName.toLowerCase() === 'openrouter') {
+    return await openRouterProvider.streamResponse(modelId, promptOrMessages, onChunk);
+  }
+
+  throw new ApiError(400, `Unsupported AI provider: ${providerName}`);
+};

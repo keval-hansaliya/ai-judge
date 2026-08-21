@@ -2,7 +2,7 @@ import { prisma } from '../config/db.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { generateResponse } from '../services/ai.service.js';
+import { generateResponse, streamResponse } from '../services/ai.service.js';
 import { calculateElo } from '../services/elo.service.js';
 
 export const createBattle = asyncHandler(async (req, res) => {
@@ -69,6 +69,173 @@ export const createBattle = asyncHandler(async (req, res) => {
       "Battle initiated. Responses generated anonymously."
     )
   );
+});
+
+export const streamBattle = asyncHandler(async (req, res) => {
+  const { prompt } = req.body;
+
+  if (!prompt || typeof prompt !== 'string' || prompt.trim() === '') {
+    throw new ApiError(400, "Prompt is required and must be a non-empty string");
+  }
+
+  const models = await prisma.model.findMany();
+  if (models.length < 2) {
+    throw new ApiError(500, "Not enough models seeded in the database to run a battle");
+  }
+
+  const shuffled = models.sort(() => 0.5 - Math.random());
+  const modelA = shuffled[0];
+  const modelB = shuffled[1];
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  if (typeof res.flushHeaders === 'function') res.flushHeaders();
+
+  const sendSSE = (event, data) => {
+    res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+  };
+
+  sendSSE('init', { prompt: prompt.trim() });
+
+  let fullA = "";
+  let fullB = "";
+
+  try {
+    await Promise.all([
+      streamResponse(modelA.provider, modelA.modelId, prompt, (chunk) => {
+        fullA += chunk;
+        sendSSE('chunk_a', { text: chunk });
+      }),
+      streamResponse(modelB.provider, modelB.modelId, prompt, (chunk) => {
+        fullB += chunk;
+        sendSSE('chunk_b', { text: chunk });
+      })
+    ]);
+
+    const initialTurns = [
+      { turn: 1, prompt: prompt.trim(), responseA: fullA, responseB: fullB }
+    ];
+
+    const battle = await prisma.battle.create({
+      data: {
+        userId: req.user.id,
+        prompt: prompt.trim(),
+        modelAId: modelA.id,
+        modelBId: modelB.id,
+        responseA: fullA,
+        responseB: fullB,
+        turns: initialTurns
+      }
+    });
+
+    sendSSE('done', {
+      battleId: battle.id,
+      turns: initialTurns
+    });
+  } catch (err) {
+    sendSSE('error', { message: err.message || "Streaming failed" });
+  } finally {
+    res.end();
+  }
+});
+
+export const streamTurn = asyncHandler(async (req, res) => {
+  const battleId = parseInt(req.params.id);
+  const { prompt } = req.body;
+
+  if (isNaN(battleId)) {
+    throw new ApiError(400, "Invalid battle ID");
+  }
+
+  if (!prompt || typeof prompt !== 'string' || prompt.trim() === '') {
+    throw new ApiError(400, "Prompt is required and must be a non-empty string");
+  }
+
+  const battle = await prisma.battle.findUnique({
+    where: { id: battleId },
+    include: { modelA: true, modelB: true }
+  });
+
+  if (!battle) {
+    throw new ApiError(404, "Battle not found");
+  }
+
+  if (battle.winner !== null) {
+    throw new ApiError(409, "Cannot add follow-up prompt to a battle that has already been voted on");
+  }
+
+  const existingTurns = Array.isArray(battle.turns) ? battle.turns : [
+    { turn: 1, prompt: battle.prompt, responseA: battle.responseA, responseB: battle.responseB }
+  ];
+
+  const messagesA = [];
+  const messagesB = [];
+
+  for (const t of existingTurns) {
+    messagesA.push({ role: 'user', content: t.prompt });
+    messagesA.push({ role: 'assistant', content: t.responseA });
+
+    messagesB.push({ role: 'user', content: t.prompt });
+    messagesB.push({ role: 'assistant', content: t.responseB });
+  }
+
+  messagesA.push({ role: 'user', content: prompt.trim() });
+  messagesB.push({ role: 'user', content: prompt.trim() });
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  if (typeof res.flushHeaders === 'function') res.flushHeaders();
+
+  const sendSSE = (event, data) => {
+    res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+  };
+
+  sendSSE('init', { prompt: prompt.trim(), turn: existingTurns.length + 1 });
+
+  let newResponseA = "";
+  let newResponseB = "";
+
+  try {
+    await Promise.all([
+      streamResponse(battle.modelA.provider, battle.modelA.modelId, messagesA, (chunk) => {
+        newResponseA += chunk;
+        sendSSE('chunk_a', { text: chunk });
+      }),
+      streamResponse(battle.modelB.provider, battle.modelB.modelId, messagesB, (chunk) => {
+        newResponseB += chunk;
+        sendSSE('chunk_b', { text: chunk });
+      })
+    ]);
+
+    const newTurn = {
+      turn: existingTurns.length + 1,
+      prompt: prompt.trim(),
+      responseA: newResponseA,
+      responseB: newResponseB
+    };
+
+    const updatedTurns = [...existingTurns, newTurn];
+
+    await prisma.battle.update({
+      where: { id: battleId },
+      data: {
+        turns: updatedTurns,
+        responseA: newResponseA,
+        responseB: newResponseB
+      }
+    });
+
+    sendSSE('done', {
+      battleId,
+      turns: updatedTurns
+    });
+  } catch (err) {
+    sendSSE('error', { message: err.message || "Streaming turn failed" });
+  } finally {
+    res.end();
+  }
 });
 
 export const appendTurn = asyncHandler(async (req, res) => {
