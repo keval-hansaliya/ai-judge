@@ -99,6 +99,112 @@ export async function appendTurn(battleId, prompt) {
 }
 
 /**
+ * Streams initial battle with real-time token chunks for Model A and Model B via SSE
+ */
+export async function createBattleStream(prompt, onChunkA, onChunkB, onDone, onError) {
+  const token = await ensureAuth();
+
+  const response = await fetch(`${API_BASE}/battles/stream`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ prompt })
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData.message || 'Streaming failed');
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const events = buffer.split('\n\n');
+    buffer = events.pop();
+
+    for (const evtBlock of events) {
+      if (!evtBlock.trim()) continue;
+      const lines = evtBlock.split('\n');
+      let eventType = 'message';
+      let data = null;
+
+      for (const line of lines) {
+        if (line.startsWith('event: ')) eventType = line.slice(7).trim();
+        if (line.startsWith('data: ')) {
+          try { data = JSON.parse(line.slice(6)); } catch(e) {}
+        }
+      }
+
+      if (eventType === 'chunk_a' && data?.text && onChunkA) onChunkA(data.text);
+      if (eventType === 'chunk_b' && data?.text && onChunkB) onChunkB(data.text);
+      if (eventType === 'done' && data && onDone) onDone(data);
+      if (eventType === 'error' && data && onError) onError(new Error(data.message));
+    }
+  }
+}
+
+/**
+ * Streams follow-up turn with real-time token chunks for Model A and Model B via SSE
+ */
+export async function appendTurnStream(battleId, prompt, onChunkA, onChunkB, onDone, onError) {
+  const token = await ensureAuth();
+
+  const response = await fetch(`${API_BASE}/battles/${battleId}/turn/stream`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ prompt })
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData.message || 'Streaming turn failed');
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const events = buffer.split('\n\n');
+    buffer = events.pop();
+
+    for (const evtBlock of events) {
+      if (!evtBlock.trim()) continue;
+      const lines = evtBlock.split('\n');
+      let eventType = 'message';
+      let data = null;
+
+      for (const line of lines) {
+        if (line.startsWith('event: ')) eventType = line.slice(7).trim();
+        if (line.startsWith('data: ')) {
+          try { data = JSON.parse(line.slice(6)); } catch(e) {}
+        }
+      }
+
+      if (eventType === 'chunk_a' && data?.text && onChunkA) onChunkA(data.text);
+      if (eventType === 'chunk_b' && data?.text && onChunkB) onChunkB(data.text);
+      if (eventType === 'done' && data && onDone) onDone(data);
+      if (eventType === 'error' && data && onError) onError(new Error(data.message));
+    }
+  }
+}
+
+/**
  * Votes on a battle result ("A", "B", "TIE")
  */
 export async function voteBattle(battleId, winner) {

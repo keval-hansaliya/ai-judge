@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
-import { createBattle, appendTurn, voteBattle, getLeaderboard } from './api.js';
+import { createBattleStream, appendTurnStream, voteBattle, getLeaderboard } from './api.js';
 import './App.css';
 
 function App() {
   const [activeTab, setActiveTab] = useState('arena'); // 'arena' | 'leaderboard'
   const [prompt, setPrompt] = useState('');
   const [followUpPrompt, setFollowUpPrompt] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [sendingFollowUp, setSendingFollowUp] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [voting, setVoting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -41,50 +40,126 @@ function App() {
 
   const handleStartBattle = async (e) => {
     e.preventDefault();
-    if (!prompt.trim()) return;
+    if (!prompt.trim() || isStreaming) return;
 
-    setLoading(true);
+    setIsStreaming(true);
     setError(null);
     setVoteResult(null);
-    setCurrentBattle(null);
+
+    const initialTurns = [
+      { turn: 1, prompt: prompt.trim(), responseA: '', responseB: '' }
+    ];
+
+    setCurrentBattle({ battleId: null, prompt: prompt.trim(), turns: initialTurns });
 
     try {
-      const battle = await createBattle(prompt.trim());
-      // Ensure turns structure
-      if (!battle.turns || !battle.turns.length) {
-        battle.turns = [{ turn: 1, prompt: battle.prompt, responseA: battle.responseA, responseB: battle.responseB }];
-      }
-      setCurrentBattle(battle);
+      await createBattleStream(
+        prompt.trim(),
+        // onChunkA
+        (chunk) => {
+          setCurrentBattle((prev) => {
+            if (!prev) return prev;
+            const turns = [...prev.turns];
+            turns[0] = { ...turns[0], responseA: turns[0].responseA + chunk };
+            return { ...prev, turns };
+          });
+        },
+        // onChunkB
+        (chunk) => {
+          setCurrentBattle((prev) => {
+            if (!prev) return prev;
+            const turns = [...prev.turns];
+            turns[0] = { ...turns[0], responseB: turns[0].responseB + chunk };
+            return { ...prev, turns };
+          });
+        },
+        // onDone
+        (data) => {
+          setCurrentBattle((prev) => ({
+            ...prev,
+            battleId: data.battleId,
+            turns: data.turns
+          }));
+          setIsStreaming(false);
+        },
+        // onError
+        (err) => {
+          setError(err.message);
+          setIsStreaming(false);
+        }
+      );
     } catch (err) {
-      setError(err.message || 'Failed to start battle');
-    } finally {
-      setLoading(false);
+      setError(err.message || 'Streaming battle failed');
+      setIsStreaming(false);
     }
   };
 
   const handleSendFollowUp = async (e) => {
     e.preventDefault();
-    if (!followUpPrompt.trim() || !currentBattle || sendingFollowUp) return;
+    if (!followUpPrompt.trim() || !currentBattle || isStreaming) return;
 
-    setSendingFollowUp(true);
+    const newPrompt = followUpPrompt.trim();
+    setFollowUpPrompt('');
+    setIsStreaming(true);
     setError(null);
 
+    const currentTurnNum = currentBattle.turns.length + 1;
+    const updatedTurns = [
+      ...currentBattle.turns,
+      { turn: currentTurnNum, prompt: newPrompt, responseA: '', responseB: '' }
+    ];
+
+    setCurrentBattle((prev) => ({
+      ...prev,
+      turns: updatedTurns
+    }));
+
     try {
-      const res = await appendTurn(currentBattle.battleId, followUpPrompt.trim());
-      setCurrentBattle(prev => ({
-        ...prev,
-        turns: res.turns
-      }));
-      setFollowUpPrompt('');
+      await appendTurnStream(
+        currentBattle.battleId,
+        newPrompt,
+        // onChunkA
+        (chunk) => {
+          setCurrentBattle((prev) => {
+            if (!prev) return prev;
+            const turns = [...prev.turns];
+            const lastIdx = turns.length - 1;
+            turns[lastIdx] = { ...turns[lastIdx], responseA: turns[lastIdx].responseA + chunk };
+            return { ...prev, turns };
+          });
+        },
+        // onChunkB
+        (chunk) => {
+          setCurrentBattle((prev) => {
+            if (!prev) return prev;
+            const turns = [...prev.turns];
+            const lastIdx = turns.length - 1;
+            turns[lastIdx] = { ...turns[lastIdx], responseB: turns[lastIdx].responseB + chunk };
+            return { ...prev, turns };
+          });
+        },
+        // onDone
+        (data) => {
+          setCurrentBattle((prev) => ({
+            ...prev,
+            turns: data.turns
+          }));
+          setIsStreaming(false);
+        },
+        // onError
+        (err) => {
+          setError(err.message);
+          setIsStreaming(false);
+        }
+      );
     } catch (err) {
-      setError(err.message || 'Failed to send follow-up prompt');
-    } finally {
-      setSendingFollowUp(false);
+      setError(err.message || 'Streaming follow-up failed');
+      setIsStreaming(false);
     }
   };
 
   const handleVote = async (winner) => {
-    if (!currentBattle || voting || voteResult) return;
+    if (!currentBattle || !currentBattle.battleId || voting || voteResult || isStreaming) return;
 
     setVoting(true);
     setError(null);
@@ -141,7 +216,7 @@ function App() {
       {activeTab === 'arena' && (
         <>
           {/* Initial Prompt Form */}
-          {!currentBattle && !loading && (
+          {!currentBattle && (
             <form onSubmit={handleStartBattle} className="prompt-card">
               <label htmlFor="prompt-input">Enter a prompt to evaluate 2 anonymous AI models:</label>
               <textarea
@@ -151,23 +226,16 @@ function App() {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 rows={3}
+                disabled={isStreaming}
               />
               <button
                 type="submit"
                 className="submit-btn"
-                disabled={!prompt.trim()}
+                disabled={!prompt.trim() || isStreaming}
               >
-                ⚔️ Generate Battle Response
+                {isStreaming ? '⚡ Streaming Token Responses...' : '⚡ Stream Battle Response'}
               </button>
             </form>
-          )}
-
-          {/* Loading Initial Battle */}
-          {loading && (
-            <div className="loading-state">
-              <div className="spinner"></div>
-              <p>Fetching parallel responses from 2 anonymous AI models...</p>
-            </div>
           )}
 
           {/* Active Battle Conversation Thread */}
@@ -203,7 +271,7 @@ function App() {
                         )}
                       </div>
                       <div className="response-content">
-                        {turnItem.responseA}
+                        {turnItem.responseA || (isStreaming && idx === currentBattle.turns.length - 1 ? '⚡ Streaming...' : '')}
                       </div>
                     </div>
 
@@ -224,23 +292,15 @@ function App() {
                         )}
                       </div>
                       <div className="response-content">
-                        {turnItem.responseB}
+                        {turnItem.responseB || (isStreaming && idx === currentBattle.turns.length - 1 ? '⚡ Streaming...' : '')}
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
 
-              {/* Loading Follow-up State */}
-              {sendingFollowUp && (
-                <div className="loading-state">
-                  <div className="spinner"></div>
-                  <p>Generating follow-up responses from both models...</p>
-                </div>
-              )}
-
               {/* Multi-turn Follow-up Input Box (Pre-Vote) */}
-              {!voteResult && !sendingFollowUp && (
+              {!voteResult && (
                 <form onSubmit={handleSendFollowUp} className="followup-box">
                   <label htmlFor="followup-input">Ask a follow-up question to continue the conversation:</label>
                   <div className="followup-row">
@@ -251,39 +311,40 @@ function App() {
                       placeholder="e.g. Can you clarify point 2, or explain in simpler terms?"
                       value={followUpPrompt}
                       onChange={(e) => setFollowUpPrompt(e.target.value)}
+                      disabled={isStreaming}
                     />
                     <button
                       type="submit"
                       className="followup-btn"
-                      disabled={!followUpPrompt.trim()}
+                      disabled={!followUpPrompt.trim() || isStreaming}
                     >
-                      💬 Send Follow-up
+                      {isStreaming ? '⚡ Streaming...' : '⚡ Send Streaming Follow-up'}
                     </button>
                   </div>
                 </form>
               )}
 
               {/* Voting Bar (Pre-Vote) */}
-              {!voteResult && !sendingFollowUp && (
+              {!voteResult && (
                 <div className="voting-bar">
                   <button
                     className="vote-btn"
                     onClick={() => handleVote('A')}
-                    disabled={voting}
+                    disabled={voting || isStreaming || !currentBattle.battleId}
                   >
                     👈 Model A is Better
                   </button>
                   <button
                     className="vote-btn tie-btn"
                     onClick={() => handleVote('TIE')}
-                    disabled={voting}
+                    disabled={voting || isStreaming || !currentBattle.battleId}
                   >
                     🤝 Tie / Equal
                   </button>
                   <button
                     className="vote-btn"
                     onClick={() => handleVote('B')}
-                    disabled={voting}
+                    disabled={voting || isStreaming || !currentBattle.battleId}
                   >
                     Model B is Better 👉
                   </button>
