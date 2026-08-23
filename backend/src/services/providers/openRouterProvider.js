@@ -3,24 +3,24 @@ import { env } from '../../config/env.js';
 import { ApiError } from '../../utils/ApiError.js';
 
 export class OpenRouterProvider extends BaseProvider {
-  async generateResponse(modelId, prompt) {
+  async generateResponse(modelId, promptOrMessages) {
     try {
+      const messages = Array.isArray(promptOrMessages)
+        ? promptOrMessages
+        : [{ role: "user", content: promptOrMessages }];
+
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://github.com/keval-hansaliya/ai-judge", // Site URL for OpenRouter ranking
+          "HTTP-Referer": "https://github.com/keval-hansaliya/ai-judge",
           "X-Title": "AI Judge MVP"
         },
         body: JSON.stringify({
           model: modelId,
-          messages: [
-            {
-              role: "user",
-              content: prompt
-            }
-          ]
+          messages,
+          max_tokens: 512
         })
       });
 

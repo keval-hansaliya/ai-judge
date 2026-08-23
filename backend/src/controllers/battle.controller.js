@@ -33,6 +33,15 @@ export const createBattle = asyncHandler(async (req, res) => {
     generateResponse(modelB.provider, modelB.modelId, prompt)
   ]);
 
+  const initialTurns = [
+    {
+      turn: 1,
+      prompt: prompt.trim(),
+      responseA,
+      responseB
+    }
+  ];
+
   // 3. Save the battle details in the database (keeping model identity hidden from response)
   const battle = await prisma.battle.create({
     data: {
@@ -41,7 +50,8 @@ export const createBattle = asyncHandler(async (req, res) => {
       modelAId: modelA.id,
       modelBId: modelB.id,
       responseA,
-      responseB
+      responseB,
+      turns: initialTurns
     }
   });
 
@@ -53,9 +63,92 @@ export const createBattle = asyncHandler(async (req, res) => {
         battleId: battle.id,
         prompt: battle.prompt,
         responseA: battle.responseA,
-        responseB: battle.responseB
+        responseB: battle.responseB,
+        turns: initialTurns
       },
       "Battle initiated. Responses generated anonymously."
+    )
+  );
+});
+
+export const appendTurn = asyncHandler(async (req, res) => {
+  const battleId = parseInt(req.params.id);
+  const { prompt } = req.body;
+
+  if (isNaN(battleId)) {
+    throw new ApiError(400, "Invalid battle ID");
+  }
+
+  if (!prompt || typeof prompt !== 'string' || prompt.trim() === '') {
+    throw new ApiError(400, "Prompt is required and must be a non-empty string");
+  }
+
+  const battle = await prisma.battle.findUnique({
+    where: { id: battleId },
+    include: { modelA: true, modelB: true }
+  });
+
+  if (!battle) {
+    throw new ApiError(404, "Battle not found");
+  }
+
+  if (battle.winner !== null) {
+    throw new ApiError(409, "Cannot add follow-up prompt to a battle that has already been voted on");
+  }
+
+  // Parse existing turns array
+  const existingTurns = Array.isArray(battle.turns) ? battle.turns : [
+    { turn: 1, prompt: battle.prompt, responseA: battle.responseA, responseB: battle.responseB }
+  ];
+
+  // Reconstruct conversation history for Model A and Model B
+  const messagesA = [];
+  const messagesB = [];
+
+  for (const t of existingTurns) {
+    messagesA.push({ role: 'user', content: t.prompt });
+    messagesA.push({ role: 'assistant', content: t.responseA });
+
+    messagesB.push({ role: 'user', content: t.prompt });
+    messagesB.push({ role: 'assistant', content: t.responseB });
+  }
+
+  // Append current follow-up prompt
+  messagesA.push({ role: 'user', content: prompt.trim() });
+  messagesB.push({ role: 'user', content: prompt.trim() });
+
+  // Fetch responses in parallel
+  const [newResponseA, newResponseB] = await Promise.all([
+    generateResponse(battle.modelA.provider, battle.modelA.modelId, messagesA),
+    generateResponse(battle.modelB.provider, battle.modelB.modelId, messagesB)
+  ]);
+
+  const newTurn = {
+    turn: existingTurns.length + 1,
+    prompt: prompt.trim(),
+    responseA: newResponseA,
+    responseB: newResponseB
+  };
+
+  const updatedTurns = [...existingTurns, newTurn];
+
+  const updatedBattle = await prisma.battle.update({
+    where: { id: battleId },
+    data: {
+      turns: updatedTurns,
+      responseA: newResponseA,
+      responseB: newResponseB
+    }
+  });
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        battleId: updatedBattle.id,
+        turns: updatedTurns
+      },
+      "Follow-up turn generated successfully."
     )
   );
 });
