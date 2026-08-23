@@ -2,8 +2,14 @@ import { useState, useEffect } from 'react';
 import { createBattleStream, appendTurnStream, voteBattle, getLeaderboard } from './api.js';
 import './App.css';
 
+const CATEGORIES = ['General', 'Coding', 'Math', 'Reasoning', 'Creative'];
+const LB_CATEGORIES = ['All', 'General', 'Coding', 'Math', 'Reasoning', 'Creative'];
+
 function App() {
   const [activeTab, setActiveTab] = useState('arena'); // 'arena' | 'leaderboard'
+  const [selectedCategory, setSelectedCategory] = useState('General');
+  const [selectedLbCategory, setSelectedLbCategory] = useState('All');
+
   const [prompt, setPrompt] = useState('');
   const [followUpPrompt, setFollowUpPrompt] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -18,18 +24,18 @@ function App() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loadingLb, setLoadingLb] = useState(false);
 
-  // Load Leaderboard when switching to leaderboard tab
+  // Load Leaderboard when switching tab or category filter
   useEffect(() => {
     if (activeTab === 'leaderboard') {
-      fetchLeaderboard();
+      fetchLeaderboard(selectedLbCategory);
     }
-  }, [activeTab]);
+  }, [activeTab, selectedLbCategory]);
 
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = async (category = selectedLbCategory) => {
     setLoadingLb(true);
     setError(null);
     try {
-      const data = await getLeaderboard();
+      const data = await getLeaderboard(category);
       setLeaderboard(data);
     } catch (err) {
       setError(err.message);
@@ -50,11 +56,12 @@ function App() {
       { turn: 1, prompt: prompt.trim(), responseA: '', responseB: '' }
     ];
 
-    setCurrentBattle({ battleId: null, prompt: prompt.trim(), turns: initialTurns });
+    setCurrentBattle({ battleId: null, prompt: prompt.trim(), category: selectedCategory, turns: initialTurns });
 
     try {
       await createBattleStream(
         prompt.trim(),
+        selectedCategory,
         // onChunkA
         (chunk) => {
           setCurrentBattle((prev) => {
@@ -218,22 +225,48 @@ function App() {
           {/* Initial Prompt Form */}
           {!currentBattle && (
             <form onSubmit={handleStartBattle} className="prompt-card">
-              <label htmlFor="prompt-input">Enter a prompt to evaluate 2 anonymous AI models:</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                <label htmlFor="prompt-input">Enter a prompt to evaluate 2 anonymous AI models:</label>
+                
+                {/* Category Selection Pills */}
+                <div className="category-row">
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Category:</span>
+                  {CATEGORIES.map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      className={`category-pill ${selectedCategory === cat ? 'active' : ''}`}
+                      onClick={() => setSelectedCategory(cat)}
+                      disabled={isStreaming}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <textarea
                 id="prompt-input"
                 className="prompt-textarea"
-                placeholder="e.g. Give 3 quick tips to stay fit and healthy..."
+                placeholder={
+                  selectedCategory === 'Coding' ? 'e.g. Write a Python function for binary search...' :
+                  selectedCategory === 'Math' ? 'e.g. Solve integral of x^2 * e^x dx step by step...' :
+                  selectedCategory === 'Reasoning' ? 'e.g. A bat and ball cost $1.10. The bat costs $1 more than the ball...' :
+                  selectedCategory === 'Creative' ? 'e.g. Write a short sci-fi story about quantum AI...' :
+                  'e.g. Give 3 quick tips to stay fit and healthy...'
+                }
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 rows={3}
                 disabled={isStreaming}
               />
+
               <button
                 type="submit"
                 className="submit-btn"
                 disabled={!prompt.trim() || isStreaming}
               >
-                {isStreaming ? '⚡ Streaming Token Responses...' : '⚡ Stream Battle Response'}
+                {isStreaming ? '⚡ Streaming Token Responses...' : `⚡ Stream Battle [${selectedCategory}]`}
               </button>
             </form>
           )}
@@ -246,7 +279,12 @@ function App() {
                   {/* Turn Prompt Header */}
                   <div className="prompt-card" style={{ padding: '14px 20px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span className="turn-badge">Turn #{turnItem.turn}</span>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <span className="turn-badge">Turn #{turnItem.turn}</span>
+                        <span className="category-pill active" style={{ fontSize: '0.75rem', padding: '2px 10px' }}>
+                          {currentBattle.category || 'General'}
+                        </span>
+                      </div>
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>PROMPT</span>
                     </div>
                     <p style={{ marginTop: '6px', fontSize: '1.05rem' }}>{turnItem.prompt}</p>
@@ -308,7 +346,7 @@ function App() {
                       id="followup-input"
                       type="text"
                       className="followup-input"
-                      placeholder="e.g. Can you clarify point 2, or explain in simpler terms?"
+                      placeholder="e.g. Can you clarify point 2, or optimize your code?"
                       value={followUpPrompt}
                       onChange={(e) => setFollowUpPrompt(e.target.value)}
                       disabled={isStreaming}
@@ -377,17 +415,32 @@ function App() {
       {/* TAB 2: LEADERBOARD */}
       {activeTab === 'leaderboard' && (
         <div className="leaderboard-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
             <h2>🏆 Elo Leaderboard</h2>
-            <button className="tab-btn" onClick={fetchLeaderboard} disabled={loadingLb}>
+            <button className="tab-btn" onClick={() => fetchLeaderboard(selectedLbCategory)} disabled={loadingLb}>
               🔄 Refresh
             </button>
+          </div>
+
+          {/* Category Filter Bar */}
+          <div className="category-row" style={{ marginTop: '16px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>Filter Domain:</span>
+            {LB_CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                className={`category-pill ${selectedLbCategory === cat ? 'active' : ''}`}
+                onClick={() => setSelectedLbCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
 
           {loadingLb ? (
             <div className="loading-state" style={{ border: 'none' }}>
               <div className="spinner"></div>
-              <p>Loading model standings...</p>
+              <p>Loading {selectedLbCategory} category standings...</p>
             </div>
           ) : (
             <table className="leaderboard-table">
@@ -395,7 +448,7 @@ function App() {
                 <tr>
                   <th>Rank</th>
                   <th>Model Name</th>
-                  <th>Elo Rating</th>
+                  <th>{selectedLbCategory === 'All' ? 'Global Elo' : `${selectedLbCategory} Elo`}</th>
                   <th>Wins</th>
                   <th>Losses</th>
                   <th>Ties</th>
