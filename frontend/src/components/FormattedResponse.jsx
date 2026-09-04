@@ -7,13 +7,13 @@ import { useState, useMemo } from 'react';
 function cleanResponseText(rawText) {
   if (!rawText) return '';
 
-  // 1. Strip complete <think>...</think> or <thought>...</thought> tags
+  // 1. Strip complete <think>...</think>, <thought>...</thought>, <tool>...</tool>, <output>...</output>
   let cleaned = rawText
-    .replace(/^\s*<(?:think|thought)>[\s\S]*?<\/(?:think|thought)>\s*/gi, '')
-    .replace(/<(?:think|thought)>[\s\S]*?<\/(?:think|thought)>/gi, '');
+    .replace(/^\s*<(?:think|thought|tool|output|scratchpad)>[\s\S]*?<\/(?:think|thought|tool|output|scratchpad)>\s*/gi, '')
+    .replace(/<(?:think|thought|tool|output|scratchpad)>[\s\S]*?<\/(?:think|thought|tool|output|scratchpad)>/gi, '');
 
-  // 2. If the model is mid-stream or hit token limit while thinking, strip any unclosed thinking tag
-  cleaned = cleaned.replace(/^\s*<(?:think|thought)>[\s\S]*/gi, '');
+  // 2. If the model is mid-stream or hit token limit while thinking/tooling, strip unclosed tags
+  cleaned = cleaned.replace(/^\s*<(?:think|thought|tool|output|scratchpad)>[\s\S]*/gi, '');
 
   return cleaned.trim();
 }

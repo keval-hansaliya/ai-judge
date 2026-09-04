@@ -23,8 +23,8 @@ export const FREE_MODELS = [
     modelId: "openai/gpt-oss-20b"
   },
   {
-    name: "Compound Mini",
+    name: "Qwen 3.6 27B",
     provider: "groq",
-    modelId: "groq/compound-mini"
+    modelId: "qwen/qwen3.6-27b"
   }
 ];

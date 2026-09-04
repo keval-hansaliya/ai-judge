@@ -12,7 +12,7 @@ const AVAILABLE_MODELS = [
   { id: "models/gemini-3.7-flash", name: "Gemini 3.7 Flash", provider: "Google" },
   { id: "openai/gpt-oss-120b", name: "OpenAI GPT-OSS 120B", provider: "Groq" },
   { id: "openai/gpt-oss-20b", name: "OpenAI GPT-OSS 20B", provider: "Groq" },
-  { id: "groq/compound-mini", name: "Compound Mini", provider: "Groq" }
+  { id: "qwen/qwen3.6-27b", name: "Qwen 3.6 27B", provider: "Groq" }
 ];
 
 
