@@ -6,6 +6,74 @@ import { generateResponse, streamResponse } from '../services/ai.service.js';
 import { calculateElo } from '../services/elo.service.js';
 import { ARENA_HYPERPARAMETERS, CATEGORY_PRESETS } from '../config/hyperparameters.js';
 
+/**
+ * Executes a model response generation with automatic provider/model fallback
+ * if the primary model hits a rate limit, quota exhaustion, or 503 error.
+ */
+async function generateModelWithFallback(primaryModel, alternateModels, promptOrMessages, options, slotName = "Model") {
+  let currentModel = primaryModel;
+  const pool = [...alternateModels];
+
+  while (true) {
+    try {
+      const response = await generateResponse(currentModel.provider, currentModel.modelId, promptOrMessages, options);
+      return { model: currentModel, response };
+    } catch (err) {
+      const isRateLimit =
+        err.message?.toLowerCase().includes('quota') ||
+        err.message?.toLowerCase().includes('rate') ||
+        err.message?.toLowerCase().includes('429') ||
+        err.message?.toLowerCase().includes('503') ||
+        err.statusCode === 429 ||
+        err.statusCode === 502;
+
+      if (isRateLimit && pool.length > 0) {
+        const nextModel = pool.shift();
+        console.warn(`[AI Judge Fallback] ${currentModel.name} (${currentModel.provider}) rate-limited for ${slotName}. Seamlessly switching to ${nextModel.name} (${nextModel.provider})...`);
+        currentModel = nextModel;
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
+/**
+ * Streams token responses from a model with automatic provider/model fallback
+ * if the primary model hits a rate limit or quota exhaustion on initial call.
+ */
+async function streamModelWithFallback(primaryModel, alternateModels, promptOrMessages, onChunk, options, slotName = "Model") {
+  let currentModel = primaryModel;
+  const pool = [...alternateModels];
+
+  while (true) {
+    let chunksStreamed = 0;
+    try {
+      await streamResponse(currentModel.provider, currentModel.modelId, promptOrMessages, (chunk) => {
+        chunksStreamed++;
+        onChunk(chunk);
+      }, options);
+      return currentModel;
+    } catch (err) {
+      const isRateLimit =
+        err.message?.toLowerCase().includes('quota') ||
+        err.message?.toLowerCase().includes('rate') ||
+        err.message?.toLowerCase().includes('429') ||
+        err.message?.toLowerCase().includes('503') ||
+        err.statusCode === 429 ||
+        err.statusCode === 502;
+
+      if (chunksStreamed === 0 && isRateLimit && pool.length > 0) {
+        const nextModel = pool.shift();
+        console.warn(`[AI Judge Fallback] ${currentModel.name} (${currentModel.provider}) rate-limited for ${slotName}. Seamlessly switching to ${nextModel.name} (${nextModel.provider})...`);
+        currentModel = nextModel;
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 export const createBattle = asyncHandler(async (req, res) => {
   const { prompt, category = 'General' } = req.body;
 
@@ -23,19 +91,30 @@ export const createBattle = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Not enough models seeded in the database to run a battle");
   }
 
-  // Shuffle and pick 2 unique models
+  // Shuffle and pick 2 unique models with alternate pool for fallbacks
   const shuffled = models.sort(() => 0.5 - Math.random());
   const modelA = shuffled[0];
   const modelB = shuffled[1];
+  const poolA = shuffled.slice(2);
+  const poolB = [...poolA];
 
   // Determine standardized hyperparameters (category preset if available, or arena default)
   const battleOptions = CATEGORY_PRESETS[category] || ARENA_HYPERPARAMETERS;
 
-  // 2. Fetch responses in parallel with identical standardized hyperparameters
-  const [responseA, responseB] = await Promise.all([
-    generateResponse(modelA.provider, modelA.modelId, prompt, battleOptions),
-    generateResponse(modelB.provider, modelB.modelId, prompt, battleOptions)
+  // 2. Fetch responses in parallel with automatic fallback if a provider is rate limited
+  const [resultA, resultB] = await Promise.all([
+    generateModelWithFallback(modelA, poolA, prompt, battleOptions, 'Model A'),
+    generateModelWithFallback(modelB, poolB, prompt, battleOptions, 'Model B')
   ]);
+
+  const actualModelA = resultA.model;
+  const actualModelB = resultB.model;
+  const responseA = resultA.response;
+  const responseB = resultB.response;
+
+  if (!responseA || !responseA.trim() || !responseB || !responseB.trim()) {
+    throw new ApiError(502, "One of the AI models returned an empty response. Please retry the battle.");
+  }
 
   const initialTurns = [
     {
@@ -52,8 +131,8 @@ export const createBattle = asyncHandler(async (req, res) => {
       userId: req.user.id,
       prompt: prompt.trim(),
       category: category || 'General',
-      modelAId: modelA.id,
-      modelBId: modelB.id,
+      modelAId: actualModelA.id,
+      modelBId: actualModelB.id,
       responseA,
       responseB,
       turns: initialTurns
@@ -88,9 +167,12 @@ export const streamBattle = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Not enough models seeded in the database to run a battle");
   }
 
+  // Shuffle and pick 2 unique models with alternate pool for fallbacks
   const shuffled = models.sort(() => 0.5 - Math.random());
   const modelA = shuffled[0];
   const modelB = shuffled[1];
+  const poolA = shuffled.slice(2);
+  const poolB = [...poolA];
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -109,16 +191,20 @@ export const streamBattle = asyncHandler(async (req, res) => {
   const battleOptions = CATEGORY_PRESETS[category] || ARENA_HYPERPARAMETERS;
 
   try {
-    await Promise.all([
-      streamResponse(modelA.provider, modelA.modelId, prompt, (chunk) => {
+    const [actualModelA, actualModelB] = await Promise.all([
+      streamModelWithFallback(modelA, poolA, prompt, (chunk) => {
         fullA += chunk;
         sendSSE('chunk_a', { text: chunk });
-      }, battleOptions),
-      streamResponse(modelB.provider, modelB.modelId, prompt, (chunk) => {
+      }, battleOptions, 'Model A'),
+      streamModelWithFallback(modelB, poolB, prompt, (chunk) => {
         fullB += chunk;
         sendSSE('chunk_b', { text: chunk });
-      }, battleOptions)
+      }, battleOptions, 'Model B')
     ]);
+
+    if (!fullA || !fullA.trim() || !fullB || !fullB.trim()) {
+      throw new ApiError(502, "One of the AI models failed to stream a complete response. Please retry.");
+    }
 
     const initialTurns = [
       { turn: 1, prompt: prompt.trim(), responseA: fullA, responseB: fullB }
@@ -129,8 +215,8 @@ export const streamBattle = asyncHandler(async (req, res) => {
         userId: req.user.id,
         prompt: prompt.trim(),
         category: category || 'General',
-        modelAId: modelA.id,
-        modelBId: modelB.id,
+        modelAId: actualModelA.id,
+        modelBId: actualModelB.id,
         responseA: fullA,
         responseB: fullB,
         turns: initialTurns
@@ -218,6 +304,10 @@ export const streamTurn = asyncHandler(async (req, res) => {
         sendSSE('chunk_b', { text: chunk });
       }, battleOptions)
     ]);
+
+    if (!newResponseA || !newResponseA.trim() || !newResponseB || !newResponseB.trim()) {
+      throw new ApiError(502, "One of the AI models failed to stream a follow-up response. Please retry.");
+    }
 
     const newTurn = {
       turn: existingTurns.length + 1,
