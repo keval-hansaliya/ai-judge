@@ -1,30 +1,50 @@
 import { useState, useEffect } from 'react';
-import { createBattleStream, appendTurnStream, voteBattle, getLeaderboard } from './api.js';
+import { createBattleStream, appendTurnStream, voteBattle, triggerAIJudge, getLeaderboard } from './api.js';
+import { BenchmarkReport } from './components/BenchmarkReport.jsx';
 import './App.css';
 
 const CATEGORIES = ['General', 'Coding', 'Math', 'Reasoning', 'Creative'];
 const LB_CATEGORIES = ['All', 'General', 'Coding', 'Math', 'Reasoning', 'Creative'];
 
+const AVAILABLE_MODELS = [
+  { id: "nvidia/nemotron-3.5-lightning:free", name: "Nemotron 3.5 Lightning (Free)", provider: "NVIDIA" },
+  { id: "inclusionai/ling-3.0-flash-fin:free", name: "Ling 3.0 Flash (Free)", provider: "InclusionAI" },
+  { id: "liquid/lfm-2.5-2.6b:free", name: "Liquid LFM 2.5 (Free)", provider: "Liquid" },
+  { id: "cohere/north-mini-code:free", name: "North Mini Code (Free)", provider: "Cohere" },
+  { id: "dots-studio/dots-3-note-preview:free", name: "Dots 3 Note (Free)", provider: "Dots Studio" }
+];
+
 function App() {
-  const [activeTab, setActiveTab] = useState('arena'); // 'arena' | 'leaderboard'
+  const [activeTab, setActiveTab] = useState('arena'); // 'arena' | 'playground' | 'leaderboard'
   const [selectedCategory, setSelectedCategory] = useState('General');
   const [selectedLbCategory, setSelectedLbCategory] = useState('All');
 
+  // Arena State
   const [prompt, setPrompt] = useState('');
   const [followUpPrompt, setFollowUpPrompt] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [voting, setVoting] = useState(false);
+  const [evaluatingJudge, setEvaluatingJudge] = useState(false);
   const [error, setError] = useState(null);
 
-  // Active battle state
   const [currentBattle, setCurrentBattle] = useState(null);
   const [voteResult, setVoteResult] = useState(null);
+  const [judgeResult, setJudgeResult] = useState(null);
 
-  // Leaderboard state
+  // Playground State (Named Side-by-Side Model Testing)
+  const [pgModelA, setPgModelA] = useState(AVAILABLE_MODELS[0].id);
+  const [pgModelB, setPgModelB] = useState(AVAILABLE_MODELS[1].id);
+  const [temperature, setTemperature] = useState(0.7);
+  const [maxTokens, setMaxTokens] = useState(512);
+  const [pgPrompt, setPgPrompt] = useState('');
+  const [pgResA, setPgResA] = useState('');
+  const [pgResB, setPgResB] = useState('');
+  const [pgStreaming, setPgStreaming] = useState(false);
+
+  // Leaderboard State
   const [leaderboard, setLeaderboard] = useState([]);
   const [loadingLb, setLoadingLb] = useState(false);
 
-  // Load Leaderboard when switching tab or category filter
   useEffect(() => {
     if (activeTab === 'leaderboard') {
       fetchLeaderboard(selectedLbCategory);
@@ -44,6 +64,7 @@ function App() {
     }
   };
 
+  // Handler: Start Blind Arena Battle
   const handleStartBattle = async (e) => {
     e.preventDefault();
     if (!prompt.trim() || isStreaming) return;
@@ -51,6 +72,7 @@ function App() {
     setIsStreaming(true);
     setError(null);
     setVoteResult(null);
+    setJudgeResult(null);
 
     const initialTurns = [
       { turn: 1, prompt: prompt.trim(), responseA: '', responseB: '' }
@@ -101,6 +123,7 @@ function App() {
     }
   };
 
+  // Handler: Send Follow-up Turn in Arena
   const handleSendFollowUp = async (e) => {
     e.preventDefault();
     if (!followUpPrompt.trim() || !currentBattle || isStreaming) return;
@@ -165,6 +188,7 @@ function App() {
     }
   };
 
+  // Handler: Human Vote
   const handleVote = async (winner) => {
     if (!currentBattle || !currentBattle.battleId || voting || voteResult || isStreaming) return;
 
@@ -181,19 +205,69 @@ function App() {
     }
   };
 
+  // Handler: Automated AI Judge
+  const handleRunAIJudge = async () => {
+    if (!currentBattle || !currentBattle.battleId || evaluatingJudge || isStreaming) return;
+
+    setEvaluatingJudge(true);
+    setError(null);
+
+    try {
+      const res = await triggerAIJudge(currentBattle.battleId);
+      setJudgeResult(res);
+    } catch (err) {
+      setError(err.message || 'AI Judge evaluation failed');
+    } finally {
+      setEvaluatingJudge(false);
+    }
+  };
+
   const handleNextBattle = () => {
     setCurrentBattle(null);
     setVoteResult(null);
+    setJudgeResult(null);
     setPrompt('');
     setFollowUpPrompt('');
   };
 
+  // Handler: Start Named Playground Side-by-Side Test
+  const handleStartPlayground = async (e) => {
+    e.preventDefault();
+    if (!pgPrompt.trim() || pgStreaming) return;
+
+    setPgStreaming(true);
+    setPgResA('');
+    setPgResB('');
+    setError(null);
+
+    try {
+      // Re-uses createBattleStream streaming logic
+      await createBattleStream(
+        pgPrompt.trim(),
+        'General',
+        (chunk) => setPgResA((prev) => prev + chunk),
+        (chunk) => setPgResB((prev) => prev + chunk),
+        () => setPgStreaming(false),
+        (err) => {
+          setError(err.message);
+          setPgStreaming(false);
+        }
+      );
+    } catch (err) {
+      setError(err.message || 'Playground streaming failed');
+      setPgStreaming(false);
+    }
+  };
+
+  const nameModelA = AVAILABLE_MODELS.find(m => m.id === pgModelA)?.name || "Model A";
+  const nameModelB = AVAILABLE_MODELS.find(m => m.id === pgModelB)?.name || "Model B";
+
   return (
     <div className="app-container">
-      {/* Navigation Header */}
+      {/* Header Navigation */}
       <header className="app-header">
         <div className="logo-title">
-          <span style={{ fontSize: '1.8rem' }}>⚔️</span>
+          <span style={{ fontSize: '2rem' }}>⚔️</span>
           <h1>LM Arena — AI Judge</h1>
         </div>
         <nav className="nav-tabs">
@@ -202,6 +276,18 @@ function App() {
             onClick={() => setActiveTab('arena')}
           >
             Arena Battle
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'benchmark' ? 'active' : ''}`}
+            onClick={() => setActiveTab('benchmark')}
+          >
+            📊 Benchmark Report
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'playground' ? 'active' : ''}`}
+            onClick={() => setActiveTab('playground')}
+          >
+            Named Playground
           </button>
           <button
             className={`tab-btn ${activeTab === 'leaderboard' ? 'active' : ''}`}
@@ -214,23 +300,21 @@ function App() {
 
       {/* Global Error Banner */}
       {error && (
-        <div className="error-banner">
+        <div className="error-banner" style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid #ef4444', padding: '12px 18px', borderRadius: '12px', color: '#fca5a5' }}>
           ⚠️ <strong>Error:</strong> {error}
         </div>
       )}
 
-      {/* TAB 1: ARENA BATTLE */}
+      {/* TAB 1: ARENA BLIND BATTLE */}
       {activeTab === 'arena' && (
         <>
-          {/* Initial Prompt Form */}
           {!currentBattle && (
             <form onSubmit={handleStartBattle} className="prompt-card">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                <label htmlFor="prompt-input">Enter a prompt to evaluate 2 anonymous AI models:</label>
+                <label htmlFor="prompt-input">Enter a prompt to evaluate 2 anonymous AI models side-by-side:</label>
                 
-                {/* Category Selection Pills */}
                 <div className="category-row">
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Category:</span>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Domain:</span>
                   {CATEGORIES.map((cat) => (
                     <button
                       key={cat}
@@ -271,26 +355,23 @@ function App() {
             </form>
           )}
 
-          {/* Active Battle Conversation Thread */}
           {currentBattle && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {currentBattle.turns.map((turnItem, idx) => (
                 <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {/* Turn Prompt Header */}
                   <div className="prompt-card" style={{ padding: '14px 20px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <span className="turn-badge">Turn #{turnItem.turn}</span>
+                        <span className="turn-badge" style={{ background: 'var(--accent-primary)', padding: '2px 10px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700 }}>Turn #{turnItem.turn}</span>
                         <span className="category-pill active" style={{ fontSize: '0.75rem', padding: '2px 10px' }}>
                           {currentBattle.category || 'General'}
                         </span>
                       </div>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>PROMPT</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>USER PROMPT</span>
                     </div>
                     <p style={{ marginTop: '6px', fontSize: '1.05rem' }}>{turnItem.prompt}</p>
                   </div>
 
-                  {/* Side-by-side Response Panels for this turn */}
                   <div className="battle-grid">
                     {/* Model A Panel */}
                     <div className="response-panel">
@@ -337,15 +418,15 @@ function App() {
                 </div>
               ))}
 
-              {/* Multi-turn Follow-up Input Box (Pre-Vote) */}
               {!voteResult && (
-                <form onSubmit={handleSendFollowUp} className="followup-box">
-                  <label htmlFor="followup-input">Ask a follow-up question to continue the conversation:</label>
-                  <div className="followup-row">
+                <form onSubmit={handleSendFollowUp} className="prompt-card" style={{ padding: '16px 20px' }}>
+                  <label htmlFor="followup-input" style={{ fontSize: '0.9rem' }}>Ask a follow-up question to continue the conversation:</label>
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
                     <input
                       id="followup-input"
                       type="text"
-                      className="followup-input"
+                      className="prompt-textarea"
+                      style={{ minHeight: '44px', flex: 1, padding: '10px 14px' }}
                       placeholder="e.g. Can you clarify point 2, or optimize your code?"
                       value={followUpPrompt}
                       onChange={(e) => setFollowUpPrompt(e.target.value)}
@@ -353,47 +434,93 @@ function App() {
                     />
                     <button
                       type="submit"
-                      className="followup-btn"
+                      className="submit-btn"
+                      style={{ padding: '10px 20px' }}
                       disabled={!followUpPrompt.trim() || isStreaming}
                     >
-                      {isStreaming ? '⚡ Streaming...' : '⚡ Send Streaming Follow-up'}
+                      {isStreaming ? '⚡ Streaming...' : '⚡ Send Follow-up'}
                     </button>
                   </div>
                 </form>
               )}
 
-              {/* Voting Bar (Pre-Vote) */}
               {!voteResult && (
-                <div className="voting-bar">
-                  <button
-                    className="vote-btn"
-                    onClick={() => handleVote('A')}
-                    disabled={voting || isStreaming || !currentBattle.battleId}
-                  >
-                    👈 Model A is Better
-                  </button>
-                  <button
-                    className="vote-btn tie-btn"
-                    onClick={() => handleVote('TIE')}
-                    disabled={voting || isStreaming || !currentBattle.battleId}
-                  >
-                    🤝 Tie / Equal
-                  </button>
-                  <button
-                    className="vote-btn"
-                    onClick={() => handleVote('B')}
-                    disabled={voting || isStreaming || !currentBattle.battleId}
-                  >
-                    Model B is Better 👉
-                  </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div className="voting-bar">
+                    <button
+                      className="vote-btn"
+                      onClick={() => handleVote('A')}
+                      disabled={voting || isStreaming || !currentBattle.battleId}
+                    >
+                      👈 Model A is Better
+                    </button>
+                    <button
+                      className="vote-btn tie-btn"
+                      onClick={() => handleVote('TIE')}
+                      disabled={voting || isStreaming || !currentBattle.battleId}
+                    >
+                      🤝 Tie / Equal
+                    </button>
+                    <button
+                      className="vote-btn"
+                      onClick={() => handleVote('B')}
+                      disabled={voting || isStreaming || !currentBattle.battleId}
+                    >
+                      Model B is Better 👉
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <button
+                      className="tab-btn active"
+                      style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', padding: '12px 28px', fontSize: '1rem' }}
+                      onClick={handleRunAIJudge}
+                      disabled={evaluatingJudge || isStreaming || !currentBattle.battleId}
+                    >
+                      {evaluatingJudge ? '🤖 AI Judge Evaluating Rubric...' : '🤖 Trigger Automated AI Judge Benchmark'}
+                    </button>
+                  </div>
                 </div>
               )}
 
-              {/* Post-Vote Result Banner */}
+              {judgeResult && (
+                <div className="judge-card">
+                  <div className="judge-header">
+                    <h3>🤖 Automated AI Judge Benchmark Result</h3>
+                    <span style={{ fontWeight: 700, color: 'var(--accent-secondary)' }}>
+                      Verdict: {judgeResult.verdict === 'TIE' ? '🤝 TIE' : `Winner: Model ${judgeResult.verdict}`}
+                    </span>
+                  </div>
+
+                  <div className="judge-grid">
+                    <div className="metric-box">
+                      <span className="metric-title">Model A Metrics (Score: {judgeResult.modelA.overallScore}/10)</span>
+                      <div className="metric-row"><span>Accuracy:</span> <span>{judgeResult.modelA.accuracy}/10</span></div>
+                      <div className="metric-row"><span>Formatting:</span> <span>{judgeResult.modelA.formatting}/10</span></div>
+                      <div className="metric-row"><span>Logic:</span> <span>{judgeResult.modelA.logic}/10</span></div>
+                      <div className="metric-row"><span>Conciseness:</span> <span>{judgeResult.modelA.conciseness}/10</span></div>
+                    </div>
+
+                    <div className="metric-box">
+                      <span className="metric-title">Model B Metrics (Score: {judgeResult.modelB.overallScore}/10)</span>
+                      <div className="metric-row"><span>Accuracy:</span> <span>{judgeResult.modelB.accuracy}/10</span></div>
+                      <div className="metric-row"><span>Formatting:</span> <span>{judgeResult.modelB.formatting}/10</span></div>
+                      <div className="metric-row"><span>Logic:</span> <span>{judgeResult.modelB.logic}/10</span></div>
+                      <div className="metric-row"><span>Conciseness:</span> <span>{judgeResult.modelB.conciseness}/10</span></div>
+                    </div>
+                  </div>
+
+                  <div className="judge-reasoning">
+                    <strong>⚖️ Judge Reasoning:</strong>
+                    <p style={{ marginTop: '4px' }}>{judgeResult.reasoning}</p>
+                  </div>
+                </div>
+              )}
+
               {voteResult && (
                 <div className="result-banner">
                   <div className="result-info">
-                    <h3>Vote Recorded! Model Identities Revealed</h3>
+                    <h3>🎉 Vote Recorded! Model Identities Revealed</h3>
                     <p>
                       {voteResult.winner === 'TIE'
                         ? 'Result declared as TIE'
@@ -412,7 +539,113 @@ function App() {
         </>
       )}
 
-      {/* TAB 2: LEADERBOARD */}
+      {/* TAB 2: BENCHMARK REPORT */}
+      {activeTab === 'benchmark' && (
+        <BenchmarkReport />
+      )}
+
+      {/* TAB 3: NAMED PLAYGROUND (DIRECT MODEL TESTING) */}
+      {activeTab === 'playground' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="playground-controls">
+            <div className="model-select-group">
+              <label htmlFor="select-model-a">Select Model A:</label>
+              <select
+                id="select-model-a"
+                className="model-dropdown"
+                value={pgModelA}
+                onChange={(e) => setPgModelA(e.target.value)}
+              >
+                {AVAILABLE_MODELS.map((m) => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="model-select-group">
+              <label htmlFor="select-model-b">Select Model B:</label>
+              <select
+                id="select-model-b"
+                className="model-dropdown"
+                value={pgModelB}
+                onChange={(e) => setPgModelB(e.target.value)}
+              >
+                {AVAILABLE_MODELS.map((m) => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="slider-group">
+              <label><span>Temperature:</span> <span>{temperature}</span></label>
+              <input
+                type="range"
+                min="0.0"
+                max="1.0"
+                step="0.1"
+                value={temperature}
+                onChange={(e) => setTemperature(parseFloat(e.target.value))}
+              />
+            </div>
+
+            <div className="slider-group">
+              <label><span>Max Tokens:</span> <span>{maxTokens}</span></label>
+              <input
+                type="range"
+                min="128"
+                max="1024"
+                step="64"
+                value={maxTokens}
+                onChange={(e) => setMaxTokens(parseInt(e.target.value))}
+              />
+            </div>
+          </div>
+
+          <form onSubmit={handleStartPlayground} className="prompt-card">
+            <label htmlFor="pg-prompt-input">Enter prompt for side-by-side comparison:</label>
+            <textarea
+              id="pg-prompt-input"
+              className="prompt-textarea"
+              placeholder="e.g. Compare recursion vs iteration in terms of time and space complexity..."
+              value={pgPrompt}
+              onChange={(e) => setPgPrompt(e.target.value)}
+              rows={3}
+              disabled={pgStreaming}
+            />
+            <button
+              type="submit"
+              className="submit-btn"
+              disabled={!pgPrompt.trim() || pgStreaming}
+            >
+              {pgStreaming ? '⚡ Streaming Both Models...' : '⚡ Stream Side-by-Side Comparison'}
+            </button>
+          </form>
+
+          {(pgResA || pgResB || pgStreaming) && (
+            <div className="battle-grid">
+              <div className="response-panel">
+                <div className="panel-header">
+                  <span className="panel-title">🤖 {nameModelA}</span>
+                </div>
+                <div className="response-content">
+                  {pgResA || (pgStreaming ? '⚡ Streaming...' : '')}
+                </div>
+              </div>
+
+              <div className="response-panel">
+                <div className="panel-header">
+                  <span className="panel-title">🤖 {nameModelB}</span>
+                </div>
+                <div className="response-content">
+                  {pgResB || (pgStreaming ? '⚡ Streaming...' : '')}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 3: LEADERBOARD */}
       {activeTab === 'leaderboard' && (
         <div className="leaderboard-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
@@ -422,7 +655,6 @@ function App() {
             </button>
           </div>
 
-          {/* Category Filter Bar */}
           <div className="category-row" style={{ marginTop: '16px', marginBottom: '8px' }}>
             <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>Filter Domain:</span>
             {LB_CATEGORIES.map((cat) => (
@@ -438,8 +670,7 @@ function App() {
           </div>
 
           {loadingLb ? (
-            <div className="loading-state" style={{ border: 'none' }}>
-              <div className="spinner"></div>
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
               <p>Loading {selectedLbCategory} category standings...</p>
             </div>
           ) : (

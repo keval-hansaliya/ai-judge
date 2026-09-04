@@ -8,18 +8,23 @@ export const FREE_MODELS = [
     modelId: "nvidia/nemotron-3.5-lightning:free"
   },
   {
+    name: "Ling 3.0 Flash (Free)",
+    provider: "openrouter",
+    modelId: "inclusionai/ling-3.0-flash-fin:free"
+  },
+  {
     name: "Liquid LFM 2.5 (Free)",
     provider: "openrouter",
     modelId: "liquid/lfm-2.5-2.6b:free"
   },
   {
-    name: "Nemotron 3 Nano (Free)",
+    name: "North Mini Code (Free)",
     provider: "openrouter",
-    modelId: "nvidia/nemotron-3-nano-30b-a3b:free"
+    modelId: "cohere/north-mini-code:free"
   },
   {
-    name: "OpenRouter Auto Free",
+    name: "Dots 3 Note (Free)",
     provider: "openrouter",
-    modelId: "openrouter/free"
+    modelId: "dots-studio/dots-3-note-preview:free"
   }
 ];

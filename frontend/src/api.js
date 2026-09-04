@@ -14,10 +14,14 @@ export const setAuthToken = (token) => {
 };
 
 /**
- * Ensures user is authenticated by auto-creating/logging into a guest account if needed.
+ * Ensures user is authenticated by auto-creating/logging into a guest account.
+ * Automatically clears stale or expired tokens.
  */
-export async function ensureAuth() {
-  if (authToken) return authToken;
+export async function ensureAuth(forceRefresh = false) {
+  if (authToken && !forceRefresh) return authToken;
+
+  // Clear stale token if refreshing
+  setAuthToken(null);
 
   const guestEmail = `guest_${Math.random().toString(36).substring(2, 9)}@arena.local`;
   const guestPassword = 'Password123!';
@@ -57,16 +61,38 @@ export async function ensureAuth() {
 }
 
 /**
+ * Universal authenticated fetch with automatic 401 retry and token regeneration.
+ */
+export async function authFetch(url, options = {}) {
+  let token = await ensureAuth();
+
+  const headers = {
+    ...options.headers,
+    'Authorization': `Bearer ${token}`
+  };
+
+  let res = await fetch(url, { ...options, headers });
+
+  // If token is expired or invalid (401), refresh token once and retry automatically
+  if (res.status === 401) {
+    token = await ensureAuth(true); // force fresh token
+    const retryHeaders = {
+      ...options.headers,
+      'Authorization': `Bearer ${token}`
+    };
+    res = await fetch(url, { ...options, headers: retryHeaders });
+  }
+
+  return res;
+}
+
+/**
  * Initiates a battle with prompt
  */
 export async function createBattle(prompt) {
-  const token = await ensureAuth();
-  const res = await fetch(`${API_BASE}/battles`, {
+  const res = await authFetch(`${API_BASE}/battles`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt })
   });
 
@@ -74,20 +100,16 @@ export async function createBattle(prompt) {
   if (!res.ok) {
     throw new Error(data.message || 'Failed to create battle');
   }
-  return data.data; // { battleId, prompt, responseA, responseB, turns }
+  return data.data;
 }
 
 /**
  * Sends a follow-up prompt to an ongoing battle
  */
 export async function appendTurn(battleId, prompt) {
-  const token = await ensureAuth();
-  const res = await fetch(`${API_BASE}/battles/${battleId}/turn`, {
+  const res = await authFetch(`${API_BASE}/battles/${battleId}/turn`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt })
   });
 
@@ -95,21 +117,16 @@ export async function appendTurn(battleId, prompt) {
   if (!res.ok) {
     throw new Error(data.message || 'Failed to append turn');
   }
-  return data.data; // { battleId, turns }
+  return data.data;
 }
 
 /**
  * Streams initial battle with real-time token chunks for Model A and Model B via SSE
  */
 export async function createBattleStream(prompt, category = 'General', onChunkA, onChunkB, onDone, onError) {
-  const token = await ensureAuth();
-
-  const response = await fetch(`${API_BASE}/battles/stream`, {
+  let response = await authFetch(`${API_BASE}/battles/stream`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt, category })
   });
 
@@ -155,14 +172,9 @@ export async function createBattleStream(prompt, category = 'General', onChunkA,
  * Streams follow-up turn with real-time token chunks for Model A and Model B via SSE
  */
 export async function appendTurnStream(battleId, prompt, onChunkA, onChunkB, onDone, onError) {
-  const token = await ensureAuth();
-
-  const response = await fetch(`${API_BASE}/battles/${battleId}/turn/stream`, {
+  const response = await authFetch(`${API_BASE}/battles/${battleId}/turn/stream`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt })
   });
 
@@ -208,13 +220,9 @@ export async function appendTurnStream(battleId, prompt, onChunkA, onChunkB, onD
  * Votes on a battle result ("A", "B", "TIE")
  */
 export async function voteBattle(battleId, winner) {
-  const token = await ensureAuth();
-  const res = await fetch(`${API_BASE}/battles/${battleId}/vote`, {
+  const res = await authFetch(`${API_BASE}/battles/${battleId}/vote`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ winner })
   });
 
@@ -222,7 +230,24 @@ export async function voteBattle(battleId, winner) {
   if (!res.ok) {
     throw new Error(data.message || 'Failed to record vote');
   }
-  return data.data; // { battleId, winner, modelA: { name, oldElo, newElo }, modelB: { name, oldElo, newElo } }
+  return data.data;
+}
+
+/**
+ * Triggers automated AI Judge evaluation for a battle
+ */
+export async function triggerAIJudge(battleId) {
+  const res = await authFetch(`${API_BASE}/evaluations/judge`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ battleId })
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'AI Judge evaluation failed');
+  }
+  return data.data;
 }
 
 /**
@@ -238,5 +263,36 @@ export async function getLeaderboard(category = 'All') {
   if (!res.ok) {
     throw new Error(data.message || 'Failed to fetch leaderboard');
   }
-  return data.data; // Array of models sorted by Elo desc
+  return data.data;
+}
+
+/**
+ * Runs the standardized benchmark suite across all models
+ */
+export async function runBenchmarkSuite() {
+  const res = await authFetch(`${API_BASE}/evaluations/benchmark`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to run benchmark suite');
+  }
+  return data.data;
+}
+
+/**
+ * Retrieves the latest benchmark report
+ */
+export async function getBenchmarkReport() {
+  const res = await authFetch(`${API_BASE}/evaluations/benchmark`, {
+    method: 'GET'
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to fetch benchmark report');
+  }
+  return data.data;
 }
