@@ -4,6 +4,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { generateResponse, streamResponse } from '../services/ai.service.js';
 import { calculateElo } from '../services/elo.service.js';
+import { ARENA_HYPERPARAMETERS, CATEGORY_PRESETS } from '../config/hyperparameters.js';
 
 export const createBattle = asyncHandler(async (req, res) => {
   const { prompt, category = 'General' } = req.body;
@@ -27,10 +28,13 @@ export const createBattle = asyncHandler(async (req, res) => {
   const modelA = shuffled[0];
   const modelB = shuffled[1];
 
-  // 2. Fetch responses in parallel (reduces overall latency)
+  // Determine standardized hyperparameters (category preset if available, or arena default)
+  const battleOptions = CATEGORY_PRESETS[category] || ARENA_HYPERPARAMETERS;
+
+  // 2. Fetch responses in parallel with identical standardized hyperparameters
   const [responseA, responseB] = await Promise.all([
-    generateResponse(modelA.provider, modelA.modelId, prompt),
-    generateResponse(modelB.provider, modelB.modelId, prompt)
+    generateResponse(modelA.provider, modelA.modelId, prompt, battleOptions),
+    generateResponse(modelB.provider, modelB.modelId, prompt, battleOptions)
   ]);
 
   const initialTurns = [
@@ -102,16 +106,18 @@ export const streamBattle = asyncHandler(async (req, res) => {
   let fullA = "";
   let fullB = "";
 
+  const battleOptions = CATEGORY_PRESETS[category] || ARENA_HYPERPARAMETERS;
+
   try {
     await Promise.all([
       streamResponse(modelA.provider, modelA.modelId, prompt, (chunk) => {
         fullA += chunk;
         sendSSE('chunk_a', { text: chunk });
-      }),
+      }, battleOptions),
       streamResponse(modelB.provider, modelB.modelId, prompt, (chunk) => {
         fullB += chunk;
         sendSSE('chunk_b', { text: chunk });
-      })
+      }, battleOptions)
     ]);
 
     const initialTurns = [
@@ -199,16 +205,18 @@ export const streamTurn = asyncHandler(async (req, res) => {
   let newResponseA = "";
   let newResponseB = "";
 
+  const battleOptions = CATEGORY_PRESETS[battle.category] || ARENA_HYPERPARAMETERS;
+
   try {
     await Promise.all([
       streamResponse(battle.modelA.provider, battle.modelA.modelId, messagesA, (chunk) => {
         newResponseA += chunk;
         sendSSE('chunk_a', { text: chunk });
-      }),
+      }, battleOptions),
       streamResponse(battle.modelB.provider, battle.modelB.modelId, messagesB, (chunk) => {
         newResponseB += chunk;
         sendSSE('chunk_b', { text: chunk });
-      })
+      }, battleOptions)
     ]);
 
     const newTurn = {
@@ -286,10 +294,12 @@ export const appendTurn = asyncHandler(async (req, res) => {
   messagesA.push({ role: 'user', content: prompt.trim() });
   messagesB.push({ role: 'user', content: prompt.trim() });
 
-  // Fetch responses in parallel
+  const battleOptions = CATEGORY_PRESETS[battle.category] || ARENA_HYPERPARAMETERS;
+
+  // Fetch responses in parallel with identical standardized hyperparameters
   const [newResponseA, newResponseB] = await Promise.all([
-    generateResponse(battle.modelA.provider, battle.modelA.modelId, messagesA),
-    generateResponse(battle.modelB.provider, battle.modelB.modelId, messagesB)
+    generateResponse(battle.modelA.provider, battle.modelA.modelId, messagesA, battleOptions),
+    generateResponse(battle.modelB.provider, battle.modelB.modelId, messagesB, battleOptions)
   ]);
 
   const newTurn = {

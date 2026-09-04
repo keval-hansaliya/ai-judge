@@ -5,6 +5,7 @@ import { ApiResponse } from './src/utils/ApiResponse.js'
 import authRouter from './src/routes/auth.routes.js'
 import battleRouter from './src/routes/battle.routes.js'
 import leaderboardRouter from './src/routes/leaderboard.routes.js'
+import evaluationRouter from './src/routes/evaluation.routes.js'
 import { errorHandler } from './src/middlewares/errorHandler.js'
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/battles', battleRouter);
 app.use('/api/v1/leaderboard', leaderboardRouter);
+app.use('/api/v1/evaluations', evaluationRouter);
 
 app.get('/', (req, res) => {
   res.status(200).json(
