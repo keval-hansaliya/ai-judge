@@ -2,7 +2,10 @@ import { generateResponse } from './ai.service.js';
 import { ApiError } from '../utils/ApiError.js';
 import { JUDGE_HYPERPARAMETERS } from '../config/hyperparameters.js';
 
-const JUDGE_MODEL = "nvidia/nemotron-3.5-lightning:free";
+const JUDGE_PROVIDER = "gemini";
+const JUDGE_MODEL = "models/gemini-3.6-flash";
+const FALLBACK_PROVIDER = "groq";
+const FALLBACK_MODEL = "openai/gpt-oss-120b";
 
 const JUDGE_SYSTEM_PROMPT = `You are an expert AI Benchmark Judge. Compare Response A and Response B to the user prompt.
 Evaluate both responses across 4 criteria: Accuracy, Formatting, Logic, Conciseness (each scored 1-10).
@@ -56,10 +59,10 @@ ${responseB}`;
   try {
     let rawText = "";
     try {
-      rawText = await generateResponse("openrouter", JUDGE_MODEL, messages, judgeOptions);
+      rawText = await generateResponse(JUDGE_PROVIDER, JUDGE_MODEL, messages, judgeOptions);
     } catch (primaryErr) {
       // Fallback model if primary judge model is busy
-      rawText = await generateResponse("openrouter", "openrouter/free", messages, judgeOptions);
+      rawText = await generateResponse(FALLBACK_PROVIDER, FALLBACK_MODEL, messages, judgeOptions);
     }
 
     let cleanJson = (rawText || "").trim();
@@ -70,7 +73,7 @@ ${responseB}`;
     }
     return JSON.parse(cleanJson);
   } catch (err) {
-    console.log("ℹ️ OpenRouter API limited or unavailable. Using Heuristic AI Judge Evaluator...");
+    console.log("ℹ️ Primary AI Judge APIs unavailable. Using Heuristic AI Judge Evaluator...");
     
     // Heuristic benchmark evaluation (evaluates length, code formatting, clarity)
     const lenA = (responseA || "").length;

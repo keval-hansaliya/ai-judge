@@ -7,7 +7,7 @@
 export const ARENA_HYPERPARAMETERS = {
   temperature: 0.7,
   top_p: 0.9,
-  max_tokens: 512,
+  max_tokens: 2048,
   frequency_penalty: 0.0,
   presence_penalty: 0.0
 };
@@ -16,7 +16,7 @@ export const ARENA_HYPERPARAMETERS = {
 export const BENCHMARK_HYPERPARAMETERS = {
   temperature: 0.0,
   top_p: 1.0,
-  max_tokens: 512,
+  max_tokens: 1536,
   frequency_penalty: 0.0,
   presence_penalty: 0.0
 };
@@ -25,16 +25,16 @@ export const BENCHMARK_HYPERPARAMETERS = {
 export const JUDGE_HYPERPARAMETERS = {
   temperature: 0.0,
   top_p: 1.0,
-  max_tokens: 1024,
+  max_tokens: 2048,
   frequency_penalty: 0.0,
   presence_penalty: 0.0
 };
 
 // Category-specific presets for live Arena if desired
 export const CATEGORY_PRESETS = {
-  General: { temperature: 0.7, top_p: 0.9, max_tokens: 512, frequency_penalty: 0.0, presence_penalty: 0.0 },
-  Coding: { temperature: 0.2, top_p: 0.85, max_tokens: 768, frequency_penalty: 0.0, presence_penalty: 0.0 },
-  Math: { temperature: 0.1, top_p: 0.8, max_tokens: 512, frequency_penalty: 0.0, presence_penalty: 0.0 },
-  Reasoning: { temperature: 0.3, top_p: 0.9, max_tokens: 640, frequency_penalty: 0.0, presence_penalty: 0.0 },
-  Creative: { temperature: 0.8, top_p: 0.95, max_tokens: 512, frequency_penalty: 0.0, presence_penalty: 0.0 }
+  General: { temperature: 0.7, top_p: 0.9, max_tokens: 2048, frequency_penalty: 0.0, presence_penalty: 0.0 },
+  Coding: { temperature: 0.2, top_p: 0.85, max_tokens: 2048, frequency_penalty: 0.0, presence_penalty: 0.0 },
+  Math: { temperature: 0.1, top_p: 0.8, max_tokens: 2048, frequency_penalty: 0.0, presence_penalty: 0.0 },
+  Reasoning: { temperature: 0.3, top_p: 0.9, max_tokens: 2048, frequency_penalty: 0.0, presence_penalty: 0.0 },
+  Creative: { temperature: 0.8, top_p: 0.95, max_tokens: 2048, frequency_penalty: 0.0, presence_penalty: 0.0 }
 };

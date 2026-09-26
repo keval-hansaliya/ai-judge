@@ -3,28 +3,28 @@
  */
 export const FREE_MODELS = [
   {
-    name: "Nemotron 3.5 Lightning (Free)",
-    provider: "openrouter",
-    modelId: "nvidia/nemotron-3.5-lightning:free"
+    name: "Gemini 3.6 Flash",
+    provider: "gemini",
+    modelId: "models/gemini-3.6-flash"
   },
   {
-    name: "Ling 3.0 Flash (Free)",
-    provider: "openrouter",
-    modelId: "inclusionai/ling-3.0-flash-fin:free"
+    name: "Gemini 3.7 Flash",
+    provider: "gemini",
+    modelId: "models/gemini-3.7-flash"
   },
   {
-    name: "Liquid LFM 2.5 (Free)",
-    provider: "openrouter",
-    modelId: "liquid/lfm-2.5-2.6b:free"
+    name: "OpenAI GPT-OSS 120B",
+    provider: "groq",
+    modelId: "openai/gpt-oss-120b"
   },
   {
-    name: "North Mini Code (Free)",
-    provider: "openrouter",
-    modelId: "cohere/north-mini-code:free"
+    name: "OpenAI GPT-OSS 20B",
+    provider: "groq",
+    modelId: "openai/gpt-oss-20b"
   },
   {
-    name: "Dots 3 Note (Free)",
-    provider: "openrouter",
-    modelId: "dots-studio/dots-3-note-preview:free"
+    name: "Qwen 3.6 27B",
+    provider: "groq",
+    modelId: "qwen/qwen3.6-27b"
   }
 ];

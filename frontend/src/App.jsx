@@ -1,18 +1,22 @@
 import { useState, useEffect } from 'react';
 import { createBattleStream, appendTurnStream, voteBattle, triggerAIJudge, getLeaderboard } from './api.js';
 import { BenchmarkReport } from './components/BenchmarkReport.jsx';
+import { FormattedResponse } from './components/FormattedResponse.jsx';
 import './App.css';
 
 const CATEGORIES = ['General', 'Coding', 'Math', 'Reasoning', 'Creative'];
 const LB_CATEGORIES = ['All', 'General', 'Coding', 'Math', 'Reasoning', 'Creative'];
 
 const AVAILABLE_MODELS = [
-  { id: "nvidia/nemotron-3.5-lightning:free", name: "Nemotron 3.5 Lightning (Free)", provider: "NVIDIA" },
-  { id: "inclusionai/ling-3.0-flash-fin:free", name: "Ling 3.0 Flash (Free)", provider: "InclusionAI" },
-  { id: "liquid/lfm-2.5-2.6b:free", name: "Liquid LFM 2.5 (Free)", provider: "Liquid" },
-  { id: "cohere/north-mini-code:free", name: "North Mini Code (Free)", provider: "Cohere" },
-  { id: "dots-studio/dots-3-note-preview:free", name: "Dots 3 Note (Free)", provider: "Dots Studio" }
+  { id: "models/gemini-3.6-flash", name: "Gemini 3.6 Flash", provider: "Google" },
+  { id: "models/gemini-3.7-flash", name: "Gemini 3.7 Flash", provider: "Google" },
+  { id: "openai/gpt-oss-120b", name: "OpenAI GPT-OSS 120B", provider: "Groq" },
+  { id: "openai/gpt-oss-20b", name: "OpenAI GPT-OSS 20B", provider: "Groq" },
+  { id: "qwen/qwen3.6-27b", name: "Qwen 3.6 27B", provider: "Groq" }
 ];
+
+
+
 
 function App() {
   const [activeTab, setActiveTab] = useState('arena'); // 'arena' | 'playground' | 'leaderboard'
@@ -300,8 +304,27 @@ function App() {
 
       {/* Global Error Banner */}
       {error && (
-        <div className="error-banner" style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid #ef4444', padding: '12px 18px', borderRadius: '12px', color: '#fca5a5' }}>
-          ⚠️ <strong>Error:</strong> {error}
+        <div className="error-banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(239, 68, 68, 0.2)', border: '1px solid #ef4444', padding: '12px 18px', borderRadius: '12px', color: '#fca5a5', marginBottom: '16px', gap: '12px' }}>
+          <div style={{ flex: 1 }}>
+            ⚠️ <strong>Error:</strong> {error}
+          </div>
+          <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+            <button
+              type="button"
+              onClick={() => { setError(null); setCurrentBattle(null); }}
+              style={{ background: '#ef4444', border: 'none', color: '#fff', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}
+            >
+              🔄 New Battle
+            </button>
+            <button
+              type="button"
+              onClick={() => setError(null)}
+              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer' }}
+              title="Dismiss"
+            >
+              ✕
+            </button>
+          </div>
         </div>
       )}
 
@@ -390,7 +413,7 @@ function App() {
                         )}
                       </div>
                       <div className="response-content">
-                        {turnItem.responseA || (isStreaming && idx === currentBattle.turns.length - 1 ? '⚡ Streaming...' : '')}
+                        <FormattedResponse text={turnItem.responseA} isStreaming={isStreaming && idx === currentBattle.turns.length - 1} />
                       </div>
                     </div>
 
@@ -411,7 +434,7 @@ function App() {
                         )}
                       </div>
                       <div className="response-content">
-                        {turnItem.responseB || (isStreaming && idx === currentBattle.turns.length - 1 ? '⚡ Streaming...' : '')}
+                        <FormattedResponse text={turnItem.responseB} isStreaming={isStreaming && idx === currentBattle.turns.length - 1} />
                       </div>
                     </div>
                   </div>
@@ -628,7 +651,7 @@ function App() {
                   <span className="panel-title">🤖 {nameModelA}</span>
                 </div>
                 <div className="response-content">
-                  {pgResA || (pgStreaming ? '⚡ Streaming...' : '')}
+                  <FormattedResponse text={pgResA} isStreaming={pgStreaming} />
                 </div>
               </div>
 
@@ -637,7 +660,7 @@ function App() {
                   <span className="panel-title">🤖 {nameModelB}</span>
                 </div>
                 <div className="response-content">
-                  {pgResB || (pgStreaming ? '⚡ Streaming...' : '')}
+                  <FormattedResponse text={pgResB} isStreaming={pgStreaming} />
                 </div>
               </div>
             </div>

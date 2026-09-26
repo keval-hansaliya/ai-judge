@@ -5,7 +5,7 @@ import { FREE_MODELS } from '../src/config/freeModels.js';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Seeding free-tier OpenRouter models...");
+  console.log("Seeding verified models for Groq & Google AI...");
   await prisma.battle.deleteMany();
   await prisma.model.deleteMany();
   for (const model of FREE_MODELS) {
