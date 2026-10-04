@@ -45,13 +45,8 @@ export const runBenchmark = asyncHandler(async (req, res) => {
 });
 
 export const getBenchmark = asyncHandler(async (req, res) => {
-  let report = getLatestBenchmarkReport();
-  if (!report) {
-    // If no run cached yet, trigger initial run
-    report = await runStandardBenchmark();
-  }
-
+  const report = getLatestBenchmarkReport();
   res.status(200).json(
-    new ApiResponse(200, report, "Latest benchmark report retrieved successfully")
+    new ApiResponse(200, report, report ? "Latest benchmark report retrieved successfully" : "No benchmark report available yet")
   );
 });

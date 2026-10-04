@@ -36,7 +36,8 @@ export class OpenRouterProvider extends BaseProvider {
           max_tokens,
           frequency_penalty,
           presence_penalty
-        })
+        }),
+        signal: AbortSignal.timeout(45000)
       });
 
       if (!response.ok) {
@@ -119,7 +120,8 @@ export class OpenRouterProvider extends BaseProvider {
           max_tokens,
           frequency_penalty,
           presence_penalty
-        })
+        }),
+        signal: AbortSignal.timeout(60000)
       });
 
       if (!response.ok) {

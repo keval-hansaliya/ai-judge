@@ -32,8 +32,25 @@ export const BENCHMARK_PROMPTS = [
   }
 ];
 
-// In-memory cache for the latest benchmark run
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const CACHE_FILE = path.join(__dirname, '../../data/latest_benchmark.json');
+
+// In-memory cache for the latest benchmark run, initialized from disk if present
 let latestBenchmarkReport = null;
+try {
+  if (fs.existsSync(CACHE_FILE)) {
+    const raw = fs.readFileSync(CACHE_FILE, 'utf-8');
+    latestBenchmarkReport = JSON.parse(raw);
+    console.log("Loaded cached benchmark report from disk.");
+  }
+} catch (e) {
+  console.warn("Could not load cached benchmark report:", e.message);
+}
 
 /**
  * Runs the standardized benchmark suite across all configured models
@@ -75,8 +92,8 @@ export async function runStandardBenchmark() {
   for (const benchPrompt of BENCHMARK_PROMPTS) {
     const responses = {};
 
-    // 1. Run all models on this prompt using identical, deterministic BENCHMARK_HYPERPARAMETERS
-    for (const m of modelsToTest) {
+    // 1. Run all models concurrently on this prompt using identical, deterministic BENCHMARK_HYPERPARAMETERS
+    await Promise.all(modelsToTest.map(async (m) => {
       try {
         const result = await generateResponse(
           m.provider,
@@ -114,14 +131,12 @@ export async function runStandardBenchmark() {
           error: err.message
         };
       }
-    }
+    }));
 
-    // 2. Score each model using the deterministic AI Judge (evaluate against a reference baseline)
+    // 2. Score each model using the deterministic AI Judge concurrently
     const testedModelIds = Object.keys(responses);
-    for (let i = 0; i < testedModelIds.length; i++) {
-      const currentId = testedModelIds[i];
+    await Promise.all(testedModelIds.map(async (currentId, i) => {
       const competitorId = testedModelIds[(i + 1) % testedModelIds.length]; // compare cyclically with neighbor
-
       const curr = responses[currentId];
       const comp = responses[competitorId];
 
@@ -150,7 +165,7 @@ export async function runStandardBenchmark() {
         score: currentScore,
         judgeReasoning: judgeEval.reasoning
       });
-    }
+    }));
 
     promptResults.push({
       promptId: benchPrompt.id,
@@ -207,6 +222,17 @@ export async function runStandardBenchmark() {
   };
 
   latestBenchmarkReport = report;
+
+  // Persist report to disk so subsequent requests or server restarts load instantly
+  try {
+    const dir = path.dirname(CACHE_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(CACHE_FILE, JSON.stringify(report, null, 2), 'utf-8');
+    console.log("Persisted benchmark report to disk cache:", CACHE_FILE);
+  } catch (persistErr) {
+    console.warn("Could not persist benchmark report to disk:", persistErr.message);
+  }
+
   return report;
 }
 

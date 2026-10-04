@@ -1,4 +1,9 @@
-const API_BASE = 'http://localhost:3000/api/v1';
+// Dynamically resolve API Base from env, defaulting to relative /api/v1 (in production/proxy) or localhost:3000
+const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE) || (
+  typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+    ? `${window.location.origin}/api/v1`
+    : 'http://localhost:3000/api/v1'
+);
 
 let authToken = localStorage.getItem('ai_judge_token') || null;
 
@@ -58,6 +63,90 @@ export async function ensureAuth(forceRefresh = false) {
     console.error('Auth initialization failed:', err);
     throw err;
   }
+}
+
+/**
+ * Log in with user credentials
+ */
+export async function loginUser({ email, password }) {
+  const res = await fetch(`${API_BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email.trim(), password })
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Invalid email or password');
+  }
+
+  if (data?.data?.token) {
+    setAuthToken(data.data.token);
+  }
+  return data.data;
+}
+
+/**
+ * Register a new user account
+ */
+export async function registerUser({ name, email, password }) {
+  const res = await fetch(`${API_BASE}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: name.trim(), email: email.trim(), password })
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Registration failed');
+  }
+
+  if (data?.data?.token) {
+    setAuthToken(data.data.token);
+  }
+  return data.data;
+}
+
+/**
+ * Log out user from current session
+ */
+export async function logoutUser() {
+  try {
+    if (authToken) {
+      await fetch(`${API_BASE}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        }
+      });
+    }
+  } catch (err) {
+    console.warn('Logout request failed:', err);
+  } finally {
+    setAuthToken(null);
+  }
+}
+
+/**
+ * Get current authenticated user profile
+ */
+export async function getCurrentUser() {
+  if (!authToken) {
+    await ensureAuth();
+  }
+
+  const res = await fetch(`${API_BASE}/auth/me`, {
+    headers: {
+      'Authorization': `Bearer ${authToken}`
+    }
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to fetch user profile');
+  }
+
+  return data.data;
 }
 
 /**
@@ -122,12 +211,21 @@ export async function appendTurn(battleId, prompt) {
 
 /**
  * Streams initial battle with real-time token chunks for Model A and Model B via SSE
+ * Supports optional modelAId, modelBId, and options for Named Playground mode
  */
-export async function createBattleStream(prompt, category = 'General', onChunkA, onChunkB, onDone, onError) {
+export async function createBattleStream(prompt, category = 'General', onChunkA, onChunkB, onDone, onError, customConfig = {}) {
+  const payload = {
+    prompt,
+    category,
+    ...(customConfig.modelAId ? { modelAId: customConfig.modelAId } : {}),
+    ...(customConfig.modelBId ? { modelBId: customConfig.modelBId } : {}),
+    ...(customConfig.options ? { options: customConfig.options } : {})
+  };
+
   let response = await authFetch(`${API_BASE}/battles/stream`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt, category })
+    body: JSON.stringify(payload)
   });
 
   if (!response.ok) {
@@ -258,12 +356,12 @@ export async function getLeaderboard(category = 'All') {
     ? `${API_BASE}/leaderboard?category=${encodeURIComponent(category)}`
     : `${API_BASE}/leaderboard`;
 
-  const res = await fetch(url);
+  const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.message || 'Failed to fetch leaderboard');
   }
-  return data.data;
+  return Array.isArray(data.data) ? data.data : [];
 }
 
 /**
@@ -272,7 +370,8 @@ export async function getLeaderboard(category = 'All') {
 export async function runBenchmarkSuite() {
   const res = await authFetch(`${API_BASE}/evaluations/benchmark`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json' },
+    signal: AbortSignal.timeout(90000)
   });
 
   const data = await res.json();
@@ -287,7 +386,8 @@ export async function runBenchmarkSuite() {
  */
 export async function getBenchmarkReport() {
   const res = await authFetch(`${API_BASE}/evaluations/benchmark`, {
-    method: 'GET'
+    method: 'GET',
+    signal: AbortSignal.timeout(15000)
   });
 
   const data = await res.json();
@@ -296,3 +396,62 @@ export async function getBenchmarkReport() {
   }
   return data.data;
 }
+
+/**
+ * Retrieves paginated battle history for the authenticated user
+ */
+export async function getBattles({ page = 1, limit = 10, category = 'All', winner, search } = {}) {
+  const query = new URLSearchParams();
+  if (page) query.set('page', page);
+  if (limit) query.set('limit', limit);
+  if (category && category !== 'All') query.set('category', category);
+  if (winner) query.set('winner', winner);
+  if (search && search.trim()) query.set('search', search.trim());
+
+  const res = await authFetch(`${API_BASE}/battles?${query.toString()}`);
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to fetch battle history');
+  }
+  return data.data;
+}
+
+/**
+ * Retrieves full details and conversation turns for a specific battle
+ */
+export async function getBattleById(battleId) {
+  const res = await authFetch(`${API_BASE}/battles/${battleId}`);
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to fetch battle details');
+  }
+  return data.data;
+}
+
+/**
+ * Deletes a battle from user history
+ */
+export async function deleteBattle(battleId) {
+  const res = await authFetch(`${API_BASE}/battles/${battleId}`, {
+    method: 'DELETE'
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to delete battle');
+  }
+  return data.data;
+}
+
+/**
+ * Retrieves aggregate personal statistics for the authenticated user
+ */
+export async function getBattleStats() {
+  const res = await authFetch(`${API_BASE}/battles/stats`);
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to fetch personal battle statistics');
+  }
+  return data.data;
+}
+
+

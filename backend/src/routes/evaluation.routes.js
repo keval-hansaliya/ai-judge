@@ -5,7 +5,7 @@ import { verifyJWT } from '../middlewares/auth.middleware.js';
 const router = Router();
 
 router.post('/judge', verifyJWT, judgeEvaluation);
-router.post('/benchmark', verifyJWT, runBenchmark);
-router.get('/benchmark', verifyJWT, getBenchmark);
+router.post('/benchmark', runBenchmark);
+router.get('/benchmark', getBenchmark);
 
 export default router;

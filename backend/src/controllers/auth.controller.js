@@ -54,11 +54,29 @@ export const register = asyncHandler(async (req, res) => {
     }
   });
 
+  // Generate JWT token
+  const token = jwt.sign(
+    { id: user.id, email: user.email },
+    env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  const isProd = process.env.NODE_ENV === "production";
+  const cookieOptions = {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "None" : "Lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  };
+
+  res.cookie("accessToken", token, cookieOptions);
+
   res.status(201).json(
     new ApiResponse(
       201, 
       { 
         user,
+        token,
         passwordStrength: passwordValidation.isStrong ? "strong" : "weak" 
       }, 
       "User registered successfully"
@@ -140,7 +158,11 @@ export const logout = asyncHandler(async (req, res) => {
 });
 
 export const getMe = asyncHandler(async (req, res) => {
+  const isGuest = req.user.email?.endsWith('@arena.local') || false;
   res.status(200).json(
-    new ApiResponse(200, req.user, "Current user details retrieved")
+    new ApiResponse(200, {
+      ...req.user,
+      isGuest
+    }, "Current user details retrieved")
   );
 });

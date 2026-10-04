@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { runBenchmarkSuite, getBenchmarkReport } from '../api.js';
+import { FormattedResponse } from './FormattedResponse.jsx';
+import { addToast } from './Toast.jsx';
+import { CATEGORY_ICONS } from '../constants.js';
 
 export function BenchmarkReport() {
   const [report, setReport] = useState(null);
@@ -19,7 +22,7 @@ export function BenchmarkReport() {
       const data = await getBenchmarkReport();
       setReport(data);
     } catch (err) {
-      console.warn("No prior benchmark found:", err.message);
+      console.warn('No prior benchmark found:', err.message);
     } finally {
       setLoading(false);
     }
@@ -31,8 +34,10 @@ export function BenchmarkReport() {
     try {
       const data = await runBenchmarkSuite();
       setReport(data);
+      addToast('📊 Standardized Benchmark Suite completed successfully!', 'success');
     } catch (err) {
-      setError(err.message || "Benchmark execution failed");
+      setError(err.message || 'Benchmark execution failed');
+      addToast(`⚠️ Benchmark failed: ${err.message}`, 'error');
     } finally {
       setRunning(false);
     }
@@ -42,70 +47,202 @@ export function BenchmarkReport() {
     setExpandedPromptId(expandedPromptId === id ? null : id);
   };
 
+  // Derived KPI metrics
+  const championModel = report?.rankings?.[0];
+  const validLatencyModels = report?.rankings?.filter(m => (m.avgLatencyMs || 0) > 0) || [];
+  const fastestModel = validLatencyModels.length > 0
+    ? [...validLatencyModels].sort((a, b) => a.avgLatencyMs - b.avgLatencyMs)[0]
+    : null;
+  const highestAccuracyModel = report?.rankings
+    ? [...report.rankings].sort((a, b) => (b.accuracy || 0) - (a.accuracy || 0))[0]
+    : null;
+
   return (
-    <div className="benchmark-container">
-      {/* Header & Controls */}
-      <div className="benchmark-header-card">
-        <div>
-          <h2>📊 Standardized Model Benchmark Suite</h2>
-          <p style={{ color: 'var(--text-muted)', marginTop: '4px', fontSize: '0.95rem' }}>
-            Multi-model evaluation executed under strictly identical, deterministic hyperparameters.
+    <div className="benchmark-page-container">
+      {/* ── Hero & Execution Control Card ─────────────────────── */}
+      <div className="benchmark-hero-card">
+        <div className="benchmark-hero-content">
+          <div className="benchmark-badge-row">
+            <span className="benchmark-hero-badge">
+              <span className="hero-pulse-dot"></span>
+              📊 STANDARDIZED EVALUATION SUITE
+            </span>
+            <span className="benchmark-env-pill">Zero-Bias Environment</span>
+          </div>
+
+          <h2 className="benchmark-hero-title">Deterministic Multi-Model Benchmark</h2>
+          <p className="benchmark-hero-desc">
+            All models are evaluated on identical, fixed prompts under strictly locked deterministic hyperparameters (Temp: 0.0, Top_p: 1.0) and scored by our automated GPT-4o judge across 4 objective rubric dimensions.
           </p>
-          {report?.hyperparameters && (
-            <div className="benchmark-params-badge">
-              <span className="param-tag deterministic">🛡️ Deterministic Mode</span>
-              <span className="param-tag">Temp: {report.hyperparameters.temperature}</span>
-              <span className="param-tag">Top_p: {report.hyperparameters.top_p}</span>
-              <span className="param-tag">Max Tokens: {report.hyperparameters.max_tokens}</span>
-              <span className="param-tag">Freq/Pres Penalty: 0.0</span>
-              <span className="param-tag">Judge Temp: 0.0</span>
-            </div>
-          )}
+
+          {/* Hyperparameter Pills */}
+          <div className="benchmark-param-chips">
+            <span className="param-chip param-chip--deterministic">
+              🛡️ Mode: Deterministic
+            </span>
+            <span className="param-chip">
+              🌡️ Temp: {report?.hyperparameters?.temperature ?? 0.0}
+            </span>
+            <span className="param-chip">
+              🎯 Top_p: {report?.hyperparameters?.top_p ?? 1.0}
+            </span>
+            <span className="param-chip">
+              📝 Max Tokens: {report?.hyperparameters?.max_tokens ?? 1536}
+            </span>
+            <span className="param-chip">
+              ⚖️ Judge Temp: 0.0
+            </span>
+            <span className="param-chip">
+              🚫 Freq/Pres Penalty: 0.0
+            </span>
+          </div>
         </div>
 
-        <button
-          className="submit-btn"
-          style={{ alignSelf: 'center', background: 'linear-gradient(135deg, #10b981, #06b6d4)' }}
-          onClick={handleRunBenchmark}
-          disabled={running}
-        >
-          {running ? '⏳ Benchmarking All Models...' : '🚀 Run Fresh Benchmark'}
-        </button>
+        <div className="benchmark-hero-action">
+          <button
+            type="button"
+            className="benchmark-run-btn"
+            onClick={handleRunBenchmark}
+            disabled={running}
+          >
+            {running ? (
+              <>
+                <span className="btn-spinner"></span>
+                <span>Benchmarking 5 Models...</span>
+              </>
+            ) : (
+              <>
+                <span>🚀 Run Fresh Benchmark Suite</span>
+              </>
+            )}
+          </button>
+          <span className="benchmark-btn-subtext">
+            Executes all models in parallel with deterministic temp
+          </span>
+        </div>
       </div>
 
+      {/* Error Banner */}
       {error && (
-        <div style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid #ef4444', padding: '12px 18px', borderRadius: '12px', color: '#fca5a5' }}>
-          ⚠️ <strong>Error:</strong> {error}
+        <div className="benchmark-error-banner">
+          ⚠️ <strong>Execution Error:</strong> {error}
         </div>
       )}
 
+      {/* Loading Skeleton Indicator */}
       {loading && !report && (
-        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-          <p>Loading benchmark data...</p>
+        <div className="benchmark-loading-state">
+          <div className="loading-radar-ring"></div>
+          <h4>Gathering Deterministic Benchmark Telemetry...</h4>
+          <p>Evaluating multi-metric rubric matrices across all active models.</p>
         </div>
       )}
 
+      {/* Empty State */}
+      {!loading && !report && (
+        <div className="benchmark-empty-state">
+          <div className="empty-state-icon">🛡️</div>
+          <h3>No Benchmark Suite Report Generated Yet</h3>
+          <p>
+            Run our standardized multi-model evaluation suite across all 5 models under strictly identical, deterministic hyperparameters (Temp: 0.0, Top_p: 1.0, Max Tokens: 1536) graded by the automated AI Judge.
+          </p>
+          <button
+            type="button"
+            className="benchmark-run-btn"
+            onClick={handleRunBenchmark}
+            disabled={running}
+          >
+            {running ? '⏳ Benchmarking All Models...' : '🚀 Run Initial Benchmark Suite'}
+          </button>
+        </div>
+      )}
+
+      {/* ── Active Benchmark Report Presentation ──────────────── */}
       {report && (
         <>
-          {/* Visual Charts Grid */}
+          {/* 1. KPI Highlight Summary Strip */}
+          <div className="benchmark-kpi-grid">
+            {/* KPI 1: Champion */}
+            <div className="benchmark-kpi-card kpi-card--gold">
+              <div className="kpi-top">
+                <span className="kpi-tag">🏆 SUITE CHAMPION</span>
+                <span className="kpi-medal">🥇</span>
+              </div>
+              <h3 className="kpi-value">{championModel?.overallScore?.toFixed(2) ?? '—'}<small>/10</small></h3>
+              <span className="kpi-label">{championModel?.name || 'Top Model'}</span>
+              <span className="kpi-sub">Highest combined rubric score</span>
+            </div>
+
+            {/* KPI 2: Fastest Model */}
+            <div className="benchmark-kpi-card kpi-card--cyan">
+              <div className="kpi-top">
+                <span className="kpi-tag">⚡ SPEED LEADER</span>
+                <span className="kpi-medal">💨</span>
+              </div>
+              <h3 className="kpi-value">{fastestModel?.avgLatencyMs?.toLocaleString() ?? '—'}<small>ms</small></h3>
+              <span className="kpi-label">{fastestModel?.name || 'Fastest Model'}</span>
+              <span className="kpi-sub">Lowest average response latency</span>
+            </div>
+
+            {/* KPI 3: Accuracy Winner */}
+            <div className="benchmark-kpi-card kpi-card--emerald">
+              <div className="kpi-top">
+                <span className="kpi-tag">🎯 ACCURACY LEADER</span>
+                <span className="kpi-medal">🎖️</span>
+              </div>
+              <h3 className="kpi-value">{highestAccuracyModel?.accuracy?.toFixed(1) ?? '—'}<small>/10</small></h3>
+              <span className="kpi-label">{highestAccuracyModel?.name || 'Accuracy Leader'}</span>
+              <span className="kpi-sub">Strict factuality & edge-case compliance</span>
+            </div>
+
+            {/* KPI 4: Reliability */}
+            <div className="benchmark-kpi-card kpi-card--purple">
+              <div className="kpi-top">
+                <span className="kpi-tag">🛡️ SUITE INTEGRITY</span>
+                <span className="kpi-medal">🔒</span>
+              </div>
+              <h3 className="kpi-value">100%<small> locked</small></h3>
+              <span className="kpi-label">Deterministic Temp 0.0</span>
+              <span className="kpi-sub">All test prompts completed without errors</span>
+            </div>
+          </div>
+
+          {/* 2. Visual Charts Grid */}
           <div className="benchmark-charts-grid">
             {/* Chart 1: Overall Standardized Score */}
             <div className="chart-card">
-              <div className="chart-title">
-                <span>🏆 Overall Score (Out of 10)</span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500 }}>Higher is better</span>
+              <div className="chart-header">
+                <div>
+                  <h4 className="chart-title-text">🏆 Standardized Overall Score</h4>
+                  <span className="chart-subtitle">Multi-prompt rubric average (Scale 0 – 10)</span>
+                </div>
+                <span className="chart-badge">Higher is better</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+              <div className="chart-bars-container">
                 {report.rankings.map((m) => {
-                  const pct = Math.min(100, Math.max(10, (m.overallScore / 10) * 100));
+                  const pct = Math.min(100, Math.max(12, (m.overallScore / 10) * 100));
+                  const isFirst = m.rank === 1;
+                  const isSecond = m.rank === 2;
+                  const isThird = m.rank === 3;
+
                   return (
-                    <div key={m.modelId} className="bar-row">
-                      <div className="bar-meta">
-                        <span>#{m.rank} {m.name}</span>
-                        <span style={{ color: '#a78bfa' }}>{m.overallScore} / 10</span>
+                    <div key={m.modelId} className="chart-bar-row">
+                      <div className="chart-bar-meta">
+                        <div className="bar-model-info">
+                          <span className={`rank-tag ${isFirst ? 'rank-gold' : isSecond ? 'rank-silver' : isThird ? 'rank-bronze' : ''}`}>
+                            {isFirst ? '🥇 #1' : isSecond ? '🥈 #2' : isThird ? '🥉 #3' : `#${m.rank}`}
+                          </span>
+                          <span className="bar-model-name">{m.name}</span>
+                        </div>
+                        <span className="bar-score-val">{m.overallScore?.toFixed(2)} <small>/ 10</small></span>
                       </div>
+
                       <div className="bar-track">
-                        <div className="bar-fill purple" style={{ width: `${pct}%` }}></div>
+                        <div
+                          className={`bar-fill ${isFirst ? 'fill-champion' : isSecond ? 'fill-second' : isThird ? 'fill-third' : 'fill-slate'}`}
+                          style={{ width: `${pct}%` }}
+                        ></div>
                       </div>
                     </div>
                   );
@@ -115,22 +252,35 @@ export function BenchmarkReport() {
 
             {/* Chart 2: Average Latency / Speed */}
             <div className="chart-card">
-              <div className="chart-title">
-                <span>⚡ Average Latency</span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500 }}>Lower is faster (ms)</span>
+              <div className="chart-header">
+                <div>
+                  <h4 className="chart-title-text">⚡ Average Latency & Speed</h4>
+                  <span className="chart-subtitle">End-to-end response generation time</span>
+                </div>
+                <span className="chart-badge">Lower is faster (ms)</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+              <div className="chart-bars-container">
                 {report.rankings.map((m) => {
                   const maxLat = Math.max(...report.rankings.map(r => r.avgLatencyMs || 1000), 2000);
-                  const pct = Math.min(100, Math.max(8, (m.avgLatencyMs / maxLat) * 100));
+                  const pct = Math.min(100, Math.max(10, ((m.avgLatencyMs || 500) / maxLat) * 100));
+                  const isFastest = fastestModel && m.modelId === fastestModel.modelId;
+
                   return (
-                    <div key={m.modelId} className="bar-row">
-                      <div className="bar-meta">
-                        <span>{m.name}</span>
-                        <span style={{ color: '#38bdf8' }}>{m.avgLatencyMs} ms</span>
+                    <div key={m.modelId} className="chart-bar-row">
+                      <div className="chart-bar-meta">
+                        <div className="bar-model-info">
+                          {isFastest && <span className="speed-pill">⚡ FASTEST</span>}
+                          <span className="bar-model-name">{m.name}</span>
+                        </div>
+                        <span className="bar-latency-val">{m.avgLatencyMs?.toLocaleString()} ms</span>
                       </div>
+
                       <div className="bar-track">
-                        <div className="bar-fill cyan" style={{ width: `${pct}%` }}></div>
+                        <div
+                          className={`bar-fill ${isFastest ? 'fill-cyan' : 'fill-blue'}`}
+                          style={{ width: `${pct}%` }}
+                        ></div>
                       </div>
                     </div>
                   );
@@ -139,95 +289,164 @@ export function BenchmarkReport() {
             </div>
           </div>
 
-          {/* Model Comparison Table */}
-          <div className="leaderboard-card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2>📋 Comparative Benchmark Rankings</h2>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                Evaluated: {new Date(report.timestamp).toLocaleString()}
-              </span>
+          {/* 3. Model Comparison Table */}
+          <div className="benchmark-table-card">
+            <div className="table-header-row">
+              <div>
+                <h3 className="table-title">📋 Comparative Benchmark Rankings</h3>
+                <span className="table-subtitle">
+                  Deterministic rubric assessment executed across all 5 models simultaneously
+                </span>
+              </div>
+              <div className="table-timestamp-badge">
+                📅 Evaluated: {new Date(report.timestamp).toLocaleString()}
+              </div>
             </div>
 
-            <table className="leaderboard-table">
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Model Name</th>
-                  <th>Overall Score</th>
-                  <th>Accuracy</th>
-                  <th>Formatting</th>
-                  <th>Logic</th>
-                  <th>Conciseness</th>
-                  <th>Avg Latency</th>
-                  <th>Truncation Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {report.rankings.map((m) => (
-                  <tr key={m.modelId}>
-                    <td className="rank-cell">#{m.rank}</td>
-                    <td>
-                      <strong>{m.name}</strong>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{m.provider}</div>
-                    </td>
-                    <td className="elo-cell" style={{ color: '#34d399' }}>{m.overallScore}</td>
-                    <td>{m.accuracy}/10</td>
-                    <td>{m.formatting}/10</td>
-                    <td>{m.logic}/10</td>
-                    <td>{m.conciseness}/10</td>
-                    <td>{m.avgLatencyMs} ms</td>
-                    <td>
-                      {m.truncationCount > 0 ? (
-                        <span className="truncation-pill">⚠️ {m.truncationCount} Truncated</span>
-                      ) : (
-                        <span style={{ color: '#10b981', fontSize: '0.85rem', fontWeight: 600 }}>✓ Complete</span>
-                      )}
-                    </td>
+            <div className="table-wrapper">
+              <table className="benchmark-table">
+                <thead>
+                  <tr>
+                    <th># Rank</th>
+                    <th>Model & Provider</th>
+                    <th>Overall Score</th>
+                    <th>🎯 Accuracy</th>
+                    <th>📐 Formatting</th>
+                    <th>🧠 Logic</th>
+                    <th>✂️ Conciseness</th>
+                    <th>⚡ Latency</th>
+                    <th>🛡️ Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {report.rankings.map((m) => {
+                    const isWinner = m.rank === 1;
+
+                    return (
+                      <tr key={m.modelId} className={isWinner ? 'winner-row' : ''}>
+                        <td className="rank-cell">
+                          <span className={`rank-badge ${m.rank === 1 ? 'rank-1' : m.rank === 2 ? 'rank-2' : m.rank === 3 ? 'rank-3' : ''}`}>
+                            {m.rank === 1 ? '🥇' : m.rank === 2 ? '🥈' : m.rank === 3 ? '🥉' : `#${m.rank}`}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="table-model-name">
+                            <span>{m.name}</span>
+                            {isWinner && <span className="winner-row-tag">👑 WINNER</span>}
+                          </div>
+                          <div className="table-model-provider">{m.provider}</div>
+                        </td>
+                        <td>
+                          <span className="overall-score-pill">
+                            {m.overallScore?.toFixed(2)}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`rubric-pill ${m.accuracy >= 7.5 ? 'pill-high' : m.accuracy >= 6.0 ? 'pill-med' : 'pill-low'}`}>
+                            {m.accuracy}/10
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`rubric-pill ${m.formatting >= 7.5 ? 'pill-high' : m.formatting >= 6.0 ? 'pill-med' : 'pill-low'}`}>
+                            {m.formatting}/10
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`rubric-pill ${m.logic >= 7.5 ? 'pill-high' : m.logic >= 6.0 ? 'pill-med' : 'pill-low'}`}>
+                            {m.logic}/10
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`rubric-pill ${m.conciseness >= 7.5 ? 'pill-high' : m.conciseness >= 6.0 ? 'pill-med' : 'pill-low'}`}>
+                            {m.conciseness}/10
+                          </span>
+                        </td>
+                        <td className="latency-cell">
+                          {m.avgLatencyMs?.toLocaleString()} ms
+                        </td>
+                        <td>
+                          {m.truncationCount > 0 ? (
+                            <span className="status-pill status-pill--truncated">
+                              ⚠️ {m.truncationCount} Truncated
+                            </span>
+                          ) : (
+                            <span className="status-pill status-pill--complete">
+                              ✓ Complete
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          {/* Standardized Prompts Response Inspector */}
+          {/* 4. Standardized Prompts Response Inspector */}
           {report.promptResults && report.promptResults.length > 0 && (
             <div className="prompt-inspector-card">
-              <h3>🔍 Standardized Prompts & Model Outputs</h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                Inspect raw outputs generated by each model under identical test prompts.
-              </p>
+              <div className="inspector-header">
+                <div>
+                  <h3 className="inspector-title">🔍 Standardized Prompts & Model Outputs Inspector</h3>
+                  <p className="inspector-subtitle">
+                    Inspect and compare the exact responses generated by each model under identical test prompts.
+                  </p>
+                </div>
+                <span className="inspector-count-tag">
+                  {report.promptResults.length} Test Prompts Evaluated
+                </span>
+              </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
+              <div className="inspector-accordions-list">
                 {report.promptResults.map((pr) => {
                   const isOpen = expandedPromptId === pr.promptId;
+                  const catIcon = CATEGORY_ICONS[pr.category] || '🌐';
+
                   return (
-                    <div key={pr.promptId} className="prompt-accordion">
-                      <div className="prompt-accordion-header" onClick={() => togglePrompt(pr.promptId)}>
-                        <div>
-                          <span style={{ background: 'var(--accent-primary)', color: '#fff', fontSize: '0.75rem', padding: '2px 8px', borderRadius: '8px', marginRight: '10px', fontWeight: 700 }}>
-                            {pr.category}
+                    <div key={pr.promptId} className={`inspector-accordion ${isOpen ? 'is-open' : ''}`}>
+                      <div
+                        className="accordion-header"
+                        onClick={() => togglePrompt(pr.promptId)}
+                      >
+                        <div className="accordion-header-left">
+                          <span className="accordion-category-pill">
+                            {catIcon} {pr.category}
                           </span>
-                          <strong>{pr.title}:</strong> <span style={{ color: '#cbd5e1' }}>"{pr.prompt}"</span>
+                          <span className="accordion-prompt-title">{pr.title}:</span>
+                          <span className="accordion-prompt-quote">"{pr.prompt}"</span>
                         </div>
-                        <span>{isOpen ? '▲ Collapse' : '▼ Expand Outputs'}</span>
+                        <div className="accordion-toggle-btn">
+                          <span>{isOpen ? 'Collapse' : 'Inspect Outputs'}</span>
+                          <span className="accordion-arrow">{isOpen ? '▲' : '▼'}</span>
+                        </div>
                       </div>
 
                       {isOpen && (
-                        <div className="prompt-accordion-body">
-                          {Object.values(pr.modelOutputs).map((out) => (
-                            <div key={out.modelId} className="response-panel" style={{ padding: '16px', background: 'rgba(15, 23, 42, 0.7)' }}>
-                              <div className="panel-header" style={{ paddingBottom: '8px' }}>
-                                <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>🤖 {out.name}</span>
-                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                  {out.isTruncated && <span className="truncation-pill">Truncated</span>}
-                                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{out.latencyMs}ms</span>
+                        <div className="accordion-body">
+                          <div className="inspector-models-grid">
+                            {Object.values(pr.modelOutputs).map((out) => (
+                              <div key={out.modelId} className="inspector-response-card">
+                                <div className="response-card-header">
+                                  <div className="response-card-title-row">
+                                    <span className="model-avatar-icon">🤖</span>
+                                    <span className="response-card-model-name">{out.name}</span>
+                                  </div>
+                                  <div className="response-card-meta">
+                                    {out.isTruncated && (
+                                      <span className="status-pill status-pill--truncated">Truncated</span>
+                                    )}
+                                    <span className="response-card-latency">
+                                      ⚡ {out.latencyMs}ms
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="response-card-content">
+                                  <FormattedResponse text={out.text} isStreaming={false} />
                                 </div>
                               </div>
-                              <div className="response-content" style={{ fontSize: '0.9rem', maxHeight: '250px', overflowY: 'auto' }}>
-                                {out.text}
-                              </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>

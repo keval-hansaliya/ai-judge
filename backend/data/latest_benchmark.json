@@ -1,0 +1,603 @@
+{
+  "benchmarkId": "bm_1789754474015",
+  "timestamp": "2026-09-18T18:01:14.015Z",
+  "hyperparameters": {
+    "temperature": 0,
+    "top_p": 1,
+    "max_tokens": 1536,
+    "frequency_penalty": 0,
+    "presence_penalty": 0
+  },
+  "totalPrompts": 4,
+  "modelsTestedCount": 5,
+  "rankings": [
+    {
+      "modelId": 42,
+      "name": "Cohere North Mini Code (Free)",
+      "provider": "openrouter",
+      "openRouterModelId": "cohere/north-mini-code:free",
+      "overallScore": 7.06,
+      "accuracy": 7,
+      "formatting": 7.5,
+      "logic": 7.5,
+      "conciseness": 6.3,
+      "avgLatencyMs": 4585,
+      "truncationCount": 0,
+      "totalPromptsTested": 4,
+      "evaluations": [
+        {
+          "promptId": "gen_1",
+          "category": "General",
+          "title": "Explanation & Analogy",
+          "response": "- **Tiny Super‑Dice:** A normal computer uses bits that are either 0 or 1 (like a regular dice). A quantum computer uses “qubits” that can be 0, 1, or both at the same time (like a magical dice that shows every number at once).  \n- **Working Together:** Because qubits can be many possibilities at once, the computer can try lots of solutions all at the same time, finding the right answer much faster for tricky problems like cracking codes or exploring molecules.  \n- **Very Fragile:** Qubits need to stay super cold and be protected from tiny disturbances (like vibrations or heat), otherwise they “collapse” back to a single 0 or 1 and lose their special powers.",
+          "latencyMs": 7472,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 9,
+            "formatting": 9,
+            "logic": 10,
+            "conciseness": 7,
+            "overallScore": 8.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "code_1",
+          "category": "Coding",
+          "title": "Algorithm Implementation",
+          "response": "```python\ndef binary_search(arr, target):\n    \"\"\"\n    Perform binary search on a sorted list to find the index of target.\n\n    Parameters:\n    arr (list): A sorted list of elements (ascending order).\n    target: The element to search for.\n\n    Returns:\n    int: The index of target if found, otherwise -1.\n    \"\"\"\n    if not arr:\n        return -1\n\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n```",
+          "latencyMs": 8385,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 8,
+            "formatting": 9,
+            "logic": 8,
+            "conciseness": 7,
+            "overallScore": 8
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
+        },
+        {
+          "promptId": "math_1",
+          "category": "Math",
+          "title": "Multi-Step Word Problem",
+          "response": "**Step‑by‑step calculation**\n\n1. **Original price of the jacket**  \n   \\[\n   P_{\\text{original}} = \\$150\n   \\]\n\n2. **Calculate the 20 % discount**  \n   \\[\n   \\text{Discount amount} = 20\\% \\times \\$150 = 0.20 \\times 150 = \\$30\n   \\]\n\n3. **Subtract the discount to get the discounted price**  \n   \\[\n   P_{\\text{discounted}} = \\$150 - \\$30 = \\$120\n   \\]\n\n4. **Calculate the sales tax (8 %) on the discounted price**  \n   \\[\n   \\text{Sales tax} = 8\\% \\times \\$120 = 0.08 \\times 120 = \\$9.60\n   \\]\n\n5. **Add the tax to the discounted price to obtain the final price**  \n   \\[\n   P_{\\text{final}} = \\$120 + \\$9.60 = \\$129.60\n   \\]\n\n---\n\n\\[\n\\boxed{\\text{Final price of the jacket} = \\$129.60}\n\\]",
+          "latencyMs": 2482,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 9,
+            "formatting": 9,
+            "logic": 10,
+            "conciseness": 7,
+            "overallScore": 8.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "reason_1",
+          "category": "Reasoning",
+          "title": "Logical Deduction",
+          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 2,
+            "formatting": 3,
+            "logic": 2,
+            "conciseness": 4,
+            "overallScore": 2.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
+        }
+      ],
+      "rank": 1
+    },
+    {
+      "modelId": 40,
+      "name": "Liquid LFM 2.5 (Free)",
+      "provider": "openrouter",
+      "openRouterModelId": "liquid/lfm-2.5-2.6b:free",
+      "overallScore": 7,
+      "accuracy": 7,
+      "formatting": 7.3,
+      "logic": 7.3,
+      "conciseness": 6.5,
+      "avgLatencyMs": 2254,
+      "truncationCount": 1,
+      "totalPromptsTested": 4,
+      "evaluations": [
+        {
+          "promptId": "gen_1",
+          "category": "General",
+          "title": "Explanation & Analogy",
+          "response": "Here is how quantum computing works, explained simply:\n\n*   **Spinning Coins:** Regular computers use switches that are either ON or OFF (like a light switch). Quantum computers use \"qubits\" that are like spinning coins—they can be heads **and** tails at the same time!\n*   **Many Paths at Once:** Because these spinning qubits can be in two places at once, a quantum computer can try millions of different answers to a puzzle all at the same time, instead of one by one.\n*   **Super Fast Solutions:** This means they can solve really hard math problems—like finding the fastest route through a giant maze—much faster than any normal computer ever could.",
+          "latencyMs": 2901,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 9,
+            "formatting": 9,
+            "logic": 10,
+            "conciseness": 7,
+            "overallScore": 8.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "code_1",
+          "category": "Coding",
+          "title": "Algorithm Implementation",
+          "response": "\n\n```python\ndef binary_search(sorted_list, target):\n    \"\"\"\n    Performs binary search on a sorted list to locate a target value.\n    \n    Assumes the input list is sorted in ascending order. Returns the index \n    of the target if found, or -1 if",
+          "latencyMs": 4292,
+          "isTruncated": true,
+          "score": {
+            "accuracy": 8,
+            "formatting": 9,
+            "logic": 7,
+            "conciseness": 8,
+            "overallScore": 8
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "math_1",
+          "category": "Math",
+          "title": "Multi-Step Word Problem",
+          "response": "Here are the step-by-step calculations to find the final price:\n\n**Step 1: Calculate the discount amount**\nFirst, find 20% of the original price of $150.\n$$150 \\times 0.20 = \\$30$$\nThe discount is **$30**.\n\n**Step 2: Calculate the discounted price**\nSubtract the discount from the original price.\n$$150 - 30 = \\$120$$\nThe price after the discount is **$120**.\n\n**Step 3: Calculate the sales tax**\nNext, apply the 8% sales tax to the discounted price of $120.\n$$120 \\times 0.08 = \\$9.60$$\nThe sales tax is **$9.60**.\n\n**Step 4: Calculate the final price**\nAdd the sales tax to the discounted price.\n$$120 + 9.60 = \\$129.60$$\n\n**Answer:**\nThe final price of the jacket is **$129.60**.",
+          "latencyMs": 1823,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 9,
+            "formatting": 8,
+            "logic": 10,
+            "conciseness": 7,
+            "overallScore": 8.5
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "reason_1",
+          "category": "Reasoning",
+          "title": "Logical Deduction",
+          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 2,
+            "formatting": 3,
+            "logic": 2,
+            "conciseness": 4,
+            "overallScore": 2.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
+        }
+      ],
+      "rank": 2
+    },
+    {
+      "modelId": 43,
+      "name": "Dots 3 Note Preview (Free)",
+      "provider": "openrouter",
+      "openRouterModelId": "dots-studio/dots-3-note-preview:free",
+      "overallScore": 6.94,
+      "accuracy": 6.8,
+      "formatting": 7.8,
+      "logic": 7,
+      "conciseness": 6.3,
+      "avgLatencyMs": 5285,
+      "truncationCount": 0,
+      "totalPromptsTested": 4,
+      "evaluations": [
+        {
+          "promptId": "gen_1",
+          "category": "General",
+          "title": "Explanation & Analogy",
+          "response": "\n\nOf course! Here's how quantum computing works, explained for a 10-year-old.\n\n*   **It uses \"spinning coins\" instead of regular switches.** Regular computers use bits that are like a coin that is either heads (0) or tails (1). Quantum computers use \"qubits,\" which are like spinning coins that can be both heads *and* tails at the same time! This lets them try many possibilities all at once.\n\n*   **The coins can be magic and connected.** These spinning quantum coins can be \"entangled.\" That's a magic link where if you make one coin spin a certain way, the other one instantly knows and spins the matching way, even if it's far away. This helps them work together on a problem.\n\n*   **It's like finding the right path in a giant maze super fast.** Instead of trying every single path one by one like a normal computer, a quantum computer can explore many paths at the same time. Then, it uses the rules of the maze (called interference) to make the wrong answers cancel out and the right answer get louder, so it finds the solution much quicker.",
+          "latencyMs": 6858,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 8,
+            "formatting": 9,
+            "logic": 8,
+            "conciseness": 7,
+            "overallScore": 8
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "code_1",
+          "category": "Coding",
+          "title": "Algorithm Implementation",
+          "response": "\n\nHere's a clean Python function that implements binary search with proper documentation and edge case handling:\n\n```python\ndef binary_search(sorted_list, target):\n    \"\"\"\n    Perform binary search on a sorted list to find the target value.\n\n    Args:\n        sorted_list: A list sorted in ascending order (must be sorted for correct results)\n        target: The value to search for in the list\n\n    Returns:\n        int: The index of the target if found, otherwise -1\n\n    Examples:\n        >>> binary_search([1, 2, 3, 4, 5], 3)\n        2\n        >>> binary_search([1, 2, 3, 4, 5], 6)\n        -1\n        >>> binary_search([], 1)\n        -1\n    \"\"\"\n    # Handle empty list case\n    if not sorted_list:\n        return -1\n    \n    left = 0\n    right = len(sorted_list) - 1\n    \n    while left <= right:\n        mid = (left + right) // 2\n        \n        if sorted_list[mid] == target:\n            return mid\n        elif sorted_list[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    \n    return -1\n```\n\nKey features of this implementation:\n1. **Docstring**: Includes description, parameters, return value, and examples\n2. **Edge Case Handling**: Explicitly checks for empty list input\n3. **Type Safety**: Works with any comparable data types (numbers, strings, etc.)\n4. **Efficiency**: O(log n) time complexity and O(1) space complexity\n5. **Clear Logic**: Uses standard iterative approach with left/right pointers\n\nExample usage:\n```python\nnumbers = [1, 3, 5, 7, 9, 11]\nprint(binary_search(numbers, 7))  # Output: 3\nprint(binary_search(numbers, 2))  # Output: -1\nprint(binary_search([], 5))       # Output: -1\n```",
+          "latencyMs": 6741,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 8,
+            "formatting": 10,
+            "logic": 8,
+            "conciseness": 6,
+            "overallScore": 8
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "math_1",
+          "category": "Math",
+          "title": "Multi-Step Word Problem",
+          "response": "\n\n**Step‑by‑step calculation**\n\n1. **Find the discount amount**  \n   \\[\n   20\\% \\text{ of } \\$150 = 0.20 \\times 150 = \\$30\n   \\]\n\n2. **Subtract the discount from the original price**  \n   \\[\n   \\$150 - \\$30 = \\$120\n   \\]\n   This is the discounted price before tax.\n\n3. **Calculate the sales tax on the discounted price**  \n   \\[\n   8\\% \\text{ of } \\$120 = 0.08 \\times 120 = \\$9.60\n   \\]\n\n4. **Add the tax to the discounted price**  \n   \\[\n   \\$120 + \\$9.60 = \\$129.60\n   \\]\n\n**Final price:** \\(\\boxed{\\$129.60}\\)",
+          "latencyMs": 7540,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 9,
+            "formatting": 9,
+            "logic": 10,
+            "conciseness": 8,
+            "overallScore": 9
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "reason_1",
+          "category": "Reasoning",
+          "title": "Logical Deduction",
+          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 2,
+            "formatting": 3,
+            "logic": 2,
+            "conciseness": 4,
+            "overallScore": 2.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
+        }
+      ],
+      "rank": 3
+    },
+    {
+      "modelId": 41,
+      "name": "Ling 3.0 Flash Fin (Free)",
+      "provider": "openrouter",
+      "openRouterModelId": "inclusionai/ling-3.0-flash-fin:free",
+      "overallScore": 5.81,
+      "accuracy": 5.5,
+      "formatting": 6.3,
+      "logic": 6,
+      "conciseness": 5.5,
+      "avgLatencyMs": 2715,
+      "truncationCount": 0,
+      "totalPromptsTested": 4,
+      "evaluations": [
+        {
+          "promptId": "gen_1",
+          "category": "General",
+          "title": "Explanation & Analogy",
+          "response": "* **Normal computers are like light switches that are either on or off, but quantum computers are like spinning coins—they can be heads, tails, or *both* at the same time!** \n* Because they can be multiple things at once, quantum computers can try out lots of different answers at the same time, like solving a giant maze by trying every path at once instead of going down one hallway at a time. \n* This makes them super powerful for solving really tricky puzzles—like finding new medicines or cracking secret codes—that would take a normal computer forever to figure out!",
+          "latencyMs": 7168,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 9,
+            "formatting": 9,
+            "logic": 10,
+            "conciseness": 8,
+            "overallScore": 9
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "code_1",
+          "category": "Coding",
+          "title": "Algorithm Implementation",
+          "response": "```python\ndef binary_search(arr, target):\n    \"\"\"\n    Performs binary search on a sorted list to find the index of a target value.\n\n    Args:\n        arr (list): A sorted list of elements to search through.\n        target: The value to search for in the list.\n\n    Returns:\n        int: The index of the target if found, otherwise -1.\n    \"\"\"\n    # Handle the empty list edge case\n    if not arr:\n        return -1\n\n    left, right = 0, len(arr) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return -1\n```\n\n### How it works:\n1. **Edge Case Handling:** The function first checks if the list is empty using `if not arr`. If it is, it immediately returns `-1`.\n2. **Pointers:** It initializes two pointers, `left` (starting at index 0) and `right` (starting at the last index).\n3. **Loop:** It enters a `while` loop that continues as long as `left` is less than or equal to `right`.\n4. **Midpoint:** It calculates the middle index `mid`.\n5. **Comparison:**\n   * If the middle element equals the target, it returns the index `mid`.\n   * If the middle element is less than the target, it discards the left half by moving `left` to `mid + 1`.\n   * If the middle element is greater than the target, it discards the right half by moving `right` to `mid - 1`.\n6. **Not Found:** If the loop exits without finding the target, the function returns `-1`.",
+          "latencyMs": 3690,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 9,
+            "formatting": 10,
+            "logic": 10,
+            "conciseness": 6,
+            "overallScore": 8.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "math_1",
+          "category": "Math",
+          "title": "Multi-Step Word Problem",
+          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 2,
+            "formatting": 3,
+            "logic": 2,
+            "conciseness": 4,
+            "overallScore": 2.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "reason_1",
+          "category": "Reasoning",
+          "title": "Logical Deduction",
+          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 2,
+            "formatting": 3,
+            "logic": 2,
+            "conciseness": 4,
+            "overallScore": 2.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
+        }
+      ],
+      "rank": 4
+    },
+    {
+      "modelId": 39,
+      "name": "Nemotron 3.5 Lightning (Free)",
+      "provider": "openrouter",
+      "openRouterModelId": "nvidia/nemotron-3.5-lightning:free",
+      "overallScore": 2.75,
+      "accuracy": 2,
+      "formatting": 3,
+      "logic": 2,
+      "conciseness": 4,
+      "avgLatencyMs": 0,
+      "truncationCount": 0,
+      "totalPromptsTested": 4,
+      "evaluations": [
+        {
+          "promptId": "gen_1",
+          "category": "General",
+          "title": "Explanation & Analogy",
+          "response": "[Error generating response: AI model failed to generate a response. Please check backend integration or try again later.]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 2,
+            "formatting": 3,
+            "logic": 2,
+            "conciseness": 4,
+            "overallScore": 2.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "code_1",
+          "category": "Coding",
+          "title": "Algorithm Implementation",
+          "response": "[Error generating response: AI model failed to generate a response. Please check backend integration or try again later.]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 2,
+            "formatting": 3,
+            "logic": 2,
+            "conciseness": 4,
+            "overallScore": 2.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "math_1",
+          "category": "Math",
+          "title": "Multi-Step Word Problem",
+          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 2,
+            "formatting": 3,
+            "logic": 2,
+            "conciseness": 4,
+            "overallScore": 2.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "reason_1",
+          "category": "Reasoning",
+          "title": "Logical Deduction",
+          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 2,
+            "formatting": 3,
+            "logic": 2,
+            "conciseness": 4,
+            "overallScore": 2.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
+        }
+      ],
+      "rank": 5
+    }
+  ],
+  "promptResults": [
+    {
+      "promptId": "gen_1",
+      "category": "General",
+      "title": "Explanation & Analogy",
+      "prompt": "Explain how quantum computing works to a 10-year-old in 3 simple bullet points.",
+      "modelOutputs": {
+        "39": {
+          "modelId": 39,
+          "name": "Nemotron 3.5 Lightning (Free)",
+          "text": "[Error generating response: AI model failed to generate a response. Please check backend integration or try again later.]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "error": "AI model failed to generate a response. Please check backend integration or try again later."
+        },
+        "40": {
+          "modelId": 40,
+          "name": "Liquid LFM 2.5 (Free)",
+          "text": "Here is how quantum computing works, explained simply:\n\n*   **Spinning Coins:** Regular computers use switches that are either ON or OFF (like a light switch). Quantum computers use \"qubits\" that are like spinning coins—they can be heads **and** tails at the same time!\n*   **Many Paths at Once:** Because these spinning qubits can be in two places at once, a quantum computer can try millions of different answers to a puzzle all at the same time, instead of one by one.\n*   **Super Fast Solutions:** This means they can solve really hard math problems—like finding the fastest route through a giant maze—much faster than any normal computer ever could.",
+          "latencyMs": 2901,
+          "isTruncated": false
+        },
+        "41": {
+          "modelId": 41,
+          "name": "Ling 3.0 Flash Fin (Free)",
+          "text": "* **Normal computers are like light switches that are either on or off, but quantum computers are like spinning coins—they can be heads, tails, or *both* at the same time!** \n* Because they can be multiple things at once, quantum computers can try out lots of different answers at the same time, like solving a giant maze by trying every path at once instead of going down one hallway at a time. \n* This makes them super powerful for solving really tricky puzzles—like finding new medicines or cracking secret codes—that would take a normal computer forever to figure out!",
+          "latencyMs": 7168,
+          "isTruncated": false
+        },
+        "42": {
+          "modelId": 42,
+          "name": "Cohere North Mini Code (Free)",
+          "text": "- **Tiny Super‑Dice:** A normal computer uses bits that are either 0 or 1 (like a regular dice). A quantum computer uses “qubits” that can be 0, 1, or both at the same time (like a magical dice that shows every number at once).  \n- **Working Together:** Because qubits can be many possibilities at once, the computer can try lots of solutions all at the same time, finding the right answer much faster for tricky problems like cracking codes or exploring molecules.  \n- **Very Fragile:** Qubits need to stay super cold and be protected from tiny disturbances (like vibrations or heat), otherwise they “collapse” back to a single 0 or 1 and lose their special powers.",
+          "latencyMs": 7472,
+          "isTruncated": false
+        },
+        "43": {
+          "modelId": 43,
+          "name": "Dots 3 Note Preview (Free)",
+          "text": "\n\nOf course! Here's how quantum computing works, explained for a 10-year-old.\n\n*   **It uses \"spinning coins\" instead of regular switches.** Regular computers use bits that are like a coin that is either heads (0) or tails (1). Quantum computers use \"qubits,\" which are like spinning coins that can be both heads *and* tails at the same time! This lets them try many possibilities all at once.\n\n*   **The coins can be magic and connected.** These spinning quantum coins can be \"entangled.\" That's a magic link where if you make one coin spin a certain way, the other one instantly knows and spins the matching way, even if it's far away. This helps them work together on a problem.\n\n*   **It's like finding the right path in a giant maze super fast.** Instead of trying every single path one by one like a normal computer, a quantum computer can explore many paths at the same time. Then, it uses the rules of the maze (called interference) to make the wrong answers cancel out and the right answer get louder, so it finds the solution much quicker.",
+          "latencyMs": 6858,
+          "isTruncated": false
+        }
+      }
+    },
+    {
+      "promptId": "code_1",
+      "category": "Coding",
+      "title": "Algorithm Implementation",
+      "prompt": "Write a clean Python function that performs binary search on a sorted list. Include docstring and handle empty list edge cases.",
+      "modelOutputs": {
+        "39": {
+          "modelId": 39,
+          "name": "Nemotron 3.5 Lightning (Free)",
+          "text": "[Error generating response: AI model failed to generate a response. Please check backend integration or try again later.]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "error": "AI model failed to generate a response. Please check backend integration or try again later."
+        },
+        "40": {
+          "modelId": 40,
+          "name": "Liquid LFM 2.5 (Free)",
+          "text": "\n\n```python\ndef binary_search(sorted_list, target):\n    \"\"\"\n    Performs binary search on a sorted list to locate a target value.\n    \n    Assumes the input list is sorted in ascending order. Returns the index \n    of the target if found, or -1 if",
+          "latencyMs": 4292,
+          "isTruncated": true
+        },
+        "41": {
+          "modelId": 41,
+          "name": "Ling 3.0 Flash Fin (Free)",
+          "text": "```python\ndef binary_search(arr, target):\n    \"\"\"\n    Performs binary search on a sorted list to find the index of a target value.\n\n    Args:\n        arr (list): A sorted list of elements to search through.\n        target: The value to search for in the list.\n\n    Returns:\n        int: The index of the target if found, otherwise -1.\n    \"\"\"\n    # Handle the empty list edge case\n    if not arr:\n        return -1\n\n    left, right = 0, len(arr) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return -1\n```\n\n### How it works:\n1. **Edge Case Handling:** The function first checks if the list is empty using `if not arr`. If it is, it immediately returns `-1`.\n2. **Pointers:** It initializes two pointers, `left` (starting at index 0) and `right` (starting at the last index).\n3. **Loop:** It enters a `while` loop that continues as long as `left` is less than or equal to `right`.\n4. **Midpoint:** It calculates the middle index `mid`.\n5. **Comparison:**\n   * If the middle element equals the target, it returns the index `mid`.\n   * If the middle element is less than the target, it discards the left half by moving `left` to `mid + 1`.\n   * If the middle element is greater than the target, it discards the right half by moving `right` to `mid - 1`.\n6. **Not Found:** If the loop exits without finding the target, the function returns `-1`.",
+          "latencyMs": 3690,
+          "isTruncated": false
+        },
+        "42": {
+          "modelId": 42,
+          "name": "Cohere North Mini Code (Free)",
+          "text": "```python\ndef binary_search(arr, target):\n    \"\"\"\n    Perform binary search on a sorted list to find the index of target.\n\n    Parameters:\n    arr (list): A sorted list of elements (ascending order).\n    target: The element to search for.\n\n    Returns:\n    int: The index of target if found, otherwise -1.\n    \"\"\"\n    if not arr:\n        return -1\n\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n```",
+          "latencyMs": 8385,
+          "isTruncated": false
+        },
+        "43": {
+          "modelId": 43,
+          "name": "Dots 3 Note Preview (Free)",
+          "text": "\n\nHere's a clean Python function that implements binary search with proper documentation and edge case handling:\n\n```python\ndef binary_search(sorted_list, target):\n    \"\"\"\n    Perform binary search on a sorted list to find the target value.\n\n    Args:\n        sorted_list: A list sorted in ascending order (must be sorted for correct results)\n        target: The value to search for in the list\n\n    Returns:\n        int: The index of the target if found, otherwise -1\n\n    Examples:\n        >>> binary_search([1, 2, 3, 4, 5], 3)\n        2\n        >>> binary_search([1, 2, 3, 4, 5], 6)\n        -1\n        >>> binary_search([], 1)\n        -1\n    \"\"\"\n    # Handle empty list case\n    if not sorted_list:\n        return -1\n    \n    left = 0\n    right = len(sorted_list) - 1\n    \n    while left <= right:\n        mid = (left + right) // 2\n        \n        if sorted_list[mid] == target:\n            return mid\n        elif sorted_list[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    \n    return -1\n```\n\nKey features of this implementation:\n1. **Docstring**: Includes description, parameters, return value, and examples\n2. **Edge Case Handling**: Explicitly checks for empty list input\n3. **Type Safety**: Works with any comparable data types (numbers, strings, etc.)\n4. **Efficiency**: O(log n) time complexity and O(1) space complexity\n5. **Clear Logic**: Uses standard iterative approach with left/right pointers\n\nExample usage:\n```python\nnumbers = [1, 3, 5, 7, 9, 11]\nprint(binary_search(numbers, 7))  # Output: 3\nprint(binary_search(numbers, 2))  # Output: -1\nprint(binary_search([], 5))       # Output: -1\n```",
+          "latencyMs": 6741,
+          "isTruncated": false
+        }
+      }
+    },
+    {
+      "promptId": "math_1",
+      "category": "Math",
+      "title": "Multi-Step Word Problem",
+      "prompt": "A store has a 20% discount on a $150 jacket. Sales tax of 8% is applied to the discounted price. What is the final price? Show step-by-step calculations.",
+      "modelOutputs": {
+        "39": {
+          "modelId": 39,
+          "name": "Nemotron 3.5 Lightning (Free)",
+          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+        },
+        "40": {
+          "modelId": 40,
+          "name": "Liquid LFM 2.5 (Free)",
+          "text": "Here are the step-by-step calculations to find the final price:\n\n**Step 1: Calculate the discount amount**\nFirst, find 20% of the original price of $150.\n$$150 \\times 0.20 = \\$30$$\nThe discount is **$30**.\n\n**Step 2: Calculate the discounted price**\nSubtract the discount from the original price.\n$$150 - 30 = \\$120$$\nThe price after the discount is **$120**.\n\n**Step 3: Calculate the sales tax**\nNext, apply the 8% sales tax to the discounted price of $120.\n$$120 \\times 0.08 = \\$9.60$$\nThe sales tax is **$9.60**.\n\n**Step 4: Calculate the final price**\nAdd the sales tax to the discounted price.\n$$120 + 9.60 = \\$129.60$$\n\n**Answer:**\nThe final price of the jacket is **$129.60**.",
+          "latencyMs": 1823,
+          "isTruncated": false
+        },
+        "41": {
+          "modelId": 41,
+          "name": "Ling 3.0 Flash Fin (Free)",
+          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+        },
+        "42": {
+          "modelId": 42,
+          "name": "Cohere North Mini Code (Free)",
+          "text": "**Step‑by‑step calculation**\n\n1. **Original price of the jacket**  \n   \\[\n   P_{\\text{original}} = \\$150\n   \\]\n\n2. **Calculate the 20 % discount**  \n   \\[\n   \\text{Discount amount} = 20\\% \\times \\$150 = 0.20 \\times 150 = \\$30\n   \\]\n\n3. **Subtract the discount to get the discounted price**  \n   \\[\n   P_{\\text{discounted}} = \\$150 - \\$30 = \\$120\n   \\]\n\n4. **Calculate the sales tax (8 %) on the discounted price**  \n   \\[\n   \\text{Sales tax} = 8\\% \\times \\$120 = 0.08 \\times 120 = \\$9.60\n   \\]\n\n5. **Add the tax to the discounted price to obtain the final price**  \n   \\[\n   P_{\\text{final}} = \\$120 + \\$9.60 = \\$129.60\n   \\]\n\n---\n\n\\[\n\\boxed{\\text{Final price of the jacket} = \\$129.60}\n\\]",
+          "latencyMs": 2482,
+          "isTruncated": false
+        },
+        "43": {
+          "modelId": 43,
+          "name": "Dots 3 Note Preview (Free)",
+          "text": "\n\n**Step‑by‑step calculation**\n\n1. **Find the discount amount**  \n   \\[\n   20\\% \\text{ of } \\$150 = 0.20 \\times 150 = \\$30\n   \\]\n\n2. **Subtract the discount from the original price**  \n   \\[\n   \\$150 - \\$30 = \\$120\n   \\]\n   This is the discounted price before tax.\n\n3. **Calculate the sales tax on the discounted price**  \n   \\[\n   8\\% \\text{ of } \\$120 = 0.08 \\times 120 = \\$9.60\n   \\]\n\n4. **Add the tax to the discounted price**  \n   \\[\n   \\$120 + \\$9.60 = \\$129.60\n   \\]\n\n**Final price:** \\(\\boxed{\\$129.60}\\)",
+          "latencyMs": 7540,
+          "isTruncated": false
+        }
+      }
+    },
+    {
+      "promptId": "reason_1",
+      "category": "Reasoning",
+      "title": "Logical Deduction",
+      "prompt": "Alice, Bob, and Charlie are sitting in a row. Alice is not next to Bob. Charlie is to the right of Alice. Who is sitting in the middle? Explain your logical deduction step by step.",
+      "modelOutputs": {
+        "39": {
+          "modelId": 39,
+          "name": "Nemotron 3.5 Lightning (Free)",
+          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+        },
+        "40": {
+          "modelId": 40,
+          "name": "Liquid LFM 2.5 (Free)",
+          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+        },
+        "41": {
+          "modelId": 41,
+          "name": "Ling 3.0 Flash Fin (Free)",
+          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+        },
+        "42": {
+          "modelId": 42,
+          "name": "Cohere North Mini Code (Free)",
+          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+        },
+        "43": {
+          "modelId": 43,
+          "name": "Dots 3 Note Preview (Free)",
+          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
+          "latencyMs": 0,
+          "isTruncated": false,
+          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+        }
+      }
+    }
+  ]
+}

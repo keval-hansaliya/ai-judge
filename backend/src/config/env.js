@@ -19,11 +19,15 @@ if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY && !process.env.OPE
 }
 
 export const env = {
-  POSTGRES_URI : process.env.POSTGRES_URI,
-  DATABASE_URL : process.env.DATABASE_URL,
-  JWT_SECRET : process.env.JWT_SECRET,
-  OPENROUTER_API_KEY : process.env.OPENROUTER_API_KEY,
-  GROQ_API_KEY : process.env.GROQ_API_KEY,
-  GEMINI_API_KEY : process.env.GEMINI_API_KEY,
-  PORT : process.env.PORT,
-}
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  POSTGRES_URI: process.env.POSTGRES_URI,
+  DATABASE_URL: process.env.DATABASE_URL,
+  JWT_SECRET: process.env.JWT_SECRET,
+  OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+  GROQ_API_KEY: process.env.GROQ_API_KEY,
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+  PORT: process.env.PORT,
+  ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
+    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:3000']
+};

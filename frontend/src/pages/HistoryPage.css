@@ -1,0 +1,618 @@
+/* ==========================================================================
+   BATTLE HISTORY & PERSONAL ANALYTICS — PREMIUM DESIGN SYSTEM
+   ========================================================================== */
+
+.history-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── 1. History Cockpit Hero ── */
+.history-hero-card {
+  background: radial-gradient(120% 140% at 50% 0%, rgba(30, 41, 59, 0.6) 0%, rgba(10, 15, 29, 0.95) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 20px;
+  padding: 32px 36px 26px;
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.history-hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #06b6d4 20%, #6366f1 50%, #ec4899 80%, transparent);
+}
+
+.history-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: #a5b4fc;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 14px;
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.15);
+}
+
+.history-hero-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 10px;
+  color: #f8fafc;
+  line-height: 1.2;
+}
+
+.history-hero-subtitle {
+  font-size: 0.98rem;
+  color: #94a3b8;
+  max-width: 820px;
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+
+/* Personal Stats KPI Strip */
+.history-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.history-kpi-card {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.history-kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+.hist-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.kpi-total .hist-icon-box {
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.15);
+}
+
+.kpi-voted .hist-icon-box {
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.15);
+}
+
+.kpi-favorite .hist-icon-box {
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.15);
+}
+
+.kpi-ratio .hist-icon-box {
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.15);
+}
+
+.hist-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.hist-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.hist-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.hist-caption {
+  font-size: 0.74rem;
+  color: #64748b;
+}
+
+/* Ratio bar */
+.ratio-bar-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+  display: flex;
+  margin-top: 4px;
+}
+
+.ratio-fill-a {
+  background: #00f0ff;
+  height: 100%;
+}
+
+.ratio-fill-b {
+  background: #d946ef;
+  height: 100%;
+}
+
+.ratio-fill-tie {
+  background: #64748b;
+  height: 100%;
+}
+
+/* ── 2. Filters & Search Controls Deck ── */
+.history-controls-card {
+  background: rgba(13, 20, 36, 0.75);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 18px;
+  padding: 18px 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.history-filters-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.history-category-pills,
+.history-status-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.history-filter-pill {
+  background: rgba(30, 41, 59, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.history-filter-pill:hover:not(:disabled) {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #38bdf8;
+  transform: translateY(-1px);
+}
+
+.history-filter-pill.active {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: #818cf8;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.35);
+  font-weight: 700;
+}
+
+.history-search-input {
+  background: rgba(10, 15, 29, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 10px;
+  padding: 8px 14px 8px 36px;
+  font-size: 0.86rem;
+  color: #f8fafc;
+  outline: none;
+  min-width: 240px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.history-search-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+/* ── 3. Battle Cards Timeline ── */
+.history-cards-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.battle-history-card {
+  background: rgba(13, 20, 36, 0.75);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 18px;
+  padding: 22px 26px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.battle-history-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(148, 163, 184, 0.3);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.card-top-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meta-tags-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hist-category-tag {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.hist-turn-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hist-date-stamp {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-family: var(--font-mono, monospace);
+}
+
+.hist-winner-badge {
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-won-a {
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+}
+
+.badge-won-b {
+  background: rgba(217, 70, 239, 0.15);
+  color: #d946ef;
+  border: 1px solid rgba(217, 70, 239, 0.4);
+  box-shadow: 0 0 10px rgba(217, 70, 239, 0.15);
+}
+
+.badge-won-tie {
+  background: rgba(148, 163, 184, 0.15);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.badge-unvoted {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+/* Prompt preview quote */
+.card-prompt-quote {
+  background: rgba(10, 15, 29, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-left: 3px solid #6366f1;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.92rem;
+  color: #f1f5f9;
+  line-height: 1.5;
+}
+
+/* Matchup row */
+.card-matchup-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.competitors-preview-dock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.competitor-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.competitor-a {
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: #38bdf8;
+}
+
+.competitor-b {
+  background: rgba(217, 70, 239, 0.08);
+  border: 1px solid rgba(217, 70, 239, 0.3);
+  color: #e879f9;
+}
+
+.matchup-vs {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.card-actions-dock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-view-replay {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.25));
+  border: 1px solid rgba(99, 102, 241, 0.45);
+  color: #ffffff;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-view-replay:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.45), rgba(168, 85, 247, 0.45));
+  border-color: #818cf8;
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.3);
+}
+
+.btn-delete-battle {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-delete-battle:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #ffffff;
+}
+
+/* ── 4. Replay Modal ── */
+.modal-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.replay-modal-window {
+  background: rgba(13, 20, 36, 0.96);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 1050px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(99, 102, 241, 0.2);
+  overflow: hidden;
+}
+
+.modal-header-bar {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.modal-title-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-title-text {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.modal-close-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ffffff;
+}
+
+.modal-body-scrollable {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.replay-turn-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.replay-prompt-banner {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+
+.turn-pill-small {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(99, 102, 241, 0.18);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  margin-right: 8px;
+}
+
+.replay-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ── 5. Pagination Bar ── */
+.history-pagination-dock {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+}
+
+.pagination-btn {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(99, 102, 241, 0.45);
+  color: #ffffff;
+}
+
+.pagination-page-indicator {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .replay-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .history-filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .history-search-input {
+    width: 100%;
+  }
+}

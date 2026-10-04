@@ -4,8 +4,8 @@ import { JUDGE_HYPERPARAMETERS } from '../config/hyperparameters.js';
 
 const JUDGE_PROVIDER = "gemini";
 const JUDGE_MODEL = "models/gemini-3.6-flash";
-const FALLBACK_PROVIDER = "groq";
-const FALLBACK_MODEL = "openai/gpt-oss-120b";
+const FALLBACK_PROVIDER = "openrouter";
+const FALLBACK_MODEL = "liquid/lfm-2.5-2.6b:free";
 
 const JUDGE_SYSTEM_PROMPT = `You are an expert AI Benchmark Judge. Compare Response A and Response B to the user prompt.
 Evaluate both responses across 4 criteria: Accuracy, Formatting, Logic, Conciseness (each scored 1-10).
@@ -53,7 +53,8 @@ ${responseB}`;
 
   // Strictly pin the judge to deterministic hyperparameters (temp: 0.0)
   const judgeOptions = {
-    ...JUDGE_HYPERPARAMETERS
+    ...JUDGE_HYPERPARAMETERS,
+    max_tokens: 600
   };
 
   try {
@@ -61,7 +62,7 @@ ${responseB}`;
     try {
       rawText = await generateResponse(JUDGE_PROVIDER, JUDGE_MODEL, messages, judgeOptions);
     } catch (primaryErr) {
-      // Fallback model if primary judge model is busy
+      console.warn(`Primary judge (${JUDGE_MODEL}) failed: ${primaryErr.message}. Trying fallback (${FALLBACK_MODEL})...`);
       rawText = await generateResponse(FALLBACK_PROVIDER, FALLBACK_MODEL, messages, judgeOptions);
     }
 
@@ -71,43 +72,77 @@ ${responseB}`;
     } else if (cleanJson.includes("```")) {
       cleanJson = cleanJson.split("```")[1].split("```")[0].trim();
     }
-    return JSON.parse(cleanJson);
+
+    const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      cleanJson = jsonMatch[0];
+    }
+
+    const parsed = JSON.parse(cleanJson);
+    if (parsed.modelA && parsed.modelB && parsed.verdict) {
+      return parsed;
+    }
+    throw new Error("Missing required evaluation keys in parsed JSON");
   } catch (err) {
-    console.log("ℹ️ Primary AI Judge APIs unavailable. Using Heuristic AI Judge Evaluator...");
+    console.log(`ℹ️ AI Judge LLM evaluation unavailable (${err.message}). Using Heuristic AI Judge Evaluator...`);
     
-    // Heuristic benchmark evaluation (evaluates length, code formatting, clarity)
-    const lenA = (responseA || "").length;
-    const lenB = (responseB || "").length;
-    const hasCodeA = (responseA || "").includes("```");
-    const hasCodeB = (responseB || "").includes("```");
+    // Heuristic benchmark evaluation with dynamic, differentiated multi-criteria scoring
+    const textA = (responseA || "").trim();
+    const textB = (responseB || "").trim();
+    const lenA = textA.length;
+    const lenB = textB.length;
 
-    let scoreA = 7.5 + (hasCodeA ? 1.0 : 0) + (lenA > 100 ? 0.5 : 0);
-    let scoreB = 7.5 + (hasCodeB ? 1.0 : 0) + (lenB > 100 ? 0.5 : 0);
+    const isErrA = !textA || textA.startsWith("[Error") || textA.startsWith("HTTP error");
+    const isErrB = !textB || textB.startsWith("[Error") || textB.startsWith("HTTP error");
 
-    scoreA = Math.min(10, Math.max(1, Math.round(scoreA * 10) / 10));
-    scoreB = Math.min(10, Math.max(1, Math.round(scoreB * 10) / 10));
+    const evalText = (text, len, isErr) => {
+      if (isErr) {
+        return { accuracy: 2, formatting: 3, logic: 2, conciseness: 4, overallScore: 2.75 };
+      }
+
+      const hasCode = text.includes("```");
+      const hasBullets = /(?:^|\n)\s*[-*•\d]\.?\s+/m.test(text);
+      const hasStructure = text.includes("\n\n") || hasBullets || hasCode;
+      const hasReasoningWords = /\b(because|therefore|since|step|first|second|conclude|result|thus)\b/i.test(text);
+
+      // Formatting score (1-10)
+      let formatting = 6 + (hasStructure ? 2 : 0) + (hasCode ? 1 : 0) + (hasBullets ? 1 : 0);
+      formatting = Math.min(10, Math.max(4, formatting));
+
+      // Logic score (1-10)
+      let logic = 6 + (hasReasoningWords ? 2 : 0) + (len > 80 ? 1 : 0) + (len > 250 ? 1 : 0);
+      logic = Math.min(10, Math.max(4, logic));
+
+      // Conciseness score (1-10)
+      let conciseness = 8;
+      if (len > 1200) conciseness = 6;
+      else if (len > 600) conciseness = 7;
+      else if (len < 40) conciseness = 5;
+
+      // Accuracy score (1-10)
+      let accuracy = 7 + (len > 100 ? 1 : 0) + (hasReasoningWords ? 1 : 0);
+      accuracy = Math.min(10, Math.max(5, accuracy));
+
+      const overallScore = Math.round(((accuracy + formatting + logic + conciseness) / 4) * 100) / 100;
+      return { accuracy, formatting, logic, conciseness, overallScore };
+    };
+
+    const scoreA = evalText(textA, lenA, isErrA);
+    const scoreB = evalText(textB, lenB, isErrB);
 
     let verdict = "TIE";
-    if (scoreA > scoreB) verdict = "A";
-    if (scoreB > scoreA) verdict = "B";
+    if (scoreA.overallScore > scoreB.overallScore) verdict = "A";
+    else if (scoreB.overallScore > scoreA.overallScore) verdict = "B";
 
     return {
-      modelA: {
-        accuracy: Math.min(10, Math.round(scoreA)),
-        formatting: hasCodeA ? 9 : 8,
-        logic: Math.min(10, Math.round(scoreA)),
-        conciseness: lenA < 500 ? 9 : 7,
-        overallScore: scoreA
-      },
-      modelB: {
-        accuracy: Math.min(10, Math.round(scoreB)),
-        formatting: hasCodeB ? 9 : 8,
-        logic: Math.min(10, Math.round(scoreB)),
-        conciseness: lenB < 500 ? 9 : 7,
-        overallScore: scoreB
-      },
+      modelA: scoreA,
+      modelB: scoreB,
       verdict,
-      reasoning: `Heuristic Judge Benchmark: ${verdict === 'TIE' ? 'Both models provided equally valid completions' : `Model ${verdict} structured its response with better formatting and clarity`}. (Deterministic evaluation)`
+      reasoning: `Deterministic Heuristic Evaluation: ${
+        verdict === 'TIE' 
+          ? 'Both models provided balanced, well-structured completions' 
+          : `Model ${verdict} demonstrated higher structural quality, clarity, and reasoning completeness.`
+      }`
     };
   }
 }
