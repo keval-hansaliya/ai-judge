@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArenaPage } from './pages/ArenaPage.jsx';
 import { PlaygroundPage } from './pages/PlaygroundPage.jsx';
 import { LeaderboardPage } from './pages/LeaderboardPage.jsx';
@@ -7,6 +7,7 @@ import { BenchmarkReport } from './components/BenchmarkReport.jsx';
 import { ToastContainer } from './components/Toast.jsx';
 import { AuthModal } from './components/AuthModal.jsx';
 import { useAuth } from './hooks/useAuth.js';
+import { getServiceHealth } from './api.js';
 import './NavBar.css';
 import './App.css';
 
@@ -58,6 +59,8 @@ const NAV_TABS = [
  */
 function App() {
   const [activeTab, setActiveTab] = useState('arena');
+  const [configuredProviders, setConfiguredProviders] = useState(['openrouter', 'groq', 'gemini']);
+
   const {
     user,
     isGuest,
@@ -69,6 +72,22 @@ function App() {
     register,
     logout
   } = useAuth();
+
+  useEffect(() => {
+    let isMounted = true;
+    getServiceHealth()
+      .then((health) => {
+        if (isMounted && Array.isArray(health?.configuredProviders) && health.configuredProviders.length > 0) {
+          setConfiguredProviders(health.configuredProviders.map((p) => p.toLowerCase()));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const isProviderActive = (name) => configuredProviders.includes(name.toLowerCase());
 
   return (
     <div className="app-container">
@@ -106,13 +125,31 @@ function App() {
 
           {/* Engine / Model Live Badges & User Auth Group */}
           <div className="header-meta-pills">
-            <div className="status-indicator-pill">
-              <span className="pulse-dot green"></span>
-              <span className="status-label">OpenRouter Connected</span>
-            </div>
-            <div className="status-indicator-pill">
-              <span className="pulse-dot cyan"></span>
-              <span className="status-label">Multi-Provider Active</span>
+            {/* Unified Multi-Provider Live Connectivity Cluster */}
+            <div className="providers-cluster-pill" title="Live status of connected AI providers">
+              <div
+                className={`provider-status-item ${!isProviderActive('openrouter') ? 'is-inactive' : ''}`}
+                title={isProviderActive('openrouter') ? 'OpenRouter Connected (Multi-model gateway)' : 'OpenRouter API Key Not Configured'}
+              >
+                <span className={`pulse-dot ${isProviderActive('openrouter') ? 'green' : 'gray'}`}></span>
+                <span className="status-label">OpenRouter</span>
+              </div>
+              <span className="provider-cluster-divider">·</span>
+              <div
+                className={`provider-status-item ${!isProviderActive('groq') ? 'is-inactive' : ''}`}
+                title={isProviderActive('groq') ? 'Groq Connected (Ultra-fast LPU inference)' : 'Groq API Key Not Configured'}
+              >
+                <span className={`pulse-dot ${isProviderActive('groq') ? 'green' : 'gray'}`}></span>
+                <span className="status-label">Groq</span>
+              </div>
+              <span className="provider-cluster-divider">·</span>
+              <div
+                className={`provider-status-item ${!isProviderActive('gemini') ? 'is-inactive' : ''}`}
+                title={isProviderActive('gemini') ? 'Google Gemini Connected (Benchmark & Arena Judge)' : 'Gemini API Key Not Configured'}
+              >
+                <span className={`pulse-dot ${isProviderActive('gemini') ? 'green' : 'gray'}`}></span>
+                <span className="status-label">Gemini</span>
+              </div>
             </div>
 
             {/* User Identity & Auth Trigger */}

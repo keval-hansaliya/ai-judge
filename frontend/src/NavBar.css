@@ -160,6 +160,15 @@
   box-shadow: 0 0 10px #00f0ff;
 }
 
+.pulse-dot.gray {
+  background: #64748b;
+  box-shadow: none;
+}
+
+.pulse-dot.gray::after {
+  display: none;
+}
+
 .pulse-dot::after {
   content: '';
   position: absolute;
@@ -177,6 +186,48 @@
 
 .status-label {
   font-weight: 600;
+}
+
+/* Multi-Provider Cluster Pill */
+.providers-cluster-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.providers-cluster-pill:hover {
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.provider-status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  cursor: default;
+  transition: opacity 0.2s ease;
+}
+
+.provider-status-item.is-inactive {
+  opacity: 0.45;
+}
+
+.provider-cluster-divider {
+  color: #475569;
+  font-weight: 700;
+  font-size: 0.85rem;
+  line-height: 1;
 }
 
 /* User Identity & Auth Buttons in Header */

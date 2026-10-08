@@ -69,7 +69,7 @@ const authLimiter = rateLimit({
 app.use('/api/v1/auth', authLimiter);
 
 // 5. Health Check & Diagnostics Endpoint
-app.get('/health', async (req, res) => {
+app.get(['/health', '/api/v1/health'], async (req, res) => {
   let dbStatus = "connected";
   try {
     await prisma.$queryRaw`SELECT 1`;

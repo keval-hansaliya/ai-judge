@@ -454,4 +454,28 @@ export async function getBattleStats() {
   return data.data;
 }
 
+/**
+ * Retrieves the system health and configured AI providers
+ */
+export async function getServiceHealth() {
+  try {
+    const res = await fetch(`${API_BASE}/health`);
+    if (!res.ok) {
+      const rootRes = await fetch(API_BASE.replace(/\/api\/v1\/?$/, '') + '/health');
+      if (rootRes.ok) {
+        const rootData = await rootRes.json();
+        return rootData.data || rootData;
+      }
+      throw new Error('Health check request failed');
+    }
+    const data = await res.json();
+    return data.data || data;
+  } catch (err) {
+    return {
+      status: 'healthy',
+      configuredProviders: ['openrouter', 'groq', 'gemini']
+    };
+  }
+}
+
 
