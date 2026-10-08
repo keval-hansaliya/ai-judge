@@ -321,7 +321,7 @@ export function ArenaPage() {
           )}
 
           {/* AI Judge result card */}
-          <JudgeCard judgeResult={judgeResult} />
+          <JudgeCard judgeResult={judgeResult} voteResult={voteResult} />
 
           {/* Post-vote reveal banner */}
           <ResultBanner voteResult={voteResult} onNextBattle={handleNextBattle} />

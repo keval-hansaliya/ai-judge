@@ -1380,6 +1380,7 @@
   flex-direction: column;
   align-items: center;
   min-width: 80px;
+  max-width: 150px;
 }
 
 .model-score-badge.model-a {
@@ -1396,8 +1397,12 @@
   font-size: 0.72rem;
   font-weight: 700;
   color: #94a3b8;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .badge-val {
@@ -1444,6 +1449,11 @@
 .legend-chip {
   font-size: 0.74rem;
   font-weight: 700;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
 }
 
 .legend-chip--a { color: #22d3ee; }

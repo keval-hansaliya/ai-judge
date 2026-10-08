@@ -5,13 +5,30 @@
  *  - judgeResult: { verdict, reasoning, modelA, modelB }
  *    modelA/modelB: { overallScore, accuracy, formatting, logic, conciseness }
  */
-export function JudgeCard({ judgeResult }) {
+export function JudgeCard({ judgeResult, voteResult, modelAName, modelBName }) {
   if (!judgeResult) return null;
 
   const { verdict, reasoning, modelA, modelB } = judgeResult;
 
+  const isRevealed = Boolean(voteResult?.modelA?.name || modelAName);
+  const nameA = voteResult?.modelA?.name || modelAName || 'Model A';
+  const nameB = voteResult?.modelB?.name || modelBName || 'Model B';
+
   const isTie = verdict === 'TIE';
   const scoreDiff = Math.abs((modelA?.overallScore || 0) - (modelB?.overallScore || 0)).toFixed(1);
+
+  const winnerName = verdict === 'A' ? nameA : verdict === 'B' ? nameB : null;
+
+  // Enhance reasoning text with revealed model names if identities are known
+  const displayReasoning = reasoning
+    ? (isRevealed
+        ? reasoning
+            .replace(/\bModel A\b/g, nameA)
+            .replace(/\bModel B\b/g, nameB)
+            .replace(/\bResponse A\b/g, `${nameA}'s response`)
+            .replace(/\bResponse B\b/g, `${nameB}'s response`)
+        : reasoning)
+    : null;
 
   const criteriaList = [
     { key: 'accuracy', label: 'Accuracy & Correctness', icon: '🎯' },
@@ -39,20 +56,26 @@ export function JudgeCard({ judgeResult }) {
             {isTie ? (
               <span>🤝 AI Verdict: <strong style={{ color: '#fbbf24' }}>Draw / Even Match</strong></span>
             ) : (
-              <span>🏆 AI Verdict: <strong style={{ color: verdict === 'A' ? 'var(--accent-cyan)' : 'var(--accent-secondary)' }}>Model {verdict} Wins</strong> {scoreDiff > 0 && <span className="verdict-diff-pill">+{scoreDiff} pts</span>}</span>
+              <span>
+                🏆 AI Verdict:{' '}
+                <strong style={{ color: verdict === 'A' ? 'var(--accent-cyan)' : 'var(--accent-secondary)' }}>
+                  {winnerName} Wins
+                </strong>{' '}
+                {scoreDiff > 0 && <span className="verdict-diff-pill">+{scoreDiff} pts</span>}
+              </span>
             )}
           </h3>
         </div>
 
         {/* Overall Score Badges */}
         <div className="judge-overall-summary">
-          <div className="model-score-badge model-a">
-            <span className="badge-tag">Model A</span>
+          <div className="model-score-badge model-a" title={nameA}>
+            <span className="badge-tag">{nameA}</span>
             <span className="badge-val">{modelA?.overallScore?.toFixed(1) ?? '—'}<small>/10</small></span>
           </div>
           <span className="score-vs-divider">vs</span>
-          <div className="model-score-badge model-b">
-            <span className="badge-tag">Model B</span>
+          <div className="model-score-badge model-b" title={nameB}>
+            <span className="badge-tag">{nameB}</span>
             <span className="badge-val">{modelB?.overallScore?.toFixed(1) ?? '—'}<small>/10</small></span>
           </div>
         </div>
@@ -63,8 +86,8 @@ export function JudgeCard({ judgeResult }) {
         <div className="rubric-deck-header">
           <span>EVALUATION RUBRIC</span>
           <div className="rubric-legend">
-            <span className="legend-chip legend-chip--a">🔵 Model A</span>
-            <span className="legend-chip legend-chip--b">🟣 Model B</span>
+            <span className="legend-chip legend-chip--a" title={nameA}>🔵 {nameA}</span>
+            <span className="legend-chip legend-chip--b" title={nameB}>🟣 {nameB}</span>
           </div>
         </div>
 
@@ -82,8 +105,8 @@ export function JudgeCard({ judgeResult }) {
                     <span className="rubric-icon">{icon}</span> {label}
                   </span>
                   <div className="rubric-scores-quick">
-                    <span className={`score-tag score-tag--a ${getScoreColorClass(valA)}`}>A: {valA}/10</span>
-                    <span className={`score-tag score-tag--b ${getScoreColorClass(valB)}`}>B: {valB}/10</span>
+                    <span className={`score-tag score-tag--a ${getScoreColorClass(valA)}`} title={`${nameA}: ${valA}/10`}>A: {valA}/10</span>
+                    <span className={`score-tag score-tag--b ${getScoreColorClass(valB)}`} title={`${nameB}: ${valB}/10`}>B: {valB}/10</span>
                   </div>
                 </div>
 
@@ -93,7 +116,7 @@ export function JudgeCard({ judgeResult }) {
                     <div
                       className="progress-fill fill--a"
                       style={{ width: `${pctA}%` }}
-                      title={`Model A: ${valA}/10`}
+                      title={`${nameA}: ${valA}/10`}
                     />
                   </div>
                   {/* Model B bar */}
@@ -101,7 +124,7 @@ export function JudgeCard({ judgeResult }) {
                     <div
                       className="progress-fill fill--b"
                       style={{ width: `${pctB}%` }}
-                      title={`Model B: ${valB}/10`}
+                      title={`${nameB}: ${valB}/10`}
                     />
                   </div>
                 </div>
@@ -112,12 +135,12 @@ export function JudgeCard({ judgeResult }) {
       </div>
 
       {/* Judge Reasoning Quote */}
-      {reasoning && (
+      {displayReasoning && (
         <div className="judge-reasoning-card">
           <div className="judge-reasoning-header">
             <span>⚖️ Impartial Deliberation</span>
           </div>
-          <p className="judge-reasoning-text">“{reasoning}”</p>
+          <p className="judge-reasoning-text">“{displayReasoning}”</p>
         </div>
       )}
     </div>
