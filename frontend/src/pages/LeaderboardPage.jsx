@@ -114,8 +114,10 @@ export function LeaderboardPage() {
             <div className="kpi-icon-box">🏆</div>
             <div className="kpi-text-block">
               <span className="kpi-label">Arena Champion</span>
-              <span className="kpi-value">{topModel ? topModel.name : 'Awaiting Data'}</span>
-              <span className="kpi-caption">
+              <span className="kpi-value" title={topModel ? topModel.name : 'Awaiting Data'}>
+                {topModel ? topModel.name : 'Awaiting Data'}
+              </span>
+              <span className="kpi-caption" title={topModel ? `Elo ${topModel.elo} · Rank #1` : 'No matches'}>
                 {topModel ? `Elo ${topModel.elo} · Rank #1` : 'No matches'}
               </span>
             </div>
@@ -125,7 +127,9 @@ export function LeaderboardPage() {
             <div className="kpi-icon-box">⚔️</div>
             <div className="kpi-text-block">
               <span className="kpi-label">Completed Battles</span>
-              <span className="kpi-value">{uniqueBattlesEstimated} Matches</span>
+              <span className="kpi-value" title={`${uniqueBattlesEstimated} Matches (${totalBattlesCount} evaluations)`}>
+                {uniqueBattlesEstimated} Matches
+              </span>
               <span className="kpi-caption">{totalBattlesCount} total evaluations</span>
             </div>
           </div>
@@ -134,7 +138,9 @@ export function LeaderboardPage() {
             <div className="kpi-icon-box">🤖</div>
             <div className="kpi-text-block">
               <span className="kpi-label">Evaluated Models</span>
-              <span className="kpi-value">{leaderboard.length} Contenders</span>
+              <span className="kpi-value" title={`${leaderboard.length} Tier-ranked Contenders`}>
+                {leaderboard.length} Models
+              </span>
               <span className="kpi-caption">Tier-ranked LLMs</span>
             </div>
           </div>
@@ -146,7 +152,7 @@ export function LeaderboardPage() {
               <span className="kpi-value">
                 {bestWinRateModel ? `${bestWinRatePercent}%` : 'N/A'}
               </span>
-              <span className="kpi-caption">
+              <span className="kpi-caption" title={bestWinRateModel ? bestWinRateModel.name : 'Pending battles'}>
                 {bestWinRateModel ? bestWinRateModel.name : 'Pending battles'}
               </span>
             </div>
