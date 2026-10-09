@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useBattle } from '../hooks/useBattle.js';
 import { FormattedResponse } from '../components/FormattedResponse.jsx';
 import { VotingBar } from '../components/VotingBar.jsx';
@@ -29,8 +29,8 @@ const QUICK_STARTERS = [
  *  3. Follow-up multi-turn dock, human voting deck, and automated AI Judge summon
  *  4. Post-vote identity reveal + Elo badges + rubric comparison
  */
-export function ArenaPage() {
-  const [selectedCategory, setSelectedCategory] = useState('General');
+export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory || 'General');
 
   const {
     prompt, setPrompt,
@@ -40,6 +40,15 @@ export function ArenaPage() {
     handleStartBattle, handleSendFollowUp,
     handleVote, handleRunAIJudge, handleNextBattle,
   } = useBattle();
+
+  useEffect(() => {
+    if (initialPrompt) {
+      setPrompt(initialPrompt);
+    }
+    if (initialCategory && CATEGORIES.includes(initialCategory)) {
+      setSelectedCategory(initialCategory);
+    }
+  }, [initialPrompt, initialCategory, setPrompt]);
 
   // Wrap vote to emit toast feedback
   const handleVoteWithToast = async (winner) => {

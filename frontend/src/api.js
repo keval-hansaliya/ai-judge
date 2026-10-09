@@ -365,6 +365,25 @@ export async function getLeaderboard(category = 'All') {
 }
 
 /**
+ * Obtains an AI-driven model recommendation for a specific use case and priority vector
+ */
+export async function getModelRecommendation(useCase, priority = 'balanced') {
+  const res = await fetch(`${API_BASE}/leaderboard/recommend`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ useCase, priority }),
+    signal: AbortSignal.timeout(30000)
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to generate model recommendation');
+  }
+  return data.data;
+}
+
+
+/**
  * Runs the standardized benchmark suite across all models
  */
 export async function runBenchmarkSuite() {

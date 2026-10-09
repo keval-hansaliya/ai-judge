@@ -1,7 +1,9 @@
 import { prisma } from '../config/db.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
+import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { calculateElo } from '../services/elo.service.js';
+import { recommendModelForUseCase } from '../services/recommender.service.js';
 
 export const getLeaderboard = asyncHandler(async (req, res) => {
   const { category } = req.query;
@@ -12,6 +14,8 @@ export const getLeaderboard = asyncHandler(async (req, res) => {
       select: {
         id: true,
         name: true,
+        provider: true,
+        modelId: true,
         elo: true,
         wins: true,
         losses: true,
@@ -40,6 +44,8 @@ export const getLeaderboard = asyncHandler(async (req, res) => {
     modelStats[m.id] = {
       id: m.id,
       name: m.name,
+      provider: m.provider,
+      modelId: m.modelId,
       elo: 1000,
       wins: 0,
       losses: 0,
@@ -79,3 +85,21 @@ export const getLeaderboard = asyncHandler(async (req, res) => {
     new ApiResponse(200, sortedList, `${category} category leaderboard retrieved successfully`)
   );
 });
+
+export const recommendModel = asyncHandler(async (req, res) => {
+  const { useCase, priority = 'balanced' } = req.body;
+
+  if (!useCase || typeof useCase !== 'string' || useCase.trim().length < 3) {
+    throw new ApiError(400, 'Please provide a valid use case description (at least 3 characters).');
+  }
+
+  const recommendation = await recommendModelForUseCase({
+    useCase: useCase.trim(),
+    priority: priority || 'balanced'
+  });
+
+  return res.status(200).json(
+    new ApiResponse(200, recommendation, 'Model recommendation generated successfully')
+  );
+});
+
