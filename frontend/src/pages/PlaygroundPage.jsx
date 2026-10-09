@@ -3,6 +3,24 @@ import { createBattleStream } from '../api.js';
 import { FormattedResponse } from '../components/FormattedResponse.jsx';
 import { addToast } from '../components/Toast.jsx';
 import { AVAILABLE_MODELS, RANDOM_PROMPTS, PROVIDER_META } from '../constants.js';
+import {
+  Sparkles,
+  SlidersHorizontal,
+  ArrowLeftRight,
+  Play,
+  RotateCcw,
+  Shuffle,
+  Trash2,
+  Cpu,
+  CheckCircle2,
+  Thermometer,
+  Hash,
+  Layers,
+  Check,
+  Zap,
+  Copy,
+  AlertCircle
+} from 'lucide-react';
 import './PlaygroundPage.css';
 
 /**
@@ -10,19 +28,19 @@ import './PlaygroundPage.css';
  */
 const PLAYGROUND_STARTERS = [
   {
-    label: '⚖️ Recursion vs Iteration',
+    label: 'Recursion vs Iteration',
     prompt: 'Compare recursion and iteration in computer science. Analyze memory overhead, call stack limits, and performance tradeoffs with concise Python code examples.',
   },
   {
-    label: '⚡ Rust vs Go Concurrency',
+    label: 'Rust vs Go Concurrency',
     prompt: 'Compare concurrency paradigms between Rust (async/await, tokio, ownership) and Go (goroutines, channels). Which is better suited for high-throughput cloud microservices and why?',
   },
   {
-    label: '🧠 Quantum Computing 101',
+    label: 'Quantum Computing 101',
     prompt: 'Explain quantum superposition and quantum entanglement to a high school senior interested in physics. Use clear, intuitive real-world analogies without mathematical jargon.',
   },
   {
-    label: '🎨 Satirical Tech Press Release',
+    label: 'Satirical Press Release',
     prompt: 'Write a hilarious, satirical Silicon Valley press release announcing "AI-Powered Organic Water 2.0" featuring blockchain hydration tracking and neural electrolyte delivery.',
   },
 ];
@@ -196,35 +214,36 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
   return (
     <div className="playground-page-container">
       {/* ── 1. Playground Hero Cockpit ── */}
+      {/* ── 1. Playground Cockpit Hero ── */}
       <div className="playground-hero-card">
         <div className="playground-badge">
-          <span className="live-dot"></span>
-          <span>MULTI-PROVIDER MODEL COMPARISON LAB</span>
+          <span className="live-dot-clean"></span>
+          <span>Model Comparison Lab</span>
         </div>
         <h2 className="playground-hero-title">
-          Named Model Playground <span className="gradient-text">&amp; Parameter Lab</span>
+          Named Model Playground
         </h2>
         <p className="playground-hero-subtitle">
-          Pit models head-to-head across Groq, Google DeepMind, and OpenRouter. Compare latency, architectural styles, and output quality in real time.
+          Compare models head-to-head across Groq, Google DeepMind, and OpenRouter with customizable hyperparameters.
         </p>
 
         {/* Live Parameter Quick-Glance Bar */}
         <div className="playground-live-params-bar">
-          <div className="param-summary-pill a-pill">
-            <span className="pill-dot a-dot"></span>
+          <div className="param-summary-pill">
             <span className="pill-label">Model A:</span>
             <span className="pill-val">{modelAObj.name}</span>
           </div>
-          <div className="param-summary-pill b-pill">
-            <span className="pill-dot b-dot"></span>
+          <div className="param-summary-pill">
             <span className="pill-label">Model B:</span>
             <span className="pill-val">{modelBObj.name}</span>
           </div>
-          <div className="param-summary-pill temp-pill">
-            <span>🌡️ Temp: <strong>{temperature.toFixed(1)}</strong></span>
+          <div className="param-summary-pill">
+            <Thermometer className="icon-xs text-muted" />
+            <span>Temp: <strong>{temperature.toFixed(1)}</strong></span>
           </div>
-          <div className="param-summary-pill tokens-pill">
-            <span>📏 Max Tokens: <strong>{maxTokens}</strong></span>
+          <div className="param-summary-pill">
+            <Hash className="icon-xs text-muted" />
+            <span>Max Tokens: <strong>{maxTokens}</strong></span>
           </div>
         </div>
       </div>
@@ -235,24 +254,16 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
         <div className="model-cockpit-card model-a-cockpit">
           <div className="cockpit-card-header">
             <div className="cockpit-header-left">
-              <span className="cockpit-badge badge-a">MODEL A COMPETITOR</span>
-              <span
-                className="cockpit-provider-tag"
-                style={{
-                  color: PROVIDER_META[modelAObj.provider]?.color || '#a855f7',
-                  backgroundColor: PROVIDER_META[modelAObj.provider]?.bgColor || 'rgba(168, 85, 247, 0.15)',
-                  borderColor: PROVIDER_META[modelAObj.provider]?.borderColor || 'rgba(168, 85, 247, 0.35)',
-                }}
-              >
-                {PROVIDER_META[modelAObj.provider]?.icon || '🌐'} {PROVIDER_META[modelAObj.provider]?.name || modelAObj.provider}
+              <span className="cockpit-badge badge-a">Model A</span>
+              <span className="cockpit-provider-tag">
+                {modelAObj.provider}
               </span>
             </div>
-            <span className="cockpit-accent-indicator dot-a"></span>
           </div>
 
           <div className="cockpit-card-body">
             <label className="cockpit-label" htmlFor="select-model-a">
-              Select Competitor Alpha:
+              Select Model Alpha:
             </label>
             <select
               id="select-model-a"
@@ -268,7 +279,8 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
             <div className="model-spec-sheet">
               <div className="spec-meta-row">
                 <span className="spec-context-badge">
-                  🧠 Context: <strong>{modelAObj.contextWindow || '32K'}</strong>
+                  <Layers className="icon-xs" />
+                  <span>{modelAObj.contextWindow || '32K'} context</span>
                 </span>
                 <span className="spec-id-mono">{modelAObj.id}</span>
               </div>
@@ -293,7 +305,7 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
             disabled={pgStreaming}
             title="Swap Model A and Model B"
           >
-            <span className="swap-icon">⇄</span>
+            <ArrowLeftRight className="icon-sm" />
             <span className="swap-label">Swap</span>
           </button>
         </div>
@@ -302,24 +314,16 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
         <div className="model-cockpit-card model-b-cockpit">
           <div className="cockpit-card-header">
             <div className="cockpit-header-left">
-              <span className="cockpit-badge badge-b">MODEL B COMPETITOR</span>
-              <span
-                className="cockpit-provider-tag"
-                style={{
-                  color: PROVIDER_META[modelBObj.provider]?.color || '#a855f7',
-                  backgroundColor: PROVIDER_META[modelBObj.provider]?.bgColor || 'rgba(168, 85, 247, 0.15)',
-                  borderColor: PROVIDER_META[modelBObj.provider]?.borderColor || 'rgba(168, 85, 247, 0.35)',
-                }}
-              >
-                {PROVIDER_META[modelBObj.provider]?.icon || '🌐'} {PROVIDER_META[modelBObj.provider]?.name || modelBObj.provider}
+              <span className="cockpit-badge badge-b">Model B</span>
+              <span className="cockpit-provider-tag">
+                {modelBObj.provider}
               </span>
             </div>
-            <span className="cockpit-accent-indicator dot-b"></span>
           </div>
 
           <div className="cockpit-card-body">
             <label className="cockpit-label" htmlFor="select-model-b">
-              Select Competitor Beta:
+              Select Model Beta:
             </label>
             <select
               id="select-model-b"
@@ -335,7 +339,8 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
             <div className="model-spec-sheet">
               <div className="spec-meta-row">
                 <span className="spec-context-badge">
-                  🧠 Context: <strong>{modelBObj.contextWindow || '32K'}</strong>
+                  <Layers className="icon-xs" />
+                  <span>{modelBObj.contextWindow || '32K'} context</span>
                 </span>
                 <span className="spec-id-mono">{modelBObj.id}</span>
               </div>
@@ -356,7 +361,10 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
       <div className="tuning-deck-card">
         <div className="tuning-deck-header">
           <div className="tuning-deck-title-row">
-            <span className="tuning-deck-badge">🎛️ HYPERPARAMETER LAB</span>
+            <span className="tuning-deck-badge">
+              <SlidersHorizontal size={13} />
+              <span>HYPERPARAMETER LAB</span>
+            </span>
             <span className="tuning-deck-subtext">Calibrate generation parameters applied simultaneously to both models</span>
           </div>
         </div>
@@ -366,7 +374,9 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
           <div className="tuning-item-card">
             <div className="tuning-item-header">
               <div className="tuning-item-title-wrap">
-                <span className="tuning-icon">🌡️</span>
+                <span className="tuning-icon-box">
+                  <Thermometer size={16} />
+                </span>
                 <div>
                   <div className="tuning-title">Temperature</div>
                   <div className="tuning-caption">Creativity vs strict determinism</div>
@@ -403,7 +413,7 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
                 onClick={() => setTemperature(0.0)}
                 disabled={pgStreaming}
               >
-                🎯 Precise 0.0
+                Precise 0.0
               </button>
               <button
                 type="button"
@@ -411,7 +421,7 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
                 onClick={() => setTemperature(0.7)}
                 disabled={pgStreaming}
               >
-                ⚖️ Balanced 0.7
+                Balanced 0.7
               </button>
               <button
                 type="button"
@@ -419,7 +429,7 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
                 onClick={() => setTemperature(1.0)}
                 disabled={pgStreaming}
               >
-                🎨 Creative 1.0
+                Creative 1.0
               </button>
             </div>
           </div>
@@ -428,7 +438,9 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
           <div className="tuning-item-card">
             <div className="tuning-item-header">
               <div className="tuning-item-title-wrap">
-                <span className="tuning-icon">📏</span>
+                <span className="tuning-icon-box">
+                  <Hash size={16} />
+                </span>
                 <div>
                   <div className="tuning-title">Max Tokens</div>
                   <div className="tuning-caption">Upper response limit (~{Math.round(maxTokens * 0.75)} words)</div>
@@ -465,7 +477,7 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
                 onClick={() => setMaxTokens(256)}
                 disabled={pgStreaming}
               >
-                ⚡ Quick 256
+                Quick 256
               </button>
               <button
                 type="button"
@@ -473,7 +485,7 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
                 onClick={() => setMaxTokens(512)}
                 disabled={pgStreaming}
               >
-                📄 Standard 512
+                Standard 512
               </button>
               <button
                 type="button"
@@ -481,7 +493,7 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
                 onClick={() => setMaxTokens(1024)}
                 disabled={pgStreaming}
               >
-                📚 Deep 1024
+                Deep 1024
               </button>
             </div>
           </div>
@@ -493,7 +505,7 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
         {/* Starter Prompts Bar */}
         <div className="playground-starters-card">
           <div className="starters-header">
-            <span className="starters-title">💡 CURATED BENCHMARK PROMPTS:</span>
+            <span className="starters-title">CURATED BENCHMARK PROMPTS</span>
             <span className="starters-hint">Click any starter to load instant comparison</span>
           </div>
           <div className="starters-chips-row">
@@ -515,7 +527,7 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
         <form onSubmit={handleStartPlayground} className="playground-form-card">
           <div className="prompt-form-header">
             <div className="prompt-header-left">
-              <span className="prompt-badge">💬 INPUT COMPARISON PROMPT</span>
+              <span className="prompt-badge">INPUT COMPARISON PROMPT</span>
               <span className="prompt-shortcut-hint">
                 Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to stream
               </span>
@@ -548,7 +560,8 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
                 onClick={handleRandomPrompt}
                 disabled={pgStreaming}
               >
-                🎲 Random Prompt
+                <Shuffle size={14} />
+                <span>Random Prompt</span>
               </button>
               {(pgPrompt || pgResA || pgResB) && (
                 <button
@@ -557,7 +570,8 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
                   onClick={handleClearAll}
                   disabled={pgStreaming}
                 >
-                  🧹 Clear All
+                  <Trash2 size={14} />
+                  <span>Clear All</span>
                 </button>
               )}
             </div>
@@ -574,7 +588,7 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
                 </>
               ) : (
                 <>
-                  <span>⚡</span>
+                  <Play size={15} fill="currentColor" />
                   <span>Stream Side-by-Side Comparison</span>
                 </>
               )}
@@ -586,7 +600,7 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
       {/* ── 5. Error Alert ── */}
       {error && (
         <div className="playground-error-card">
-          <span className="error-icon">⚠️</span>
+          <AlertCircle size={16} className="error-icon" />
           <div className="error-body">
             <strong>Stream Error:</strong> {error}
           </div>
@@ -641,7 +655,8 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
                         onClick={() => handleCopy(pgResA, modelAObj.name)}
                         title="Copy Model A response"
                       >
-                        📋 Copy
+                        <Copy size={13} />
+                        <span>Copy</span>
                       </button>
                     </div>
                   ) : (
@@ -699,7 +714,8 @@ export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
                         onClick={() => handleCopy(pgResB, modelBObj.name)}
                         title="Copy Model B response"
                       >
-                        📋 Copy
+                        <Copy size={13} />
+                        <span>Copy</span>
                       </button>
                     </div>
                   ) : (

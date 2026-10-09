@@ -1,52 +1,71 @@
 import { useState } from 'react';
 import { getModelRecommendation } from '../api.js';
 import { addToast } from './Toast.jsx';
+import {
+  Sparkles,
+  Zap,
+  Code2,
+  Calculator,
+  Brain,
+  PenTool,
+  FileText,
+  Check,
+  Info,
+  Swords,
+  FlaskConical,
+  Target,
+  RotateCcw,
+  Lightbulb,
+  ArrowRight,
+  Gauge,
+  Coins,
+  ShieldCheck
+} from 'lucide-react';
 
-// Quick starter presets for instant testing
 const WORKLOAD_PRESETS = [
   {
-    icon: '⚡',
-    label: 'Real-time JSON Extraction',
+    icon: Zap,
+    label: 'JSON Extraction',
     priority: 'speed',
-    text: 'Ultra-low latency extraction of structured JSON from unstructured invoices and emails (<300ms latency requirement).'
+    text: 'Ultra-low latency extraction of structured JSON from unstructured invoices and emails with sub-300ms SLA.'
   },
   {
-    icon: '💻',
-    label: 'Python Code Refactoring',
+    icon: Code2,
+    label: 'Code Refactoring',
     priority: 'quality',
-    text: 'Analyze complex Python repositories, identify edge-case concurrency bugs, and generate robust unit tests.'
+    text: 'Analyze complex repositories, detect edge-case concurrency bugs, and generate robust unit tests.'
   },
   {
-    icon: '📐',
-    label: 'Formal Math & Proofs',
+    icon: Calculator,
+    label: 'Math & Proofs',
     priority: 'quality',
-    text: 'Solve multi-step university-level calculus, linear algebra, and formal mathematical proofs with rigorous Chain-of-Thought.'
+    text: 'Solve university-level calculus, linear algebra, and formal mathematical proofs with rigorous Chain-of-Thought.'
   },
   {
-    icon: '🧠',
-    label: 'Logic & Deductive Puzzles',
+    icon: Brain,
+    label: 'Logic & Reasoning',
     priority: 'balanced',
-    text: 'Evaluate riddle arguments, detect logical fallacies, and solve complex lateral reasoning puzzles.'
+    text: 'Evaluate riddle arguments, detect logical fallacies, and solve complex deductive reasoning problems.'
   },
   {
-    icon: '🎨',
-    label: 'Nuanced Creative Writing',
+    icon: PenTool,
+    label: 'Creative Writing',
     priority: 'balanced',
-    text: 'Draft immersive science fiction stories with believable dialogue, vivid worldbuilding, and distinct character voices.'
+    text: 'Draft long-form narrative with consistent character voice, nuanced dialogue, and structured pacing.'
   },
   {
-    icon: '📄',
-    label: 'Long Document Synthesis',
+    icon: FileText,
+    label: 'Long Documents',
     priority: 'quality',
-    text: 'Analyze 100K+ token technical whitepapers and legal contracts, synthesizing key liabilities and obligations.'
+    text: 'Analyze 100K+ token technical papers and agreements, synthesizing key liabilities and terms.'
   }
 ];
 
 const PRIORITY_OPTIONS = [
-  { id: 'balanced', label: 'Balanced', icon: '⚖️', desc: 'Optimal Quality & Speed' },
-  { id: 'quality', label: 'Peak Elo', icon: '👑', desc: 'Maximum Capability' },
-  { id: 'speed', label: 'Ultra Speed', icon: '⚡', desc: 'Lowest Latency (<300ms)' },
-  { id: 'cost', label: 'Budget / Free', icon: '💰', desc: 'Maximum Efficiency' }
+  { id: 'balanced', label: 'Balanced', desc: 'Balanced accuracy and latency' },
+  { id: 'quality', label: 'High Precision', desc: 'Highest reasoning and Elo performance' },
+  { id: 'speed', label: 'Low Latency', desc: 'Fastest token streaming and high TPS' },
+  { id: 'cost', label: 'Efficiency', desc: 'Cost-effective and scalable throughput' }
 ];
 
 export function ModelMatchmaker({ onHighlightModel, onNavigate }) {
@@ -76,10 +95,10 @@ export function ModelMatchmaker({ onHighlightModel, onNavigate }) {
     try {
       const data = await getModelRecommendation(useCase.trim(), priority);
       setRecommendation(data);
-      addToast(`✨ Matchmaker found top model: ${data.primaryRecommendation?.modelName}`, 'success');
+      addToast(`Selected ${data.primaryRecommendation?.modelName}`, 'success');
     } catch (err) {
       setError(err.message || 'Failed to generate recommendation. Please try again.');
-      addToast('Error analyzing workload: ' + (err.message || 'Server error'), 'error');
+      addToast('Analysis error: ' + (err.message || 'Server error'), 'error');
     } finally {
       setLoading(false);
     }
@@ -91,7 +110,7 @@ export function ModelMatchmaker({ onHighlightModel, onNavigate }) {
   };
 
   const handleHighlight = (recItem) => {
-    if (onHighlightModel) {
+    if (onHighlightModel && recItem) {
       onHighlightModel(recItem.databaseId, recItem.modelId, recItem.modelName);
     }
   };
@@ -102,7 +121,7 @@ export function ModelMatchmaker({ onHighlightModel, onNavigate }) {
         prompt: useCase.trim(),
         category: recommendation?.domain || 'General'
       });
-      addToast('Switched to Arena Battle with preloaded workload prompt!', 'info');
+      addToast('Workload loaded into Arena Battle', 'info');
     }
   };
 
@@ -112,64 +131,66 @@ export function ModelMatchmaker({ onHighlightModel, onNavigate }) {
         modelId,
         prompt: useCase.trim()
       });
-      addToast('Opened model in Named Playground lab!', 'info');
+      addToast('Model loaded into Named Playground', 'info');
     }
   };
 
   return (
-    <div className="matchmaker-container">
-      {/* ── Matchmaker Header Deck ── */}
-      <div className="matchmaker-header">
-        <div className="matchmaker-badge">
-          <span className="matchmaker-pulse-dot"></span>
-          <span>AI MODEL MATCHMAKER • WORKLOAD ADVISOR</span>
+    <section className="shadcn-matchmaker-card" aria-label="Model Matchmaker">
+      {/* ── Top Header ── */}
+      <div className="matchmaker-header-group">
+        <div className="matchmaker-badge-clean">
+          <Sparkles className="icon-xs" />
+          <span>Model Advisor</span>
         </div>
-        <h3 className="matchmaker-title">
-          Find the Ideal Model for Your <span className="gradient-text">Exact Use Case</span>
-        </h3>
-        <p className="matchmaker-subtitle">
-          Describe your task, latency target, or prompt. Our engine correlates real-time Arena Elo,
-          inference throughput, and architectural strengths to select the optimal model.
-        </p>
+        <div className="matchmaker-title-block">
+          <h3 className="matchmaker-heading-clean">Find the right model for your workload</h3>
+          <p className="matchmaker-subheading-clean">
+            Describe your task, latency target, or constraints. Models are matched using real-time
+            Arena Elo benchmarks, context capacity, and throughput characteristics.
+          </p>
+        </div>
       </div>
 
       {/* ── Quick Starter Presets ── */}
-      <div className="matchmaker-presets-strip">
-        <span className="presets-label">Workload Presets:</span>
-        <div className="presets-scroll-track">
-          {WORKLOAD_PRESETS.map((p, idx) => (
-            <button
-              key={idx}
-              type="button"
-              className="preset-chip"
-              onClick={() => handlePresetClick(p)}
-              disabled={loading}
-              title={p.text}
-            >
-              <span>{p.icon}</span>
-              <span>{p.label}</span>
-            </button>
-          ))}
+      <div className="matchmaker-presets-container">
+        <span className="presets-caption">Presets:</span>
+        <div className="presets-pill-list">
+          {WORKLOAD_PRESETS.map((p, idx) => {
+            const Icon = p.icon;
+            return (
+              <button
+                key={idx}
+                type="button"
+                className="preset-pill-clean"
+                onClick={() => handlePresetClick(p)}
+                disabled={loading}
+              >
+                <Icon className="icon-xs text-muted-dim" />
+                <span>{p.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* ── Input Box & Priority Selectors ── */}
-      <form className="matchmaker-form" onSubmit={handleRecommend}>
-        <div className="matchmaker-input-wrapper">
+      {/* ── Textarea & Priority Bar ── */}
+      <form onSubmit={handleRecommend} className="matchmaker-form-clean">
+        <div className="textarea-container-clean">
           <textarea
-            className="matchmaker-textarea"
+            className="shadcn-textarea"
             rows="3"
-            placeholder="e.g. I am building a customer support triage agent that needs to parse messy user complaints into JSON with strict accuracy and sub-500ms latency..."
+            placeholder="e.g. Inbound support ticket triage requiring classification into strict JSON schemas with sub-400ms latency..."
             value={useCase}
             onChange={(e) => setUseCase(e.target.value)}
             disabled={loading}
           />
-          <div className="matchmaker-textarea-footer">
-            <span className="char-count">{useCase.length} characters</span>
+          <div className="textarea-meta-bar">
+            <span className="char-count-clean">{useCase.length} characters</span>
             {useCase && (
               <button
                 type="button"
-                className="clear-input-btn"
+                className="clear-link-clean"
                 onClick={() => setUseCase('')}
                 disabled={loading}
               >
@@ -179,53 +200,53 @@ export function ModelMatchmaker({ onHighlightModel, onNavigate }) {
           </div>
         </div>
 
-        {/* Priority Controls Bar */}
-        <div className="matchmaker-controls-row">
-          <div className="priority-selector-group">
-            <span className="control-label">Optimization Goal:</span>
-            <div className="priority-pill-cluster">
+        {/* Controls row */}
+        <div className="matchmaker-action-bar">
+          <div className="priority-segmented-group">
+            <span className="priority-label-clean">Priority:</span>
+            <div className="segmented-control">
               {PRIORITY_OPTIONS.map((opt) => (
                 <button
                   key={opt.id}
                   type="button"
-                  className={`priority-pill ${priority === opt.id ? 'active' : ''}`}
+                  className={`segmented-button ${priority === opt.id ? 'active' : ''}`}
                   onClick={() => setPriority(opt.id)}
                   disabled={loading}
                   title={opt.desc}
                 >
-                  <span className="priority-icon">{opt.icon}</span>
-                  <span className="priority-name">{opt.label}</span>
+                  {opt.label}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="matchmaker-submit-cluster">
+          <div className="submit-group-clean">
             {recommendation && (
               <button
                 type="button"
-                className="matchmaker-reset-btn"
+                className="btn-outline-clean"
                 onClick={handleClear}
                 disabled={loading}
               >
-                Reset Results
+                <RotateCcw className="icon-xs" />
+                <span>Reset</span>
               </button>
             )}
 
             <button
               type="submit"
-              className="matchmaker-submit-btn"
+              className="btn-primary-clean"
               disabled={loading || !useCase.trim()}
             >
               {loading ? (
                 <>
-                  <span className="btn-spinner"></span>
-                  <span>Analyzing Matrix...</span>
+                  <span className="spinner-clean"></span>
+                  <span>Analyzing...</span>
                 </>
               ) : (
                 <>
-                  <span>✨</span>
-                  <span>Find Best Model</span>
+                  <Sparkles className="icon-xs" />
+                  <span>Recommend Model</span>
                 </>
               )}
             </button>
@@ -233,227 +254,241 @@ export function ModelMatchmaker({ onHighlightModel, onNavigate }) {
         </div>
       </form>
 
-      {/* ── Error Notice ── */}
+      {/* ── Error Banner ── */}
       {error && (
-        <div className="matchmaker-error-banner">
-          <span>⚠️</span>
+        <div className="alert-destructive-clean">
+          <Info className="icon-sm" />
           <span>{error}</span>
         </div>
       )}
 
-      {/* ── Recommendation Showcase Card ── */}
+      {/* ── Recommendations Grid ── */}
       {recommendation && (
-        <div className="matchmaker-results-showcase">
-          {/* Workload Profile Banner */}
-          <div className="results-profile-header">
-            <div className="profile-domain-pill">
-              <span className="domain-icon">
-                {recommendation.domain === 'Coding' && '💻'}
-                {recommendation.domain === 'Math' && '📐'}
-                {recommendation.domain === 'Reasoning' && '🧠'}
-                {recommendation.domain === 'Creative' && '🎨'}
-                {recommendation.domain === 'General' && '🌐'}
-              </span>
-              <span>{recommendation.domain} Workload Profile</span>
+        <div className="recommendations-container-clean">
+          {/* Analysis Summary Bar */}
+          <div className="analysis-summary-bar">
+            <div className="domain-tag-clean">
+              <span>{recommendation.domain}</span>
             </div>
-            <p className="profile-analysis-text">
-              {recommendation.analysis}
-            </p>
+            <p className="analysis-summary-text">{recommendation.analysis}</p>
           </div>
 
-          {/* 3-Tier Recommendation Cards Grid */}
-          <div className="recommendations-grid">
-            {/* 1. Primary Champion Pick */}
+          {/* Cards Grid */}
+          <div className="recommendation-cards-grid">
+            {/* Primary Recommendation Card */}
             {recommendation.primaryRecommendation && (
-              <div className="rec-card rec-primary-card">
-                <div className="rec-card-crown-stripe">
-                  <span className="crown-badge">👑 PRIMARY RECOMMENDATION</span>
+              <div className="rec-card-hero">
+                <div className="card-top-status">
+                  <span className="status-badge-primary">
+                    <ShieldCheck className="icon-xs" />
+                    <span>Primary Match</span>
+                  </span>
                   {recommendation.primaryRecommendation.matchScore && (
-                    <span className="match-score-badge">
+                    <span className="match-pill">
                       {recommendation.primaryRecommendation.matchScore}% Match
                     </span>
                   )}
                 </div>
 
-                <div className="rec-header-row">
-                  <div>
-                    <h4 className="rec-model-name">
-                      {recommendation.primaryRecommendation.modelName}
-                    </h4>
-                    <div className="rec-tags-strip">
-                      <span className="rec-provider-tag">
-                        {recommendation.primaryRecommendation.provider || 'Verified AI'}
-                      </span>
-                      {recommendation.primaryRecommendation.contextWindow && (
-                        <span className="rec-context-tag">
-                          📚 {recommendation.primaryRecommendation.contextWindow} Context
+                <div className="card-header-block">
+                  <h4 className="card-title-lg">
+                    {recommendation.primaryRecommendation.modelName}
+                  </h4>
+                  <div className="specs-row-clean">
+                    <span className="spec-item">
+                      {recommendation.primaryRecommendation.provider || 'AI Model'}
+                    </span>
+                    {recommendation.primaryRecommendation.contextWindow && (
+                      <>
+                        <span className="spec-dot">·</span>
+                        <span className="spec-item">
+                          {recommendation.primaryRecommendation.contextWindow} context
                         </span>
-                      )}
-                      {recommendation.primaryRecommendation.elo && (
-                        <span className="rec-elo-tag">
-                          ⚡ Elo {recommendation.primaryRecommendation.elo}
+                      </>
+                    )}
+                    {recommendation.primaryRecommendation.elo && (
+                      <>
+                        <span className="spec-dot">·</span>
+                        <span className="spec-item font-mono font-semibold">
+                          Elo {recommendation.primaryRecommendation.elo}
                         </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="rec-ribbon-pill">
-                    {recommendation.primaryRecommendation.badge || 'Optimal Pick'}
+                      </>
+                    )}
                   </div>
                 </div>
 
-                <div className="rec-body-content">
-                  <div className="rec-reasoning-box">
-                    <strong>Why this model:</strong> {recommendation.primaryRecommendation.reasoning}
-                  </div>
+                <div className="card-content-body">
+                  <p className="reasoning-text-clean">
+                    {recommendation.primaryRecommendation.reasoning}
+                  </p>
 
                   {recommendation.primaryRecommendation.strengthsHighlight?.length > 0 && (
-                    <div className="rec-strengths-row">
-                      <span className="strengths-label">Key Strengths:</span>
-                      <div className="strengths-tags">
+                    <div className="strengths-clean-group">
+                      <span className="strengths-label-clean">Key capabilities:</span>
+                      <div className="strengths-pills-clean">
                         {recommendation.primaryRecommendation.strengthsHighlight.map((s, idx) => (
-                          <span key={idx} className="strength-chip">✓ {s}</span>
+                          <span key={idx} className="strength-badge-clean">
+                            <Check className="icon-xxs" />
+                            <span>{s}</span>
+                          </span>
                         ))}
                       </div>
                     </div>
                   )}
 
                   {recommendation.primaryRecommendation.tradeoff && (
-                    <div className="rec-tradeoff-notice">
-                      <span className="tradeoff-icon">ℹ️</span>
-                      <span><strong>Trade-off:</strong> {recommendation.primaryRecommendation.tradeoff}</span>
+                    <div className="tradeoff-box-clean">
+                      <Info className="icon-xs text-muted-dim flex-shrink-0" />
+                      <span>{recommendation.primaryRecommendation.tradeoff}</span>
                     </div>
                   )}
                 </div>
 
-                {/* Primary Card CTAs */}
-                <div className="rec-card-actions">
+                {/* Actions */}
+                <div className="card-actions-clean">
                   <button
                     type="button"
-                    className="rec-action-btn btn-highlight"
+                    className="btn-secondary-clean"
                     onClick={() => handleHighlight(recommendation.primaryRecommendation)}
-                    title="Highlight model in standings table below"
                   >
-                    <span>🎯</span>
-                    <span>View in Standings</span>
+                    <Target className="icon-xs" />
+                    <span>View in Table</span>
                   </button>
                   <button
                     type="button"
-                    className="rec-action-btn btn-arena"
+                    className="btn-secondary-clean"
                     onClick={handleTestInArena}
-                    title="Launch Arena battle with this workload"
                   >
-                    <span>⚔️</span>
+                    <Swords className="icon-xs" />
                     <span>Test in Arena</span>
                   </button>
                   <button
                     type="button"
-                    className="rec-action-btn btn-playground"
+                    className="btn-outline-clean"
                     onClick={() => handleOpenPlayground(recommendation.primaryRecommendation.modelId)}
-                    title="Open directly in playground lab"
                   >
-                    <span>🧪</span>
-                    <span>Playground Lab</span>
+                    <FlaskConical className="icon-xs" />
+                    <span>Playground</span>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* 2. Speed Demon Card */}
+            {/* Speed Option Card */}
             {recommendation.speedRecommendation && (
-              <div className="rec-card rec-secondary-card rec-speed-card">
-                <div className="rec-card-crown-stripe secondary-stripe">
-                  <span className="speed-crown-badge">⚡ ULTRA SPEED DEMON</span>
-                  <span className="secondary-tag-pill">High TPS</span>
+              <div className="rec-card-sub">
+                <div className="card-top-status">
+                  <span className="status-badge-sub">
+                    <Gauge className="icon-xs" />
+                    <span>Low Latency Pick</span>
+                  </span>
                 </div>
 
-                <h4 className="rec-model-name">
+                <h4 className="card-title-md">
                   {recommendation.speedRecommendation.modelName}
                 </h4>
 
-                <div className="rec-tags-strip">
-                  <span className="rec-provider-tag provider-groq">Groq LPU Engine</span>
+                <div className="specs-row-clean">
+                  <span className="spec-item">High Throughput</span>
                   {recommendation.speedRecommendation.elo && (
-                    <span className="rec-elo-tag">Elo {recommendation.speedRecommendation.elo}</span>
+                    <>
+                      <span className="spec-dot">·</span>
+                      <span className="spec-item font-mono font-semibold">
+                        Elo {recommendation.speedRecommendation.elo}
+                      </span>
+                    </>
                   )}
                 </div>
 
-                <p className="secondary-reason-text">
+                <p className="sub-reasoning-clean">
                   {recommendation.speedRecommendation.reasoning}
                 </p>
 
-                <div className="secondary-actions-row">
+                <div className="sub-actions-clean">
                   <button
                     type="button"
-                    className="secondary-btn btn-view"
+                    className="btn-ghost-clean"
                     onClick={() => handleHighlight(recommendation.speedRecommendation)}
                   >
-                    <span>🎯</span> Standings
+                    <Target className="icon-xs" />
+                    <span>View in Table</span>
                   </button>
                   <button
                     type="button"
-                    className="secondary-btn btn-test"
+                    className="btn-ghost-clean"
                     onClick={() => handleOpenPlayground(recommendation.speedRecommendation.modelId)}
                   >
-                    <span>🧪</span> Playground
+                    <FlaskConical className="icon-xs" />
+                    <span>Playground</span>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* 3. Value / Efficiency Card */}
+            {/* Value Option Card */}
             {recommendation.valueRecommendation && (
-              <div className="rec-card rec-secondary-card rec-value-card">
-                <div className="rec-card-crown-stripe secondary-stripe">
-                  <span className="value-crown-badge">💰 EFFICIENCY & VALUE</span>
-                  <span className="secondary-tag-pill">High ROI</span>
+              <div className="rec-card-sub">
+                <div className="card-top-status">
+                  <span className="status-badge-sub">
+                    <Coins className="icon-xs" />
+                    <span>Cost-Efficient Pick</span>
+                  </span>
                 </div>
 
-                <h4 className="rec-model-name">
+                <h4 className="card-title-md">
                   {recommendation.valueRecommendation.modelName}
                 </h4>
 
-                <div className="rec-tags-strip">
-                  <span className="rec-provider-tag provider-value">Cost-Optimized</span>
+                <div className="specs-row-clean">
+                  <span className="spec-item">Cost Optimized</span>
                   {recommendation.valueRecommendation.elo && (
-                    <span className="rec-elo-tag">Elo {recommendation.valueRecommendation.elo}</span>
+                    <>
+                      <span className="spec-dot">·</span>
+                      <span className="spec-item font-mono font-semibold">
+                        Elo {recommendation.valueRecommendation.elo}
+                      </span>
+                    </>
                   )}
                 </div>
 
-                <p className="secondary-reason-text">
+                <p className="sub-reasoning-clean">
                   {recommendation.valueRecommendation.reasoning}
                 </p>
 
-                <div className="secondary-actions-row">
+                <div className="sub-actions-clean">
                   <button
                     type="button"
-                    className="secondary-btn btn-view"
+                    className="btn-ghost-clean"
                     onClick={() => handleHighlight(recommendation.valueRecommendation)}
                   >
-                    <span>🎯</span> Standings
+                    <Target className="icon-xs" />
+                    <span>View in Table</span>
                   </button>
                   <button
                     type="button"
-                    className="secondary-btn btn-test"
+                    className="btn-ghost-clean"
                     onClick={() => handleOpenPlayground(recommendation.valueRecommendation.modelId)}
                   >
-                    <span>🧪</span> Playground
+                    <FlaskConical className="icon-xs" />
+                    <span>Playground</span>
                   </button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Architecture & Prompting Tip Box */}
+          {/* Architectural Pro-Tip Callout */}
           {recommendation.keyEngineeringTip && (
-            <div className="matchmaker-pro-tip">
-              <span className="tip-icon">💡</span>
-              <div className="tip-body">
-                <strong>Architectural Recommendation:</strong> {recommendation.keyEngineeringTip}
-              </div>
+            <div className="tip-callout-clean">
+              <Lightbulb className="icon-xs text-amber-dim flex-shrink-0" />
+              <p className="tip-callout-text">
+                <strong className="text-zinc-200">Implementation tip:</strong>{' '}
+                {recommendation.keyEngineeringTip}
+              </p>
             </div>
           )}
         </div>
       )}
-    </div>
+    </section>
   );
 }

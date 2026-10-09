@@ -8,10 +8,23 @@ import { SkeletonPanel } from '../components/SkeletonPanel.jsx';
 import { addToast } from '../components/Toast.jsx';
 import {
   CATEGORIES,
-  CATEGORY_ICONS,
   CATEGORY_PLACEHOLDERS,
   getRandomPrompt
 } from '../constants.js';
+import {
+  Swords,
+  Globe,
+  Code2,
+  Calculator,
+  Brain,
+  Sparkles,
+  Shuffle,
+  Play,
+  Send,
+  Scale,
+  Trophy,
+  CheckCircle2
+} from 'lucide-react';
 
 // Suggested starter prompts for quick testing
 const QUICK_STARTERS = [
@@ -19,6 +32,14 @@ const QUICK_STARTERS = [
   { label: 'Python LRU Cache', prompt: 'Write an efficient LRU Cache class in Python with get and put methods in O(1) time complexity.' },
   { label: 'Kafka vs RabbitMQ', prompt: 'Compare Apache Kafka and RabbitMQ. Detail 3 architectural differences and when to choose which.' },
 ];
+
+const CATEGORY_ICONS = {
+  General: Globe,
+  Coding: Code2,
+  Math: Calculator,
+  Reasoning: Brain,
+  Creative: Sparkles,
+};
 
 /**
  * ArenaPage — the Blind Battle tab.
@@ -54,9 +75,9 @@ export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
   const handleVoteWithToast = async (winner) => {
     await handleVote(winner);
     if (winner === 'TIE') {
-      addToast('🤝 Tie vote recorded! Model identities revealed.', 'info');
+      addToast('Tie vote recorded! Model identities revealed.', 'info');
     } else {
-      addToast(`👍 Vote for Model ${winner} recorded! Elo ratings updated.`, 'success');
+      addToast(`Vote for Model ${winner} recorded! Elo ratings updated.`, 'success');
     }
   };
 
@@ -91,8 +112,8 @@ export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
           {/* Hero Banner */}
           <div className="arena-hero">
             <div className="arena-hero-badge">
-              <span className="hero-pulse-dot"></span>
-              ⚔️ BLIND LLM EVALUATION ARENA
+              <Swords size={13} />
+              <span>BLIND LLM EVALUATION ARENA</span>
             </div>
             <h2 className="arena-hero-title">
               Side-by-Side Model Battleground
@@ -108,18 +129,21 @@ export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
             <div className="prompt-header-row">
               <span className="prompt-card-label">Select Evaluation Domain:</span>
               <div className="category-pill-group">
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    className={`category-pill ${selectedCategory === cat ? 'active' : ''}`}
-                    onClick={() => setSelectedCategory(cat)}
-                    disabled={isStreaming}
-                  >
-                    <span className="cat-icon">{CATEGORY_ICONS[cat] || '✨'}</span>
-                    <span>{cat}</span>
-                  </button>
-                ))}
+                {CATEGORIES.map((cat) => {
+                  const IconComp = CATEGORY_ICONS[cat] || Globe;
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      className={`category-pill ${selectedCategory === cat ? 'active' : ''}`}
+                      onClick={() => setSelectedCategory(cat)}
+                      disabled={isStreaming}
+                    >
+                      <IconComp size={13} className="cat-icon" />
+                      <span>{cat}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -149,7 +173,7 @@ export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
 
             {/* Quick Starters */}
             <div className="quick-starters-row">
-              <span className="quick-starters-label">💡 Quick Starters:</span>
+              <span className="quick-starters-label">Quick Starters:</span>
               <div className="quick-chips-wrap">
                 {QUICK_STARTERS.map((item, i) => (
                   <button
@@ -174,7 +198,8 @@ export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
                 disabled={isStreaming}
                 title="Fill with a random example prompt"
               >
-                🎲 Random {selectedCategory} Prompt
+                <Shuffle size={14} />
+                <span>Random {selectedCategory} Prompt</span>
               </button>
 
               <button
@@ -189,7 +214,8 @@ export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
                   </>
                 ) : (
                   <>
-                    <span>⚡ Stream Battle [{selectedCategory}]</span>
+                    <Play size={15} fill="currentColor" />
+                    <span>Stream Battle [{selectedCategory}]</span>
                   </>
                 )}
               </button>
@@ -204,6 +230,7 @@ export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
           {currentBattle.turns.map((turnItem, idx) => {
             const isLastTurn = idx === currentBattle.turns.length - 1;
             const showSkeleton = isStreaming && isLastTurn;
+            const TurnIcon = CATEGORY_ICONS[currentBattle.category] || Globe;
 
             return (
               <div key={idx} className="battle-round-block">
@@ -213,7 +240,8 @@ export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
                     <div className="prompt-meta-left">
                       <span className="turn-pill">ROUND {turnItem.turn}</span>
                       <span className="category-tag-pill">
-                        {CATEGORY_ICONS[currentBattle.category] || '🌐'} {currentBattle.category || 'General'}
+                        <TurnIcon size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                        {currentBattle.category || 'General'}
                       </span>
                     </div>
                     <span className="prompt-user-label">USER QUERY</span>
@@ -263,7 +291,7 @@ export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
           {!voteResult && (
             <form onSubmit={handleSendFollowUp} className="followup-card">
               <div className="followup-header">
-                <span className="followup-tag">💬 MULTI-TURN CONTINUATION</span>
+                <span className="followup-tag">MULTI-TURN CONTINUATION</span>
                 <span className="followup-subtext">Ask follow-ups to test memory, nuance, or code fixes</span>
               </div>
               <div className="followup-input-row">
@@ -282,7 +310,8 @@ export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
                   className="followup-submit-btn"
                   disabled={!followUpPrompt.trim() || isStreaming}
                 >
-                  {isStreaming ? '⚡ Streaming...' : '⚡ Send Follow-up'}
+                  <Send size={14} />
+                  <span>{isStreaming ? 'Streaming...' : 'Send Follow-up'}</span>
                 </button>
               </div>
             </form>
@@ -301,7 +330,7 @@ export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
               <div className="ai-judge-summon-card">
                 <div className="judge-summon-info">
                   <div className="judge-summon-title">
-                    <span className="judge-summon-icon">🤖</span>
+                    <Scale size={16} />
                     <span>Automated AI Judge Benchmark</span>
                   </div>
                   <p className="judge-summon-desc">
@@ -321,7 +350,8 @@ export function ArenaPage({ initialPrompt = '', initialCategory = 'General' }) {
                     </>
                   ) : (
                     <>
-                      <span>⚖️ Trigger Automated AI Judge</span>
+                      <Scale size={15} />
+                      <span>Trigger Automated AI Judge</span>
                     </>
                   )}
                 </button>
@@ -362,7 +392,7 @@ function ResponsePanel({
       <div className="panel-header">
         <div className="panel-title-wrap">
           <div className={`panel-avatar-badge ${isA ? 'avatar-a' : 'avatar-b'}`}>
-            {isWinner ? '👑' : isA ? '🔵' : '🟣'}
+            {isWinner ? <Trophy size={14} /> : isA ? 'A' : 'B'}
           </div>
           <div className="panel-text-block">
             <div className="panel-title-row">

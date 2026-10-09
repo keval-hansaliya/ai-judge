@@ -2,7 +2,22 @@ import { useState, useEffect } from 'react';
 import { runBenchmarkSuite, getBenchmarkReport } from '../api.js';
 import { FormattedResponse } from './FormattedResponse.jsx';
 import { addToast } from './Toast.jsx';
-import { CATEGORY_ICONS } from '../constants.js';
+import {
+  BarChart3,
+  Play,
+  Trophy,
+  Zap,
+  Target,
+  ShieldCheck,
+  Calendar,
+  AlertCircle,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Clock,
+  Sparkles
+} from 'lucide-react';
 
 export function BenchmarkReport() {
   const [report, setReport] = useState(null);
@@ -34,10 +49,10 @@ export function BenchmarkReport() {
     try {
       const data = await runBenchmarkSuite();
       setReport(data);
-      addToast('📊 Standardized Benchmark Suite completed successfully!', 'success');
+      addToast('Standardized Benchmark Suite completed successfully!', 'success');
     } catch (err) {
       setError(err.message || 'Benchmark execution failed');
-      addToast(`⚠️ Benchmark failed: ${err.message}`, 'error');
+      addToast(`Benchmark failed: ${err.message}`, 'error');
     } finally {
       setRunning(false);
     }
@@ -64,8 +79,8 @@ export function BenchmarkReport() {
         <div className="benchmark-hero-content">
           <div className="benchmark-badge-row">
             <span className="benchmark-hero-badge">
-              <span className="hero-pulse-dot"></span>
-              📊 STANDARDIZED EVALUATION SUITE
+              <BarChart3 size={13} />
+              <span>STANDARDIZED EVALUATION SUITE</span>
             </span>
             <span className="benchmark-env-pill">Zero-Bias Environment</span>
           </div>
@@ -78,22 +93,23 @@ export function BenchmarkReport() {
           {/* Hyperparameter Pills */}
           <div className="benchmark-param-chips">
             <span className="param-chip param-chip--deterministic">
-              🛡️ Mode: Deterministic
+              <ShieldCheck size={12} />
+              <span>Mode: Deterministic</span>
             </span>
             <span className="param-chip">
-              🌡️ Temp: {report?.hyperparameters?.temperature ?? 0.0}
+              Temp: {report?.hyperparameters?.temperature ?? 0.0}
             </span>
             <span className="param-chip">
-              🎯 Top_p: {report?.hyperparameters?.top_p ?? 1.0}
+              Top_p: {report?.hyperparameters?.top_p ?? 1.0}
             </span>
             <span className="param-chip">
-              📝 Max Tokens: {report?.hyperparameters?.max_tokens ?? 1536}
+              Max Tokens: {report?.hyperparameters?.max_tokens ?? 1536}
             </span>
             <span className="param-chip">
-              ⚖️ Judge Temp: 0.0
+              Judge Temp: 0.0
             </span>
             <span className="param-chip">
-              🚫 Freq/Pres Penalty: 0.0
+              Freq/Pres Penalty: 0.0
             </span>
           </div>
         </div>
@@ -112,7 +128,8 @@ export function BenchmarkReport() {
               </>
             ) : (
               <>
-                <span>🚀 Run Fresh Benchmark Suite</span>
+                <Play size={15} fill="currentColor" />
+                <span>Run Fresh Benchmark Suite</span>
               </>
             )}
           </button>
@@ -125,7 +142,8 @@ export function BenchmarkReport() {
       {/* Error Banner */}
       {error && (
         <div className="benchmark-error-banner">
-          ⚠️ <strong>Execution Error:</strong> {error}
+          <AlertCircle size={16} />
+          <span><strong>Execution Error:</strong> {error}</span>
         </div>
       )}
 
@@ -141,7 +159,9 @@ export function BenchmarkReport() {
       {/* Empty State */}
       {!loading && !report && (
         <div className="benchmark-empty-state">
-          <div className="empty-state-icon">🛡️</div>
+          <div className="empty-state-icon">
+            <ShieldCheck size={40} />
+          </div>
           <h3>No Benchmark Suite Report Generated Yet</h3>
           <p>
             Run our standardized multi-model evaluation suite across all 5 models under strictly identical, deterministic hyperparameters (Temp: 0.0, Top_p: 1.0, Max Tokens: 1536) graded by the automated AI Judge.
@@ -152,7 +172,17 @@ export function BenchmarkReport() {
             onClick={handleRunBenchmark}
             disabled={running}
           >
-            {running ? '⏳ Benchmarking All Models...' : '🚀 Run Initial Benchmark Suite'}
+            {running ? (
+              <>
+                <span className="btn-spinner"></span>
+                <span>Benchmarking All Models...</span>
+              </>
+            ) : (
+              <>
+                <Play size={15} fill="currentColor" />
+                <span>Run Initial Benchmark Suite</span>
+              </>
+            )}
           </button>
         </div>
       )}
@@ -163,10 +193,12 @@ export function BenchmarkReport() {
           {/* 1. KPI Highlight Summary Strip */}
           <div className="benchmark-kpi-grid">
             {/* KPI 1: Champion */}
-            <div className="benchmark-kpi-card kpi-card--gold">
+            <div className="benchmark-kpi-card">
               <div className="kpi-top">
-                <span className="kpi-tag">🏆 SUITE CHAMPION</span>
-                <span className="kpi-medal">🥇</span>
+                <span className="kpi-tag">SUITE CHAMPION</span>
+                <span className="kpi-icon-box">
+                  <Trophy size={15} />
+                </span>
               </div>
               <h3 className="kpi-value">{championModel?.overallScore?.toFixed(2) ?? '—'}<small>/10</small></h3>
               <span className="kpi-label">{championModel?.name || 'Top Model'}</span>
@@ -174,10 +206,12 @@ export function BenchmarkReport() {
             </div>
 
             {/* KPI 2: Fastest Model */}
-            <div className="benchmark-kpi-card kpi-card--cyan">
+            <div className="benchmark-kpi-card">
               <div className="kpi-top">
-                <span className="kpi-tag">⚡ SPEED LEADER</span>
-                <span className="kpi-medal">💨</span>
+                <span className="kpi-tag">SPEED LEADER</span>
+                <span className="kpi-icon-box">
+                  <Zap size={15} />
+                </span>
               </div>
               <h3 className="kpi-value">{fastestModel?.avgLatencyMs?.toLocaleString() ?? '—'}<small>ms</small></h3>
               <span className="kpi-label">{fastestModel?.name || 'Fastest Model'}</span>
@@ -185,10 +219,12 @@ export function BenchmarkReport() {
             </div>
 
             {/* KPI 3: Accuracy Winner */}
-            <div className="benchmark-kpi-card kpi-card--emerald">
+            <div className="benchmark-kpi-card">
               <div className="kpi-top">
-                <span className="kpi-tag">🎯 ACCURACY LEADER</span>
-                <span className="kpi-medal">🎖️</span>
+                <span className="kpi-tag">ACCURACY LEADER</span>
+                <span className="kpi-icon-box">
+                  <Target size={15} />
+                </span>
               </div>
               <h3 className="kpi-value">{highestAccuracyModel?.accuracy?.toFixed(1) ?? '—'}<small>/10</small></h3>
               <span className="kpi-label">{highestAccuracyModel?.name || 'Accuracy Leader'}</span>
@@ -196,10 +232,12 @@ export function BenchmarkReport() {
             </div>
 
             {/* KPI 4: Reliability */}
-            <div className="benchmark-kpi-card kpi-card--purple">
+            <div className="benchmark-kpi-card">
               <div className="kpi-top">
-                <span className="kpi-tag">🛡️ SUITE INTEGRITY</span>
-                <span className="kpi-medal">🔒</span>
+                <span className="kpi-tag">SUITE INTEGRITY</span>
+                <span className="kpi-icon-box">
+                  <ShieldCheck size={15} />
+                </span>
               </div>
               <h3 className="kpi-value">100%<small> locked</small></h3>
               <span className="kpi-label">Deterministic Temp 0.0</span>
@@ -213,7 +251,7 @@ export function BenchmarkReport() {
             <div className="chart-card">
               <div className="chart-header">
                 <div>
-                  <h4 className="chart-title-text">🏆 Standardized Overall Score</h4>
+                  <h4 className="chart-title-text">Standardized Overall Score</h4>
                   <span className="chart-subtitle">Multi-prompt rubric average (Scale 0 – 10)</span>
                 </div>
                 <span className="chart-badge">Higher is better</span>
@@ -223,15 +261,13 @@ export function BenchmarkReport() {
                 {report.rankings.map((m) => {
                   const pct = Math.min(100, Math.max(12, (m.overallScore / 10) * 100));
                   const isFirst = m.rank === 1;
-                  const isSecond = m.rank === 2;
-                  const isThird = m.rank === 3;
 
                   return (
                     <div key={m.modelId} className="chart-bar-row">
                       <div className="chart-bar-meta">
                         <div className="bar-model-info">
-                          <span className={`rank-tag ${isFirst ? 'rank-gold' : isSecond ? 'rank-silver' : isThird ? 'rank-bronze' : ''}`}>
-                            {isFirst ? '🥇 #1' : isSecond ? '🥈 #2' : isThird ? '🥉 #3' : `#${m.rank}`}
+                          <span className={`rank-tag ${isFirst ? 'rank-gold' : ''}`}>
+                            #{m.rank}
                           </span>
                           <span className="bar-model-name">{m.name}</span>
                         </div>
@@ -240,7 +276,7 @@ export function BenchmarkReport() {
 
                       <div className="bar-track">
                         <div
-                          className={`bar-fill ${isFirst ? 'fill-champion' : isSecond ? 'fill-second' : isThird ? 'fill-third' : 'fill-slate'}`}
+                          className={`bar-fill ${isFirst ? 'fill-champion' : 'fill-slate'}`}
                           style={{ width: `${pct}%` }}
                         ></div>
                       </div>
@@ -254,7 +290,7 @@ export function BenchmarkReport() {
             <div className="chart-card">
               <div className="chart-header">
                 <div>
-                  <h4 className="chart-title-text">⚡ Average Latency & Speed</h4>
+                  <h4 className="chart-title-text">Average Latency & Speed</h4>
                   <span className="chart-subtitle">End-to-end response generation time</span>
                 </div>
                 <span className="chart-badge">Lower is faster (ms)</span>
@@ -270,7 +306,7 @@ export function BenchmarkReport() {
                     <div key={m.modelId} className="chart-bar-row">
                       <div className="chart-bar-meta">
                         <div className="bar-model-info">
-                          {isFastest && <span className="speed-pill">⚡ FASTEST</span>}
+                          {isFastest && <span className="speed-pill">FASTEST</span>}
                           <span className="bar-model-name">{m.name}</span>
                         </div>
                         <span className="bar-latency-val">{m.avgLatencyMs?.toLocaleString()} ms</span>
@@ -278,7 +314,7 @@ export function BenchmarkReport() {
 
                       <div className="bar-track">
                         <div
-                          className={`bar-fill ${isFastest ? 'fill-cyan' : 'fill-blue'}`}
+                          className={`bar-fill ${isFastest ? 'fill-fastest' : 'fill-slate'}`}
                           style={{ width: `${pct}%` }}
                         ></div>
                       </div>
@@ -293,13 +329,14 @@ export function BenchmarkReport() {
           <div className="benchmark-table-card">
             <div className="table-header-row">
               <div>
-                <h3 className="table-title">📋 Comparative Benchmark Rankings</h3>
+                <h3 className="table-title">Comparative Benchmark Rankings</h3>
                 <span className="table-subtitle">
                   Deterministic rubric assessment executed across all 5 models simultaneously
                 </span>
               </div>
               <div className="table-timestamp-badge">
-                📅 Evaluated: {new Date(report.timestamp).toLocaleString()}
+                <Calendar size={13} />
+                <span>Evaluated: {new Date(report.timestamp).toLocaleString()}</span>
               </div>
             </div>
 
@@ -310,12 +347,12 @@ export function BenchmarkReport() {
                     <th># Rank</th>
                     <th>Model & Provider</th>
                     <th>Overall Score</th>
-                    <th>🎯 Accuracy</th>
-                    <th>📐 Formatting</th>
-                    <th>🧠 Logic</th>
-                    <th>✂️ Conciseness</th>
-                    <th>⚡ Latency</th>
-                    <th>🛡️ Status</th>
+                    <th>Accuracy</th>
+                    <th>Formatting</th>
+                    <th>Logic</th>
+                    <th>Conciseness</th>
+                    <th>Latency</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -325,14 +362,14 @@ export function BenchmarkReport() {
                     return (
                       <tr key={m.modelId} className={isWinner ? 'winner-row' : ''}>
                         <td className="rank-cell">
-                          <span className={`rank-badge ${m.rank === 1 ? 'rank-1' : m.rank === 2 ? 'rank-2' : m.rank === 3 ? 'rank-3' : ''}`}>
-                            {m.rank === 1 ? '🥇' : m.rank === 2 ? '🥈' : m.rank === 3 ? '🥉' : `#${m.rank}`}
+                          <span className={`rank-badge ${m.rank === 1 ? 'rank-1' : ''}`}>
+                            #{m.rank}
                           </span>
                         </td>
                         <td>
                           <div className="table-model-name">
                             <span>{m.name}</span>
-                            {isWinner && <span className="winner-row-tag">👑 WINNER</span>}
+                            {isWinner && <span className="winner-row-tag">WINNER</span>}
                           </div>
                           <div className="table-model-provider">{m.provider}</div>
                         </td>
@@ -367,11 +404,13 @@ export function BenchmarkReport() {
                         <td>
                           {m.truncationCount > 0 ? (
                             <span className="status-pill status-pill--truncated">
-                              ⚠️ {m.truncationCount} Truncated
+                              <AlertCircle size={12} />
+                              <span>{m.truncationCount} Truncated</span>
                             </span>
                           ) : (
                             <span className="status-pill status-pill--complete">
-                              ✓ Complete
+                              <CheckCircle2 size={12} />
+                              <span>Complete</span>
                             </span>
                           )}
                         </td>
@@ -388,7 +427,7 @@ export function BenchmarkReport() {
             <div className="prompt-inspector-card">
               <div className="inspector-header">
                 <div>
-                  <h3 className="inspector-title">🔍 Standardized Prompts & Model Outputs Inspector</h3>
+                  <h3 className="inspector-title">Standardized Prompts & Model Outputs Inspector</h3>
                   <p className="inspector-subtitle">
                     Inspect and compare the exact responses generated by each model under identical test prompts.
                   </p>
@@ -401,7 +440,6 @@ export function BenchmarkReport() {
               <div className="inspector-accordions-list">
                 {report.promptResults.map((pr) => {
                   const isOpen = expandedPromptId === pr.promptId;
-                  const catIcon = CATEGORY_ICONS[pr.category] || '🌐';
 
                   return (
                     <div key={pr.promptId} className={`inspector-accordion ${isOpen ? 'is-open' : ''}`}>
@@ -411,14 +449,16 @@ export function BenchmarkReport() {
                       >
                         <div className="accordion-header-left">
                           <span className="accordion-category-pill">
-                            {catIcon} {pr.category}
+                            {pr.category}
                           </span>
                           <span className="accordion-prompt-title">{pr.title}:</span>
                           <span className="accordion-prompt-quote">"{pr.prompt}"</span>
                         </div>
                         <div className="accordion-toggle-btn">
                           <span>{isOpen ? 'Collapse' : 'Inspect Outputs'}</span>
-                          <span className="accordion-arrow">{isOpen ? '▲' : '▼'}</span>
+                          <span className="accordion-arrow">
+                            {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                          </span>
                         </div>
                       </div>
 
@@ -429,7 +469,6 @@ export function BenchmarkReport() {
                               <div key={out.modelId} className="inspector-response-card">
                                 <div className="response-card-header">
                                   <div className="response-card-title-row">
-                                    <span className="model-avatar-icon">🤖</span>
                                     <span className="response-card-model-name">{out.name}</span>
                                   </div>
                                   <div className="response-card-meta">
@@ -437,7 +476,8 @@ export function BenchmarkReport() {
                                       <span className="status-pill status-pill--truncated">Truncated</span>
                                     )}
                                     <span className="response-card-latency">
-                                      ⚡ {out.latencyMs}ms
+                                      <Clock size={12} />
+                                      <span>{out.latencyMs}ms</span>
                                     </span>
                                   </div>
                                 </div>

@@ -1,3 +1,5 @@
+import { Trophy, Handshake, ArrowUpRight, ArrowDownRight, Play } from 'lucide-react';
+
 /**
  * ResultBanner — shown after human vote is cast.
  * Reveals mystery model identities with head-to-head Elo rating cards.
@@ -26,15 +28,17 @@ export function ResultBanner({ voteResult, onNextBattle }) {
       {/* Top Banner */}
       <div className="result-reveal-header">
         <div className="reveal-badge-wrap">
-          <span className="reveal-celebrate-badge">🎉 IDENTITIES UNVEILED</span>
+          <span className="reveal-celebrate-badge">IDENTITIES UNVEILED</span>
           <span className="reveal-sub-badge">Elo Updated</span>
         </div>
         <h3 className="reveal-winner-title">
           {isTie ? (
-            <span>🤝 Standoff: It's a Tie!</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <Handshake size={20} /> Standoff: It's a Tie!
+            </span>
           ) : (
-            <span>
-              🏆 Victory: <strong className="winner-highlight">{winnerName}</strong>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <Trophy size={20} /> Victory: <strong className="winner-highlight">{winnerName}</strong>
             </span>
           )}
         </h3>
@@ -48,7 +52,7 @@ export function ResultBanner({ voteResult, onNextBattle }) {
         {/* Model A Card */}
         <div className={`reveal-competitor-card ${voteResult.winner === 'A' ? 'is-winner' : ''}`}>
           <div className="competitor-corner-tag tag-a">
-            {voteResult.winner === 'A' ? '👑 WINNER · MODEL A' : 'MODEL A'}
+            {voteResult.winner === 'A' ? 'WINNER · MODEL A' : 'MODEL A'}
           </div>
           <h4 className="competitor-real-name">{voteResult.modelA.name}</h4>
           <div className="competitor-elo-stats">
@@ -57,7 +61,11 @@ export function ResultBanner({ voteResult, onNextBattle }) {
               <span className="elo-current">{voteResult.modelA.newElo}</span>
             </div>
             <div className={`elo-delta-tag ${deltaA >= 0 ? 'delta-up' : 'delta-down'}`}>
-              {deltaA >= 0 ? `+${deltaA} ↗` : `${deltaA} ↘`}
+              {deltaA >= 0 ? (
+                <>+{deltaA} <ArrowUpRight size={12} style={{ display: 'inline' }} /></>
+              ) : (
+                <>{deltaA} <ArrowDownRight size={12} style={{ display: 'inline' }} /></>
+              )}
             </div>
           </div>
         </div>
@@ -68,7 +76,7 @@ export function ResultBanner({ voteResult, onNextBattle }) {
         {/* Model B Card */}
         <div className={`reveal-competitor-card ${voteResult.winner === 'B' ? 'is-winner' : ''}`}>
           <div className="competitor-corner-tag tag-b">
-            {voteResult.winner === 'B' ? '👑 WINNER · MODEL B' : 'MODEL B'}
+            {voteResult.winner === 'B' ? 'WINNER · MODEL B' : 'MODEL B'}
           </div>
           <h4 className="competitor-real-name">{voteResult.modelB.name}</h4>
           <div className="competitor-elo-stats">
@@ -77,7 +85,11 @@ export function ResultBanner({ voteResult, onNextBattle }) {
               <span className="elo-current">{voteResult.modelB.newElo}</span>
             </div>
             <div className={`elo-delta-tag ${deltaB >= 0 ? 'delta-up' : 'delta-down'}`}>
-              {deltaB >= 0 ? `+${deltaB} ↗` : `${deltaB} ↘`}
+              {deltaB >= 0 ? (
+                <>+{deltaB} <ArrowUpRight size={12} style={{ display: 'inline' }} /></>
+              ) : (
+                <>{deltaB} <ArrowDownRight size={12} style={{ display: 'inline' }} /></>
+              )}
             </div>
           </div>
         </div>
@@ -86,7 +98,8 @@ export function ResultBanner({ voteResult, onNextBattle }) {
       {/* Action Footer */}
       <div className="reveal-action-footer">
         <button type="button" className="next-battle-btn" onClick={onNextBattle}>
-          <span>⚡ Start Next Battle</span>
+          <Play size={14} fill="currentColor" />
+          <span>Start Next Battle</span>
         </button>
       </div>
     </div>

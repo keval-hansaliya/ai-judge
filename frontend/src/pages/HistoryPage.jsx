@@ -2,8 +2,37 @@ import { useState, useEffect, useCallback } from 'react';
 import { getBattles, getBattleById, deleteBattle, getBattleStats } from '../api.js';
 import { addToast } from '../components/Toast.jsx';
 import { FormattedResponse } from '../components/FormattedResponse.jsx';
-import { LB_CATEGORIES, CATEGORY_ICONS } from '../constants.js';
+import { LB_CATEGORIES } from '../constants.js';
+import {
+  History,
+  Swords,
+  Scale,
+  Target,
+  BarChart3,
+  Search,
+  RotateCcw,
+  Trophy,
+  Globe,
+  Code2,
+  Calculator,
+  Brain,
+  Sparkles,
+  Trash2,
+  ExternalLink,
+  X,
+  ChevronLeft,
+  ChevronRight
+} from 'lucide-react';
 import './HistoryPage.css';
+
+const CATEGORY_LUCIDE = {
+  All: Globe,
+  General: Globe,
+  Coding: Code2,
+  Math: Calculator,
+  Reasoning: Brain,
+  Creative: Sparkles,
+};
 
 /**
  * Format ISO date string into human-readable local time
@@ -108,7 +137,6 @@ export function HistoryPage({ currentUser }) {
   const handleOpenReplay = async (battle) => {
     try {
       setLoadingModal(true);
-      // Fetch full battle details with complete turns
       const fullDetails = await getBattleById(battle.id);
       setActiveModalBattle(fullDetails);
     } catch (err) {
@@ -130,7 +158,6 @@ export function HistoryPage({ currentUser }) {
       setDeletingId(battleId);
       await deleteBattle(battleId);
       addToast(`Battle #${battleId} deleted from history`, 'success');
-      // Refresh timeline and stats
       fetchBattleList(page);
       fetchStats();
       if (activeModalBattle?.id === battleId) {
@@ -158,7 +185,8 @@ export function HistoryPage({ currentUser }) {
       {/* ── 1. Hero Header & Personal Analytics KPI Strip ── */}
       <section className="history-hero-card">
         <div className="history-badge">
-          <span>📜</span> PERSONAL BATTLE VAULT &amp; METRICS
+          <History size={13} />
+          <span>PERSONAL BATTLE VAULT &amp; METRICS</span>
         </div>
         <h1 className="history-hero-title">Evaluation History &amp; Decision Matrix</h1>
         <p className="history-hero-subtitle">
@@ -168,8 +196,10 @@ export function HistoryPage({ currentUser }) {
         {/* KPI Strip */}
         <div className="history-kpi-strip">
           {/* KPI 1: Total Battles */}
-          <div className="history-kpi-card kpi-total">
-            <div className="hist-icon-box">⚔️</div>
+          <div className="history-kpi-card">
+            <div className="hist-icon-box">
+              <Swords size={18} />
+            </div>
             <div className="hist-text-block">
               <span className="hist-label">Total Battles</span>
               <span className="hist-value">{statsLoading ? '...' : (stats?.totalBattles || 0)}</span>
@@ -178,8 +208,10 @@ export function HistoryPage({ currentUser }) {
           </div>
 
           {/* KPI 2: Voted Decisions */}
-          <div className="history-kpi-card kpi-voted">
-            <div className="hist-icon-box">⚖️</div>
+          <div className="history-kpi-card">
+            <div className="hist-icon-box">
+              <Scale size={18} />
+            </div>
             <div className="hist-text-block">
               <span className="hist-label">Decisions Cast</span>
               <span className="hist-value">
@@ -194,9 +226,9 @@ export function HistoryPage({ currentUser }) {
           </div>
 
           {/* KPI 3: Favorite Category */}
-          <div className="history-kpi-card kpi-favorite">
+          <div className="history-kpi-card">
             <div className="hist-icon-box">
-              {CATEGORY_ICONS[stats?.favoriteCategory] || '🎯'}
+              <Target size={18} />
             </div>
             <div className="hist-text-block">
               <span className="hist-label">Favorite Domain</span>
@@ -206,11 +238,13 @@ export function HistoryPage({ currentUser }) {
           </div>
 
           {/* KPI 4: Voting Split */}
-          <div className="history-kpi-card kpi-ratio">
-            <div className="hist-icon-box">📊</div>
+          <div className="history-kpi-card">
+            <div className="hist-icon-box">
+              <BarChart3 size={18} />
+            </div>
             <div className="hist-text-block">
               <span className="hist-label">Vote Split (A / B / Tie)</span>
-              <span className="hist-value" style={{ fontSize: '1.05rem' }}>
+              <span className="hist-value" style={{ fontSize: '0.98rem' }}>
                 {statsLoading
                   ? '...'
                   : `${stats?.votesDistribution?.modelA || 0}A · ${stats?.votesDistribution?.modelB || 0}B · ${stats?.votesDistribution?.tie || 0}T`}
@@ -231,7 +265,7 @@ export function HistoryPage({ currentUser }) {
         <div className="history-filters-row">
           <div className="history-category-pills">
             {LB_CATEGORIES.map((cat) => {
-              const icon = cat === 'All' ? '🌐' : CATEGORY_ICONS[cat] || '🏷️';
+              const IconComp = CATEGORY_LUCIDE[cat] || Globe;
               const isActive = selectedCategory === cat;
               return (
                 <button
@@ -240,7 +274,7 @@ export function HistoryPage({ currentUser }) {
                   className={`history-filter-pill ${isActive ? 'active' : ''}`}
                   onClick={() => handleCategoryChange(cat)}
                 >
-                  <span>{icon}</span>
+                  <IconComp size={13} />
                   <span>{cat}</span>
                 </button>
               );
@@ -248,7 +282,7 @@ export function HistoryPage({ currentUser }) {
           </div>
 
           {/* Live Search Form */}
-          <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
+          <form onSubmit={handleSearchSubmit} className="history-search-form">
             <input
               type="text"
               className="history-search-input"
@@ -259,25 +293,26 @@ export function HistoryPage({ currentUser }) {
             <button
               type="submit"
               className="history-filter-pill active"
-              style={{ padding: '8px 16px', borderRadius: '10px' }}
+              style={{ padding: '6px 14px', borderRadius: '6px' }}
             >
-              🔍 Filter
+              <Search size={13} />
+              <span>Filter</span>
             </button>
           </form>
         </div>
 
         {/* Winner Filter Row */}
-        <div className="history-filters-row" style={{ paddingTop: '8px', borderTop: '1px solid rgba(148, 163, 184, 0.08)' }}>
+        <div className="history-filters-row" style={{ paddingTop: '8px', borderTop: '1px solid #27272a' }}>
           <div className="history-status-pills">
-            <span style={{ fontSize: '0.76rem', fontWeight: '700', color: '#64748b', alignSelf: 'center', marginRight: '4px' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: '600', color: '#71717a', alignSelf: 'center', marginRight: '4px' }}>
               OUTCOME:
             </span>
             {[
               { id: 'ALL', label: 'All Results' },
-              { id: 'A', label: '🏆 Model A Won' },
-              { id: 'B', label: '🏆 Model B Won' },
-              { id: 'TIE', label: '🤝 Tie / Draw' },
-              { id: 'unvoted', label: '⏳ Unvoted' }
+              { id: 'A', label: 'Model A Won' },
+              { id: 'B', label: 'Model B Won' },
+              { id: 'TIE', label: 'Tie / Draw' },
+              { id: 'unvoted', label: 'Unvoted' }
             ].map((st) => {
               const isActive = selectedWinner === st.id;
               return (
@@ -296,13 +331,14 @@ export function HistoryPage({ currentUser }) {
           <button
             type="button"
             className="history-filter-pill"
-            style={{ fontSize: '0.78rem' }}
+            style={{ fontSize: '0.76rem' }}
             onClick={() => {
               fetchBattleList(page);
               fetchStats();
             }}
           >
-            🔄 Refresh
+            <RotateCcw size={12} />
+            <span>Refresh</span>
           </button>
         </div>
       </section>
@@ -310,15 +346,17 @@ export function HistoryPage({ currentUser }) {
       {/* ── 3. Battle Cards Timeline ── */}
       <section className="history-cards-timeline">
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#94a3b8' }}>
-            <div className="brand-pulse-ring" style={{ width: '40px', height: '40px', margin: '0 auto 16px' }} />
-            <p style={{ fontWeight: '600' }}>Loading your battle records...</p>
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#71717a' }}>
+            <div className="brand-pulse-ring" style={{ width: '36px', height: '36px', margin: '0 auto 14px' }} />
+            <p style={{ fontWeight: '500', fontSize: '0.9rem' }}>Loading battle records...</p>
           </div>
         ) : battles.length === 0 ? (
           <div className="battle-history-card" style={{ textAlign: 'center', padding: '48px 24px' }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>📂</div>
-            <h3 style={{ margin: '0 0 8px', color: '#f8fafc', fontSize: '1.2rem' }}>No Battles Found</h3>
-            <p style={{ color: '#94a3b8', fontSize: '0.9rem', maxWidth: '440px', margin: '0 auto 18px' }}>
+            <div style={{ color: '#71717a', marginBottom: '10px' }}>
+              <History size={36} style={{ margin: '0 auto' }} />
+            </div>
+            <h3 style={{ margin: '0 0 6px', color: '#fafafa', fontSize: '1.15rem', fontWeight: '600' }}>No Battles Found</h3>
+            <p style={{ color: '#71717a', fontSize: '0.88rem', maxWidth: '440px', margin: '0 auto 16px' }}>
               {searchQuery || selectedCategory !== 'All' || selectedWinner !== 'ALL'
                 ? 'No battle records matched your search filters. Try clearing filters.'
                 : 'You have not conducted any battles yet. Enter the Arena to run your first 1v1 battle!'}
@@ -342,18 +380,20 @@ export function HistoryPage({ currentUser }) {
           battles.map((battle) => {
             const isVoted = battle.winner !== null;
             let winnerBadgeClass = 'badge-unvoted';
-            let winnerLabel = '⏳ Unvoted';
+            let winnerLabel = 'Unvoted';
 
             if (battle.winner === 'A') {
               winnerBadgeClass = 'badge-won-a';
-              winnerLabel = '🏆 Model A Won';
+              winnerLabel = 'Model A Won';
             } else if (battle.winner === 'B') {
               winnerBadgeClass = 'badge-won-b';
-              winnerLabel = '🏆 Model B Won';
+              winnerLabel = 'Model B Won';
             } else if (battle.winner === 'TIE') {
               winnerBadgeClass = 'badge-won-tie';
-              winnerLabel = '🤝 Tie / Draw';
+              winnerLabel = 'Tie / Draw';
             }
+
+            const CardCategoryIcon = CATEGORY_LUCIDE[battle.category] || Globe;
 
             return (
               <div key={battle.id} className="battle-history-card">
@@ -361,7 +401,8 @@ export function HistoryPage({ currentUser }) {
                 <div className="card-top-meta">
                   <div className="meta-tags-group">
                     <span className="hist-category-tag">
-                      {CATEGORY_ICONS[battle.category] || '🌐'} {battle.category}
+                      <CardCategoryIcon size={12} />
+                      <span>{battle.category}</span>
                     </span>
                     <span className="hist-turn-tag">
                       {battle.turnCount || 1} {(battle.turnCount || 1) === 1 ? 'Turn' : 'Turns'}
@@ -378,7 +419,7 @@ export function HistoryPage({ currentUser }) {
 
                 {/* Prompt Preview Block */}
                 <div className="card-prompt-quote">
-                  <span style={{ color: '#818cf8', fontWeight: '700', marginRight: '6px' }}>Prompt:</span>
+                  <span style={{ color: '#a1a1aa', fontWeight: '600', marginRight: '6px' }}>Prompt:</span>
                   &ldquo;{battle.prompt}&rdquo;
                 </div>
 
@@ -386,19 +427,13 @@ export function HistoryPage({ currentUser }) {
                 <div className="card-matchup-row">
                   <div className="competitors-preview-dock">
                     <div className="competitor-pill competitor-a">
-                      <span>🤖</span>
-                      <span>
-                        {isVoted ? `${battle.modelA?.provider || ''} / ${battle.modelA?.name || 'Model A'}` : 'Model A (Blind)'}
-                      </span>
+                      <span>{isVoted ? `${battle.modelA?.provider || ''} / ${battle.modelA?.name || 'Model A'}` : 'Model A (Blind)'}</span>
                     </div>
 
-                    <span className="matchup-vs">VS</span>
+                    <span className="matchup-vs">vs</span>
 
                     <div className="competitor-pill competitor-b">
-                      <span>⚡</span>
-                      <span>
-                        {isVoted ? `${battle.modelB?.provider || ''} / ${battle.modelB?.name || 'Model B'}` : 'Model B (Blind)'}
-                      </span>
+                      <span>{isVoted ? `${battle.modelB?.provider || ''} / ${battle.modelB?.name || 'Model B'}` : 'Model B (Blind)'}</span>
                     </div>
                   </div>
 
@@ -409,7 +444,7 @@ export function HistoryPage({ currentUser }) {
                       onClick={() => handleOpenReplay(battle)}
                       disabled={loadingModal}
                     >
-                      <span>🔍</span>
+                      <ExternalLink size={13} />
                       <span>Replay &amp; Audit</span>
                     </button>
 
@@ -420,7 +455,7 @@ export function HistoryPage({ currentUser }) {
                       onClick={(e) => handleDeleteBattle(e, battle.id)}
                       disabled={deletingId === battle.id}
                     >
-                      {deletingId === battle.id ? '⏳' : '🗑️'}
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 </div>
@@ -438,7 +473,8 @@ export function HistoryPage({ currentUser }) {
               disabled={page <= 1 || loading}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
             >
-              ← Previous
+              <ChevronLeft size={14} />
+              <span>Previous</span>
             </button>
             <span className="pagination-page-indicator">
               Page {pagination.page} of {pagination.totalPages} ({pagination.total} battles)
@@ -449,7 +485,8 @@ export function HistoryPage({ currentUser }) {
               disabled={page >= pagination.totalPages || loading}
               onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
             >
-              Next →
+              <span>Next</span>
+              <ChevronRight size={14} />
             </button>
           </div>
         )}
@@ -462,17 +499,17 @@ export function HistoryPage({ currentUser }) {
             {/* Modal Header */}
             <div className="modal-header-bar">
               <div className="modal-title-left">
-                <span style={{ fontSize: '1.4rem' }}>⚔️</span>
+                <Swords size={18} style={{ color: '#a1a1aa' }} />
                 <div>
                   <div className="modal-title-text">
                     Battle #{activeModalBattle.id} Transcript Replay
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', display: 'flex', gap: '8px', marginTop: '2px' }}>
-                    <span>{CATEGORY_ICONS[activeModalBattle.category] || '🌐'} {activeModalBattle.category}</span>
+                  <div style={{ fontSize: '0.76rem', color: '#71717a', display: 'flex', gap: '8px', marginTop: '2px', alignItems: 'center' }}>
+                    <span>{activeModalBattle.category}</span>
                     <span>•</span>
                     <span>{formatDate(activeModalBattle.createdAt)}</span>
                     <span>•</span>
-                    <span style={{ color: activeModalBattle.winner === 'A' ? '#00f0ff' : activeModalBattle.winner === 'B' ? '#d946ef' : '#fbbf24', fontWeight: '700' }}>
+                    <span style={{ color: '#fafafa', fontWeight: '600' }}>
                       {activeModalBattle.winner === 'A' ? 'Model A Won' : activeModalBattle.winner === 'B' ? 'Model B Won' : activeModalBattle.winner === 'TIE' ? 'Tie' : 'Unvoted'}
                     </span>
                   </div>
@@ -485,7 +522,7 @@ export function HistoryPage({ currentUser }) {
                 onClick={() => setActiveModalBattle(null)}
                 aria-label="Close Replay Modal"
               >
-                ✕
+                <X size={16} />
               </button>
             </div>
 
@@ -497,19 +534,19 @@ export function HistoryPage({ currentUser }) {
                     {/* Turn Prompt Banner */}
                     <div className="replay-prompt-banner">
                       <span className="turn-pill-small">Turn {turn.turn || idx + 1}</span>
-                      <strong style={{ color: '#f8fafc', fontSize: '0.92rem' }}>Prompt: </strong>
-                      <span style={{ color: '#e2e8f0', fontSize: '0.92rem' }}>{turn.prompt}</span>
+                      <strong style={{ color: '#fafafa', fontSize: '0.88rem' }}>Prompt: </strong>
+                      <span style={{ color: '#a1a1aa', fontSize: '0.88rem' }}>{turn.prompt}</span>
                     </div>
 
                     {/* Side-by-Side Responses */}
                     <div className="replay-grid">
                       {/* Model A Response */}
-                      <div className="model-panel panel-a" style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(0, 240, 255, 0.25)', borderRadius: '12px', padding: '16px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid rgba(0, 240, 255, 0.15)' }}>
-                          <span style={{ color: '#00f0ff', fontWeight: '800', fontSize: '0.86rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span>🤖</span> Model A {activeModalBattle.winner === 'A' && '🏆 (Winner)'}
+                      <div className="model-panel panel-a">
+                        <div className="replay-panel-header">
+                          <span className="panel-model-tag tag-a">
+                            Model A {activeModalBattle.winner === 'A' && '(Winner)'}
                           </span>
-                          <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                          <span style={{ fontSize: '0.74rem', color: '#71717a' }}>
                             {activeModalBattle.modelA?.provider} / {activeModalBattle.modelA?.name}
                           </span>
                         </div>
@@ -517,12 +554,12 @@ export function HistoryPage({ currentUser }) {
                       </div>
 
                       {/* Model B Response */}
-                      <div className="model-panel panel-b" style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(217, 70, 239, 0.25)', borderRadius: '12px', padding: '16px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid rgba(217, 70, 239, 0.15)' }}>
-                          <span style={{ color: '#d946ef', fontWeight: '800', fontSize: '0.86rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span>⚡</span> Model B {activeModalBattle.winner === 'B' && '🏆 (Winner)'}
+                      <div className="model-panel panel-b">
+                        <div className="replay-panel-header">
+                          <span className="panel-model-tag tag-b">
+                            Model B {activeModalBattle.winner === 'B' && '(Winner)'}
                           </span>
-                          <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                          <span style={{ fontSize: '0.74rem', color: '#71717a' }}>
                             {activeModalBattle.modelB?.provider} / {activeModalBattle.modelB?.name}
                           </span>
                         </div>
@@ -533,15 +570,19 @@ export function HistoryPage({ currentUser }) {
                 ))
               ) : (
                 <div className="replay-grid">
-                  <div className="model-panel panel-a" style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(0, 240, 255, 0.25)', borderRadius: '12px', padding: '16px' }}>
-                    <div style={{ marginBottom: '10px', color: '#00f0ff', fontWeight: '800' }}>
-                      Model A ({activeModalBattle.modelA?.name})
+                  <div className="model-panel panel-a">
+                    <div className="replay-panel-header">
+                      <span className="panel-model-tag tag-a">
+                        Model A ({activeModalBattle.modelA?.name})
+                      </span>
                     </div>
                     <FormattedResponse text={activeModalBattle.responseA} isStreaming={false} />
                   </div>
-                  <div className="model-panel panel-b" style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(217, 70, 239, 0.25)', borderRadius: '12px', padding: '16px' }}>
-                    <div style={{ marginBottom: '10px', color: '#d946ef', fontWeight: '800' }}>
-                      Model B ({activeModalBattle.modelB?.name})
+                  <div className="model-panel panel-b">
+                    <div className="replay-panel-header">
+                      <span className="panel-model-tag tag-b">
+                        Model B ({activeModalBattle.modelB?.name})
+                      </span>
                     </div>
                     <FormattedResponse text={activeModalBattle.responseB} isStreaming={false} />
                   </div>

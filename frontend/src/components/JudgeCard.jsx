@@ -1,3 +1,5 @@
+import { Scale, Target, Brain, LayoutTemplate, Scissors, Trophy, Handshake } from 'lucide-react';
+
 /**
  * JudgeCard — displays the AI Judge benchmark result card with animated comparison bars.
  *
@@ -31,10 +33,10 @@ export function JudgeCard({ judgeResult, voteResult, modelAName, modelBName }) {
     : null;
 
   const criteriaList = [
-    { key: 'accuracy', label: 'Accuracy & Correctness', icon: '🎯' },
-    { key: 'logic', label: 'Reasoning & Logic', icon: '🧠' },
-    { key: 'formatting', label: 'Formatting & Structure', icon: '📐' },
-    { key: 'conciseness', label: 'Conciseness & Clarity', icon: '✂️' },
+    { key: 'accuracy', label: 'Accuracy & Correctness', Icon: Target },
+    { key: 'logic', label: 'Reasoning & Logic', Icon: Brain },
+    { key: 'formatting', label: 'Formatting & Structure', Icon: LayoutTemplate },
+    { key: 'conciseness', label: 'Conciseness & Clarity', Icon: Scissors },
   ];
 
   const getScoreColorClass = (score) => {
@@ -49,16 +51,18 @@ export function JudgeCard({ judgeResult, voteResult, modelAName, modelBName }) {
       <div className="judge-header">
         <div className="judge-header-left">
           <div className="judge-eyebrow">
-            <span className="judge-pulse-dot"></span>
-            🤖 AUTOMATED AI BENCHMARK (GPT-4O JUDGE)
+            <Scale size={13} />
+            <span>AUTOMATED AI BENCHMARK (GPT-4O JUDGE)</span>
           </div>
           <h3 className="judge-headline">
             {isTie ? (
-              <span>🤝 AI Verdict: <strong style={{ color: '#fbbf24' }}>Draw / Even Match</strong></span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <Handshake size={20} /> AI Verdict: <strong>Draw / Even Match</strong>
+              </span>
             ) : (
-              <span>
-                🏆 AI Verdict:{' '}
-                <strong style={{ color: verdict === 'A' ? 'var(--accent-cyan)' : 'var(--accent-secondary)' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <Trophy size={20} /> AI Verdict:{' '}
+                <strong>
                   {winnerName} Wins
                 </strong>{' '}
                 {scoreDiff > 0 && <span className="verdict-diff-pill">+{scoreDiff} pts</span>}
@@ -86,13 +90,13 @@ export function JudgeCard({ judgeResult, voteResult, modelAName, modelBName }) {
         <div className="rubric-deck-header">
           <span>EVALUATION RUBRIC</span>
           <div className="rubric-legend">
-            <span className="legend-chip legend-chip--a" title={nameA}>🔵 {nameA}</span>
-            <span className="legend-chip legend-chip--b" title={nameB}>🟣 {nameB}</span>
+            <span className="legend-chip legend-chip--a" title={nameA}>{nameA}</span>
+            <span className="legend-chip legend-chip--b" title={nameB}>{nameB}</span>
           </div>
         </div>
 
         <div className="rubric-rows-container">
-          {criteriaList.map(({ key, label, icon }) => {
+          {criteriaList.map(({ key, label, Icon }) => {
             const valA = modelA?.[key] ?? 0;
             const valB = modelB?.[key] ?? 0;
             const pctA = Math.min(100, Math.max(0, (valA / 10) * 100));
@@ -102,7 +106,8 @@ export function JudgeCard({ judgeResult, voteResult, modelAName, modelBName }) {
               <div key={key} className="rubric-row">
                 <div className="rubric-info">
                   <span className="rubric-label">
-                    <span className="rubric-icon">{icon}</span> {label}
+                    <Icon size={14} className="rubric-icon" style={{ display: 'inline', marginRight: '6px' }} />
+                    {label}
                   </span>
                   <div className="rubric-scores-quick">
                     <span className={`score-tag score-tag--a ${getScoreColorClass(valA)}`} title={`${nameA}: ${valA}/10`}>A: {valA}/10</span>
@@ -138,7 +143,8 @@ export function JudgeCard({ judgeResult, voteResult, modelAName, modelBName }) {
       {displayReasoning && (
         <div className="judge-reasoning-card">
           <div className="judge-reasoning-header">
-            <span>⚖️ Impartial Deliberation</span>
+            <Scale size={13} />
+            <span>Impartial Deliberation</span>
           </div>
           <p className="judge-reasoning-text">“{displayReasoning}”</p>
         </div>

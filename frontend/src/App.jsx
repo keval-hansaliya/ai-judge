@@ -8,41 +8,52 @@ import { ToastContainer } from './components/Toast.jsx';
 import { AuthModal } from './components/AuthModal.jsx';
 import { useAuth } from './hooks/useAuth.js';
 import { getServiceHealth } from './api.js';
+import {
+  Swords,
+  BarChart3,
+  FlaskConical,
+  Trophy,
+  History,
+  Lock,
+  LogOut,
+  User as UserIcon,
+  Zap
+} from 'lucide-react';
 import './NavBar.css';
 import './App.css';
 
 /**
- * Tab definitions with rich icons, micro-tags, and unique theme keys.
+ * Tab definitions with clean Lucide icons, micro-tags, and unique theme keys.
  */
 const NAV_TABS = [
   {
     id: 'arena',
     label: 'Arena Battle',
-    icon: '⚔️',
+    icon: Swords,
     tag: 'Blind 1v1',
   },
   {
     id: 'benchmark',
     label: 'Benchmark Report',
-    icon: '📊',
+    icon: BarChart3,
     tag: 'Standardized',
   },
   {
     id: 'playground',
     label: 'Named Playground',
-    icon: '🧪',
+    icon: FlaskConical,
     tag: 'Direct Lab',
   },
   {
     id: 'leaderboard',
     label: 'Elo Leaderboard',
-    icon: '🏆',
+    icon: Trophy,
     tag: 'Rankings',
   },
   {
     id: 'history',
     label: 'Battle History',
-    icon: '📜',
+    icon: History,
     tag: 'Audit Vault',
   },
 ];
@@ -115,16 +126,15 @@ function App() {
         <div className="header-top-row">
           <div className="brand-lockup">
             <div className="brand-logo-emblem">
-              <span className="brand-icon">⚔️</span>
-              <span className="brand-pulse-ring"></span>
+              <Swords className="brand-logo-icon" />
             </div>
             <div className="brand-text-group">
               <div className="brand-title-row">
                 <span className="brand-title">LM ARENA</span>
-                <span className="brand-badge-pill">AI JUDGE v2.4</span>
+                <span className="brand-badge-pill">AI JUDGE</span>
               </div>
               <span className="brand-tagline">
-                Autonomous LLM Evaluation, Benchmarking &amp; Community Elo Matrix
+                Autonomous LLM Evaluation &amp; Community Elo Matrix
               </span>
             </div>
           </div>
@@ -168,7 +178,7 @@ function App() {
                     </div>
                     <div className="user-info-text">
                       <span className="user-name-title">{user.name}</span>
-                      <span className="user-status-sub">Verified Evaluator</span>
+                      <span className="user-status-sub">Evaluator</span>
                     </div>
                   </div>
                   <button
@@ -177,21 +187,22 @@ function App() {
                     onClick={logout}
                     title="Sign out of account"
                   >
-                    Sign Out
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
                   </button>
                 </>
               ) : (
                 <>
-                  <div className="status-indicator-pill" style={{ opacity: 0.9 }}>
-                    <span style={{ fontSize: '0.86rem' }}>👤</span>
-                    <span className="status-label">Guest Mode</span>
+                  <div className="status-indicator-pill">
+                    <UserIcon className="w-3.5 h-3.5 text-zinc-400" />
+                    <span className="status-label">Guest</span>
                   </div>
                   <button
                     type="button"
                     className="header-auth-btn"
                     onClick={() => openAuthModal('login')}
                   >
-                    <span>🔐</span>
+                    <Lock className="w-3.5 h-3.5" />
                     <span>Sign In</span>
                   </button>
                 </>
@@ -204,6 +215,7 @@ function App() {
         <nav className="nav-tabs-dock" aria-label="Main Navigation">
           {NAV_TABS.map((tab) => {
             const isActive = activeTab === tab.id;
+            const TabIcon = tab.icon;
             return (
               <button
                 key={tab.id}
@@ -214,12 +226,11 @@ function App() {
                   setActiveTab(tab.id);
                 }}
               >
-                <span className="tab-icon">{tab.icon}</span>
+                <TabIcon className="tab-icon-svg" />
                 <div className="tab-label-group">
                   <span className="tab-title">{tab.label}</span>
                   <span className="tab-micro-tag">{tab.tag}</span>
                 </div>
-                {isActive && <span className="tab-active-glow"></span>}
               </button>
             );
           })}

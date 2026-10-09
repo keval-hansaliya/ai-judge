@@ -1,29 +1,16 @@
 /* ==========================================================================
-   NAVIGATION & HEADER DOCK — PREMIUM DESIGN SYSTEM
+   NAVIGATION & HEADER DOCK — SHADCN/UI ZINC DESIGN SYSTEM
    ========================================================================== */
 
 .app-header-shell {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  background: radial-gradient(120% 140% at 50% 0%, rgba(30, 41, 59, 0.5) 0%, rgba(10, 15, 29, 0.9) 100%);
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  border-radius: 20px;
-  padding: 22px 28px 18px;
-  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  gap: 16px;
+  background: #121215;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  padding: 18px 24px 14px;
   position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(20px);
-}
-
-.app-header-shell::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #00f0ff 0%, #8b5cf6 35%, #ec4899 70%, #fbbf24 100%);
 }
 
 /* ── Top Row: Brand & Status Indicators ── */
@@ -32,233 +19,145 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 14px;
 }
 
 .brand-lockup {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .brand-logo-emblem {
-  position: relative;
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(139, 92, 246, 0.25));
-  border: 1px solid rgba(0, 240, 255, 0.35);
-  border-radius: 14px;
+  width: 36px;
+  height: 36px;
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  color: #fafafa;
 }
 
-.brand-icon {
-  font-size: 1.6rem;
-  line-height: 1;
-  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.5));
-}
-
-.brand-pulse-ring {
-  position: absolute;
-  inset: -3px;
-  border-radius: 16px;
-  border: 1px solid rgba(0, 240, 255, 0.4);
-  animation: emblemPulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  pointer-events: none;
-}
-
-@keyframes emblemPulse {
-  0%, 100% {
-    opacity: 0.2;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
+.brand-logo-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .brand-text-group {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .brand-title-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .brand-title {
-  font-size: 1.55rem;
-  font-weight: 850;
-  letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 40%, #38bdf8 80%, #c084fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  line-height: 1.1;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fafafa;
 }
 
 .brand-badge-pill {
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  padding: 3px 8px;
-  border-radius: 6px;
-  background: rgba(0, 240, 255, 0.12);
-  color: #38bdf8;
-  border: 1px solid rgba(0, 240, 255, 0.35);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: #18181b;
+  border: 1px solid #27272a;
+  color: #a1a1aa;
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
 }
 
 .brand-tagline {
-  font-size: 0.82rem;
-  color: #94a3b8;
-  letter-spacing: 0.01em;
+  font-size: 0.76rem;
+  color: #71717a;
+  line-height: 1.4;
 }
 
-/* Header Meta Status Pills */
+/* ── Providers Cluster & Auth ── */
 .header-meta-pills {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
-.status-indicator-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  padding: 6px 14px;
-  border-radius: 9999px;
-  font-size: 0.78rem;
-  color: #cbd5e1;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(10px);
-}
-
-.pulse-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  display: inline-block;
-  position: relative;
-}
-
-.pulse-dot.green {
-  background: #10b981;
-  box-shadow: 0 0 10px #10b981;
-}
-
-.pulse-dot.cyan {
-  background: #00f0ff;
-  box-shadow: 0 0 10px #00f0ff;
-}
-
-.pulse-dot.gray {
-  background: #64748b;
-  box-shadow: none;
-}
-
-.pulse-dot.gray::after {
-  display: none;
-}
-
-.pulse-dot::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 50%;
-  background: inherit;
-  opacity: 0.4;
-  animation: pulseDotRing 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-}
-
-@keyframes pulseDotRing {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(2.4); opacity: 0; }
-}
-
-.status-label {
-  font-weight: 600;
-}
-
-/* Multi-Provider Cluster Pill */
 .providers-cluster-pill {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  padding: 6px 14px;
-  border-radius: 9999px;
-  font-size: 0.78rem;
-  color: #cbd5e1;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(10px);
-  user-select: none;
-  transition: all 0.2s ease;
-}
-
-.providers-cluster-pill:hover {
-  border-color: rgba(0, 240, 255, 0.3);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  gap: 8px;
+  background: #18181b;
+  border: 1px solid #27272a;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.74rem;
 }
 
 .provider-status-item {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  font-weight: 600;
-  cursor: default;
-  transition: opacity 0.2s ease;
+  gap: 5px;
+  color: #d4d4d8;
+  font-weight: 500;
 }
 
 .provider-status-item.is-inactive {
   opacity: 0.45;
 }
 
-.provider-cluster-divider {
-  color: #475569;
-  font-weight: 700;
-  font-size: 0.85rem;
-  line-height: 1;
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
 }
 
-/* User Identity & Auth Buttons in Header */
+.pulse-dot.green {
+  background: #22c55e;
+}
+
+.pulse-dot.gray {
+  background: #71717a;
+}
+
+.provider-cluster-divider {
+  color: #3f3f46;
+}
+
+/* Auth Group */
 .header-auth-group {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .header-user-profile {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  padding: 5px 12px 5px 6px;
-  border-radius: 9999px;
-  box-shadow: 0 0 14px rgba(99, 102, 241, 0.15);
+  gap: 8px;
+  background: #18181b;
+  border: 1px solid #27272a;
+  padding: 3px 10px;
+  border-radius: 6px;
 }
 
 .user-avatar-badge {
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6366f1, #ec4899);
+  background: #27272a;
+  color: #fafafa;
+  font-size: 0.7rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.76rem;
-  font-weight: 800;
-  color: #ffffff;
 }
 
 .user-info-text {
@@ -267,239 +166,146 @@
 }
 
 .user-name-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #f8fafc;
-  line-height: 1.1;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #f4f4f5;
 }
 
 .user-status-sub {
   font-size: 0.65rem;
-  color: #a5b4fc;
+  color: #71717a;
 }
 
-.header-logout-btn {
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
-  padding: 6px 12px;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.header-logout-btn:hover {
-  background: rgba(239, 68, 68, 0.25);
-  border-color: #ef4444;
-  color: #ffffff;
-  transform: translateY(-1px);
+.status-indicator-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #18181b;
+  border: 1px solid #27272a;
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  color: #a1a1aa;
 }
 
 .header-auth-btn {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%);
-  border: 1px solid rgba(129, 140, 248, 0.5);
-  color: #ffffff;
-  padding: 6px 16px;
-  border-radius: 9999px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 0 14px rgba(99, 102, 241, 0.25);
+  background: #fafafa;
+  color: #09090b;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
 .header-auth-btn:hover {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.5) 0%, rgba(236, 72, 153, 0.5) 100%);
-  border-color: #a5b4fc;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-  transform: translateY(-1px);
+  background: #e4e4e7;
 }
 
-/* ── Bottom Row: Modern Segmented Tab Dock ── */
+.header-logout-btn {
+  background: transparent;
+  border: 1px solid #27272a;
+  color: #a1a1aa;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.header-logout-btn:hover {
+  background: #18181b;
+  color: #fafafa;
+  border-color: #3f3f46;
+}
+
+/* ── Segmented Navigation Dock (shadcn/ui style) ── */
 .nav-tabs-dock {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  background: rgba(9, 14, 28, 0.85);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 14px;
-  padding: 6px;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.25);
+  gap: 4px;
+  background: #18181b;
+  border: 1px solid #27272a;
+  padding: 4px;
+  border-radius: 8px;
 }
 
 .nav-dock-tab {
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 10px;
-  padding: 10px 14px;
+  color: #a1a1aa;
+  padding: 7px 12px;
+  border-radius: 6px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  cursor: pointer;
+  gap: 8px;
+  transition: all 0.15s ease;
   position: relative;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  color: #94a3b8;
-  outline: none;
 }
 
-.nav-dock-tab:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
-  border-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-1px);
+.nav-dock-tab:hover {
+  color: #fafafa;
+  background: rgba(39, 39, 42, 0.4);
 }
 
-.tab-icon {
-  font-size: 1.25rem;
-  line-height: 1;
-  transition: transform 0.2s ease;
+.nav-dock-tab.active {
+  background: #27272a;
+  color: #fafafa;
+  border-color: #3f3f46;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.nav-dock-tab:hover .tab-icon {
-  transform: scale(1.15);
+.tab-icon-svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  color: inherit;
 }
 
 .tab-label-group {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  text-align: left;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .tab-title {
-  font-size: 0.92rem;
-  font-weight: 700;
-  line-height: 1.2;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: inherit;
+  white-space: nowrap;
 }
 
 .tab-micro-tag {
-  font-size: 0.66rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: #71717a;
   text-transform: uppercase;
-  color: #64748b;
-  transition: color 0.2s ease;
+  letter-spacing: 0.04em;
 }
 
-/* ── Active Tab Theming per Feature ── */
-
-/* 1. Arena Battle (Cyan/Indigo) */
-.tab-arena.active {
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(99, 102, 241, 0.25) 100%);
-  border: 1px solid rgba(0, 240, 255, 0.45);
-  color: #ffffff;
-  box-shadow: 0 4px 18px rgba(0, 240, 255, 0.2);
+.nav-dock-tab.active .tab-micro-tag {
+  color: #a1a1aa;
 }
 
-.tab-arena.active .tab-title {
-  color: #f8fafc;
-}
-
-.tab-arena.active .tab-micro-tag {
-  color: #38bdf8;
-}
-
-/* 2. Benchmark Suite (Emerald/Teal) */
-.tab-benchmark.active {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.25) 100%);
-  border: 1px solid rgba(16, 185, 129, 0.45);
-  color: #ffffff;
-  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.2);
-}
-
-.tab-benchmark.active .tab-title {
-  color: #f8fafc;
-}
-
-.tab-benchmark.active .tab-micro-tag {
-  color: #34d399;
-}
-
-/* 3. Named Playground (Fuchsia/Purple) */
-.tab-playground.active {
-  background: linear-gradient(135deg, rgba(217, 70, 239, 0.15) 0%, rgba(168, 85, 247, 0.25) 100%);
-  border: 1px solid rgba(217, 70, 239, 0.45);
-  color: #ffffff;
-  box-shadow: 0 4px 18px rgba(217, 70, 239, 0.2);
-}
-
-.tab-playground.active .tab-title {
-  color: #f8fafc;
-}
-
-.tab-playground.active .tab-micro-tag {
-  color: #e879f9;
-}
-
-/* 4. Leaderboard (Gold/Amber) */
-.tab-leaderboard.active {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.25) 100%);
-  border: 1px solid rgba(251, 191, 36, 0.45);
-  color: #ffffff;
-  box-shadow: 0 4px 18px rgba(251, 191, 36, 0.2);
-}
-
-.tab-leaderboard.active .tab-title {
-  color: #f8fafc;
-}
-
-.tab-leaderboard.active .tab-micro-tag {
-  color: #fbbf24;
-}
-
-/* 5. Battle History (Indigo/Rose) */
-.tab-history.active {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(244, 63, 94, 0.25) 100%);
-  border: 1px solid rgba(129, 140, 248, 0.5);
-  color: #ffffff;
-  box-shadow: 0 4px 18px rgba(99, 102, 241, 0.25);
-}
-
-.tab-history.active .tab-title {
-  color: #f8fafc;
-}
-
-.tab-history.active .tab-micro-tag {
-  color: #a5b4fc;
-}
-
-/* Active Bottom Highlight Glow */
-.tab-active-glow {
-  position: absolute;
-  bottom: 0;
-  left: 25%;
-  right: 25%;
-  height: 2px;
-  background: #ffffff;
-  border-radius: 9999px;
-  box-shadow: 0 0 10px #ffffff;
-}
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .nav-tabs-dock {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 680px) {
-  .header-top-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
+@media (max-width: 600px) {
   .nav-tabs-dock {
     grid-template-columns: 1fr;
-  }
-
-  .nav-dock-tab {
-    justify-content: flex-start;
   }
 }

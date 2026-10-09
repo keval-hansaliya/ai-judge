@@ -1,3 +1,5 @@
+import { UserCheck, Scale, Handshake, ThumbsUp } from 'lucide-react';
+
 /**
  * VotingBar — high-impact three-button human voting deck rendered under battle responses.
  *
@@ -11,7 +13,8 @@ export function VotingBar({ onVote, disabled }) {
       <div className="voting-header">
         <div className="voting-badge-row">
           <span className="voting-badge">
-            <span className="pulsing-dot-amber"></span> 🗳️ HUMAN EVALUATION
+            <UserCheck size={13} />
+            <span>HUMAN EVALUATION</span>
           </span>
           <span className="voting-hint-tag">Updates Global Elo</span>
         </div>
@@ -29,8 +32,10 @@ export function VotingBar({ onVote, disabled }) {
           disabled={disabled}
         >
           <div className="vote-card-top">
-            <span className="vote-model-tag tag-a">🔵 MODEL A</span>
-            <span className="vote-icon">👈</span>
+            <span className="vote-model-tag tag-a">MODEL A</span>
+            <span className="vote-icon">
+              <ThumbsUp size={15} />
+            </span>
           </div>
           <div className="vote-card-body">
             <span className="vote-card-label">Model A is Better</span>
@@ -45,8 +50,10 @@ export function VotingBar({ onVote, disabled }) {
           disabled={disabled}
         >
           <div className="vote-card-top">
-            <span className="vote-model-tag tag-tie">⚖️ NEUTRAL</span>
-            <span className="vote-icon">🤝</span>
+            <span className="vote-model-tag tag-tie">NEUTRAL</span>
+            <span className="vote-icon">
+              <Handshake size={15} />
+            </span>
           </div>
           <div className="vote-card-body">
             <span className="vote-card-label">Tie / Equal Quality</span>
@@ -61,8 +68,10 @@ export function VotingBar({ onVote, disabled }) {
           disabled={disabled}
         >
           <div className="vote-card-top">
-            <span className="vote-model-tag tag-b">🟣 MODEL B</span>
-            <span className="vote-icon">👉</span>
+            <span className="vote-model-tag tag-b">MODEL B</span>
+            <span className="vote-icon">
+              <ThumbsUp size={15} />
+            </span>
           </div>
           <div className="vote-card-body">
             <span className="vote-card-label">Model B is Better</span>
