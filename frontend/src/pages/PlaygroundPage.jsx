@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createBattleStream } from '../api.js';
 import { FormattedResponse } from '../components/FormattedResponse.jsx';
 import { addToast } from '../components/Toast.jsx';
@@ -34,16 +34,30 @@ const PLAYGROUND_STARTERS = [
  * inspect architecture specifications and context limits, calibrate hyperparameters,
  * and stream synchronized side-by-side evaluations.
  */
-export function PlaygroundPage() {
-  const [pgModelA, setPgModelA] = useState(AVAILABLE_MODELS[0]?.id || '');
+export function PlaygroundPage({ initialModelId = '', initialPrompt = '' }) {
+  const [pgModelA, setPgModelA] = useState(() => {
+    if (initialModelId && AVAILABLE_MODELS.some((m) => m.id === initialModelId)) {
+      return initialModelId;
+    }
+    return AVAILABLE_MODELS[0]?.id || '';
+  });
   const [pgModelB, setPgModelB] = useState(AVAILABLE_MODELS[4]?.id || AVAILABLE_MODELS[1]?.id || '');
   const [temperature, setTemperature] = useState(0.7);
   const [maxTokens, setMaxTokens] = useState(512);
-  const [pgPrompt, setPgPrompt] = useState('');
+  const [pgPrompt, setPgPrompt] = useState(initialPrompt || '');
   const [pgResA, setPgResA] = useState('');
   const [pgResB, setPgResB] = useState('');
   const [pgStreaming, setPgStreaming] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (initialModelId && AVAILABLE_MODELS.some((m) => m.id === initialModelId)) {
+      setPgModelA(initialModelId);
+    }
+    if (initialPrompt) {
+      setPgPrompt(initialPrompt);
+    }
+  }, [initialModelId, initialPrompt]);
 
   const modelAObj = AVAILABLE_MODELS.find((m) => m.id === pgModelA) || {
     id: pgModelA,

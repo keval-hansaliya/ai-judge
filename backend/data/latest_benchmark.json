@@ -1,6 +1,6 @@
 {
-  "benchmarkId": "bm_1789754474015",
-  "timestamp": "2026-09-18T18:01:14.015Z",
+  "benchmarkId": "bm_1791446734473",
+  "timestamp": "2026-10-08T08:05:34.473Z",
   "hyperparameters": {
     "temperature": 0,
     "top_p": 1,
@@ -12,16 +12,16 @@
   "modelsTestedCount": 5,
   "rankings": [
     {
-      "modelId": 42,
-      "name": "Cohere North Mini Code (Free)",
-      "provider": "openrouter",
-      "openRouterModelId": "cohere/north-mini-code:free",
-      "overallScore": 7.06,
-      "accuracy": 7,
-      "formatting": 7.5,
-      "logic": 7.5,
-      "conciseness": 6.3,
-      "avgLatencyMs": 4585,
+      "modelId": 56,
+      "name": "OpenAI GPT-OSS 120B",
+      "provider": "groq",
+      "openRouterModelId": "openai/gpt-oss-120b",
+      "overallScore": 9.19,
+      "accuracy": 9.5,
+      "formatting": 9.5,
+      "logic": 10,
+      "conciseness": 7.8,
+      "avgLatencyMs": 1846,
       "truncationCount": 0,
       "totalPromptsTested": 4,
       "evaluations": [
@@ -29,121 +29,40 @@
           "promptId": "gen_1",
           "category": "General",
           "title": "Explanation & Analogy",
-          "response": "- **Tiny Super‑Dice:** A normal computer uses bits that are either 0 or 1 (like a regular dice). A quantum computer uses “qubits” that can be 0, 1, or both at the same time (like a magical dice that shows every number at once).  \n- **Working Together:** Because qubits can be many possibilities at once, the computer can try lots of solutions all at the same time, finding the right answer much faster for tricky problems like cracking codes or exploring molecules.  \n- **Very Fragile:** Qubits need to stay super cold and be protected from tiny disturbances (like vibrations or heat), otherwise they “collapse” back to a single 0 or 1 and lose their special powers.",
-          "latencyMs": 7472,
+          "response": "- **Qubits are like magical coins:** A regular computer uses bits that are either heads (1) or tails (0). A quantum computer uses qubits, which can be heads, tails, or both at the same time—like a coin that spins so fast you can’t tell which side it’s on until you look.\n\n- **They can talk to each other instantly:** When qubits get “entangled,” changing one instantly affects the other, no matter how far apart they are. It’s like having two dice that always show matching numbers even if you roll them in different rooms.\n\n- **They try many possibilities at once:** Because each qubit can be many things at once, a quantum computer can test a huge number of solutions all at the same time, kind of like trying every key on a giant keyring simultaneously to open a lock. This makes some problems solve much faster than a regular computer.",
+          "latencyMs": 1368,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 10,
+            "formatting": 10,
+            "logic": 10,
+            "conciseness": 9,
+            "overallScore": 9.75
+          },
+          "judgeReasoning": "Both responses are excellent and follow all constraints perfectly. Model A is selected as the winner because its analogies (spinning coin, matching dice, keyring) are exceptionally clear and well-suited for a 10-year-old audience."
+        },
+        {
+          "promptId": "code_1",
+          "category": "Coding",
+          "title": "Algorithm Implementation",
+          "response": "Here is a compact, well‑documented implementation of binary search that works on any sorted list (or any sequence that supports indexing and length).  \nIt returns the index of the target value, or `-1` when the value is not present – including the special case of an empty list.\n\n```python\nfrom typing import List, Sequence, TypeVar, Optional\n\nT = TypeVar(\"T\")\n\n\ndef binary_search(seq: Sequence[T], target: T) -> int:\n    \"\"\"\n    Perform a binary search for ``target`` in a sorted sequence.\n\n    Parameters\n    ----------\n    seq : Sequence[T]\n        A **sorted** sequence (list, tuple, array, etc.) that supports\n        ``len()`` and element access via ``seq[index]``.  The elements must be\n        comparable with the ``target`` using the ``<`` and ``>`` operators.\n    target : T\n        The value to locate in ``seq``.\n\n    Returns\n    -------\n    int\n        The index of ``target`` in ``seq`` if it is present; otherwise ``-1``.\n        An empty ``seq`` also yields ``-1``.\n\n    Notes\n    -----\n    * The algorithm runs in O(log n) time and O(1) extra space.\n    * The function is *iterative* to avoid the recursion depth limit.\n    * If the list contains duplicate values, the index of **any** matching\n      element may be returned (the one found first by the algorithm).\n\n    Examples\n    --------\n    >>> binary_search([1, 3, 5, 7, 9], 5)\n    2\n    >>> binary_search([1, 3, 5, 7, 9], 6)\n    -1\n    >>> binary_search([], 42)\n    -1\n    \"\"\"\n    # Fast‑path for the empty‑list edge case.\n    if not seq:\n        return -1\n\n    left, right = 0, len(seq) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n        mid_val = seq[mid]\n\n        if mid_val == target:\n            return mid\n        elif mid_val < target:\n            left = mid + 1\n        else:               # mid_val > target\n            right = mid - 1\n\n    # Target not found.\n    return -1\n```\n\n### How it works\n1. **Empty list check** – `if not seq:` returns `-1` immediately, handling the edge case without entering the loop.\n2. **Loop invariant** – the search interval `[left, right]` always contains the possible location of `target`.  \n   Each iteration halves the interval by comparing `target` with the middle element.\n3. **Termination** – when `left` exceeds `right` the interval is empty, meaning the value is absent.\n\nFeel free to drop this function into any module and use it directly. If you prefer a version that returns `None` instead of `-1`, just replace the final `return -1` with `return None` and adjust the type hint accordingly.",
+          "latencyMs": 2177,
           "isTruncated": false,
           "score": {
             "accuracy": 9,
-            "formatting": 9,
+            "formatting": 10,
             "logic": 10,
-            "conciseness": 7,
+            "conciseness": 6,
             "overallScore": 8.75
           },
           "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
         },
         {
-          "promptId": "code_1",
-          "category": "Coding",
-          "title": "Algorithm Implementation",
-          "response": "```python\ndef binary_search(arr, target):\n    \"\"\"\n    Perform binary search on a sorted list to find the index of target.\n\n    Parameters:\n    arr (list): A sorted list of elements (ascending order).\n    target: The element to search for.\n\n    Returns:\n    int: The index of target if found, otherwise -1.\n    \"\"\"\n    if not arr:\n        return -1\n\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n```",
-          "latencyMs": 8385,
-          "isTruncated": false,
-          "score": {
-            "accuracy": 8,
-            "formatting": 9,
-            "logic": 8,
-            "conciseness": 7,
-            "overallScore": 8
-          },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
-        },
-        {
           "promptId": "math_1",
           "category": "Math",
           "title": "Multi-Step Word Problem",
-          "response": "**Step‑by‑step calculation**\n\n1. **Original price of the jacket**  \n   \\[\n   P_{\\text{original}} = \\$150\n   \\]\n\n2. **Calculate the 20 % discount**  \n   \\[\n   \\text{Discount amount} = 20\\% \\times \\$150 = 0.20 \\times 150 = \\$30\n   \\]\n\n3. **Subtract the discount to get the discounted price**  \n   \\[\n   P_{\\text{discounted}} = \\$150 - \\$30 = \\$120\n   \\]\n\n4. **Calculate the sales tax (8 %) on the discounted price**  \n   \\[\n   \\text{Sales tax} = 8\\% \\times \\$120 = 0.08 \\times 120 = \\$9.60\n   \\]\n\n5. **Add the tax to the discounted price to obtain the final price**  \n   \\[\n   P_{\\text{final}} = \\$120 + \\$9.60 = \\$129.60\n   \\]\n\n---\n\n\\[\n\\boxed{\\text{Final price of the jacket} = \\$129.60}\n\\]",
-          "latencyMs": 2482,
-          "isTruncated": false,
-          "score": {
-            "accuracy": 9,
-            "formatting": 9,
-            "logic": 10,
-            "conciseness": 7,
-            "overallScore": 8.75
-          },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
-        },
-        {
-          "promptId": "reason_1",
-          "category": "Reasoning",
-          "title": "Logical Deduction",
-          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
-          "isTruncated": false,
-          "score": {
-            "accuracy": 2,
-            "formatting": 3,
-            "logic": 2,
-            "conciseness": 4,
-            "overallScore": 2.75
-          },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
-        }
-      ],
-      "rank": 1
-    },
-    {
-      "modelId": 40,
-      "name": "Liquid LFM 2.5 (Free)",
-      "provider": "openrouter",
-      "openRouterModelId": "liquid/lfm-2.5-2.6b:free",
-      "overallScore": 7,
-      "accuracy": 7,
-      "formatting": 7.3,
-      "logic": 7.3,
-      "conciseness": 6.5,
-      "avgLatencyMs": 2254,
-      "truncationCount": 1,
-      "totalPromptsTested": 4,
-      "evaluations": [
-        {
-          "promptId": "gen_1",
-          "category": "General",
-          "title": "Explanation & Analogy",
-          "response": "Here is how quantum computing works, explained simply:\n\n*   **Spinning Coins:** Regular computers use switches that are either ON or OFF (like a light switch). Quantum computers use \"qubits\" that are like spinning coins—they can be heads **and** tails at the same time!\n*   **Many Paths at Once:** Because these spinning qubits can be in two places at once, a quantum computer can try millions of different answers to a puzzle all at the same time, instead of one by one.\n*   **Super Fast Solutions:** This means they can solve really hard math problems—like finding the fastest route through a giant maze—much faster than any normal computer ever could.",
-          "latencyMs": 2901,
-          "isTruncated": false,
-          "score": {
-            "accuracy": 9,
-            "formatting": 9,
-            "logic": 10,
-            "conciseness": 7,
-            "overallScore": 8.75
-          },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
-        },
-        {
-          "promptId": "code_1",
-          "category": "Coding",
-          "title": "Algorithm Implementation",
-          "response": "\n\n```python\ndef binary_search(sorted_list, target):\n    \"\"\"\n    Performs binary search on a sorted list to locate a target value.\n    \n    Assumes the input list is sorted in ascending order. Returns the index \n    of the target if found, or -1 if",
-          "latencyMs": 4292,
-          "isTruncated": true,
-          "score": {
-            "accuracy": 8,
-            "formatting": 9,
-            "logic": 7,
-            "conciseness": 8,
-            "overallScore": 8
-          },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
-        },
-        {
-          "promptId": "math_1",
-          "category": "Math",
-          "title": "Multi-Step Word Problem",
-          "response": "Here are the step-by-step calculations to find the final price:\n\n**Step 1: Calculate the discount amount**\nFirst, find 20% of the original price of $150.\n$$150 \\times 0.20 = \\$30$$\nThe discount is **$30**.\n\n**Step 2: Calculate the discounted price**\nSubtract the discount from the original price.\n$$150 - 30 = \\$120$$\nThe price after the discount is **$120**.\n\n**Step 3: Calculate the sales tax**\nNext, apply the 8% sales tax to the discounted price of $120.\n$$120 \\times 0.08 = \\$9.60$$\nThe sales tax is **$9.60**.\n\n**Step 4: Calculate the final price**\nAdd the sales tax to the discounted price.\n$$120 + 9.60 = \\$129.60$$\n\n**Answer:**\nThe final price of the jacket is **$129.60**.",
-          "latencyMs": 1823,
+          "response": "**Step‑by‑step calculation**\n\n| Step | What we do | Calculation | Result |\n|------|------------|-------------|--------|\n| 1 | Find the amount of the discount (20 % of \\$150) | \\(0.20 \\times 150 = 30\\) | \\$30 |\n| 2 | Subtract the discount from the original price | \\(150 - 30 = 120\\) | **Discounted price = \\$120** |\n| 3 | Compute the sales tax (8 % of the discounted price) | \\(0.08 \\times 120 = 9.60\\) | \\$9.60 |\n| 4 | Add the tax to the discounted price to get the final amount | \\(120 + 9.60 = 129.60\\) | **Final price = \\$129.60** |\n\n**Answer:** The jacket will cost **\\$129.60** after the 20 % discount and the 8 % sales tax.",
+          "latencyMs": 1219,
           "isTruncated": false,
           "score": {
             "accuracy": 9,
@@ -152,38 +71,38 @@
             "conciseness": 7,
             "overallScore": 8.5
           },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
         },
         {
           "promptId": "reason_1",
           "category": "Reasoning",
           "title": "Logical Deduction",
-          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
+          "response": "**Step‑by‑step deduction**\n\n1. **Label the three seats**  \n   - Seat 1 = leftmost  \n   - Seat 2 = middle  \n   - Seat 3 = rightmost  \n\n2. **Use the clue “Charlie is to the right of Alice.”**  \n   - This means Alice cannot be in the rightmost seat (Seat 3), because there would be no seat to her right.  \n   - So Alice can be only in Seat 1 (leftmost) or Seat 2 (middle).\n\n3. **Consider each possible place for Alice.**\n\n   ---\n   **Case A: Alice in Seat 1**  \n   - Charlie must be somewhere to the right of Alice, i.e. Seat 2 **or** Seat 3.  \n\n   *Sub‑case A1:* Charlie in Seat 2.  \n   - The only remaining person, Bob, must sit in Seat 3.  \n   - Check the other condition: “Alice is **not** next to Bob.”  \n     - Alice (Seat 1) and Bob (Seat 3) are two seats apart → they are **not** adjacent.  \n   - **All conditions are satisfied.**  \n\n   *Sub‑case A2:* Charlie in Seat 3.  \n   - Bob would have to sit in Seat 2.  \n   - Now Alice (Seat 1) and Bob (Seat 2) are adjacent, violating “Alice is not next to Bob.”  \n   - **This arrangement is impossible.**\n\n   ---\n   **Case B: Alice in Seat 2**  \n   - Charlie must be to the right of Alice, so Charlie can only be in Seat 3.  \n   - Bob would then have to sit in Seat 1.  \n   - Alice (Seat 2) and Bob (Seat 1) are adjacent → violates “Alice is not next to Bob.”  \n   - **This arrangement is impossible.**\n\n4. **Only one arrangement survives all constraints:**  \n\n   | Seat 1 | Seat 2 | Seat 3 |\n   |--------|--------|--------|\n   | Alice  | Charlie| Bob    |\n\n5. **Identify the middle seat.**  \n   - The middle seat (Seat 2) is occupied by **Charlie**.\n\n---\n\n**Answer:** **Charlie is sitting in the middle.** The logical steps above show that every other placement either puts Alice next to Bob or makes it impossible for Charlie to be to the right of Alice.",
+          "latencyMs": 2621,
           "isTruncated": false,
           "score": {
-            "accuracy": 2,
-            "formatting": 3,
-            "logic": 2,
-            "conciseness": 4,
-            "overallScore": 2.75
+            "accuracy": 10,
+            "formatting": 10,
+            "logic": 10,
+            "conciseness": 9,
+            "overallScore": 9.75
           },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
+          "judgeReasoning": "Both models arrived at the correct answer through sound, step-by-step logical deduction. Model B is slightly better as its logic in step 4 directly eliminates possibilities using the constraints, rather than splitting into sub-cases like Model A did, making the reasoning cleaner and more efficient."
         }
       ],
-      "rank": 2
+      "rank": 1
     },
     {
-      "modelId": 43,
-      "name": "Dots 3 Note Preview (Free)",
-      "provider": "openrouter",
-      "openRouterModelId": "dots-studio/dots-3-note-preview:free",
-      "overallScore": 6.94,
-      "accuracy": 6.8,
-      "formatting": 7.8,
-      "logic": 7,
-      "conciseness": 6.3,
-      "avgLatencyMs": 5285,
+      "modelId": 58,
+      "name": "Qwen 3.8 27B",
+      "provider": "groq",
+      "openRouterModelId": "qwen/qwen3.8-27b",
+      "overallScore": 9,
+      "accuracy": 9.3,
+      "formatting": 9.5,
+      "logic": 9.5,
+      "conciseness": 7.8,
+      "avgLatencyMs": 1164,
       "truncationCount": 0,
       "totalPromptsTested": 4,
       "evaluations": [
@@ -191,8 +110,186 @@
           "promptId": "gen_1",
           "category": "General",
           "title": "Explanation & Analogy",
-          "response": "\n\nOf course! Here's how quantum computing works, explained for a 10-year-old.\n\n*   **It uses \"spinning coins\" instead of regular switches.** Regular computers use bits that are like a coin that is either heads (0) or tails (1). Quantum computers use \"qubits,\" which are like spinning coins that can be both heads *and* tails at the same time! This lets them try many possibilities all at once.\n\n*   **The coins can be magic and connected.** These spinning quantum coins can be \"entangled.\" That's a magic link where if you make one coin spin a certain way, the other one instantly knows and spins the matching way, even if it's far away. This helps them work together on a problem.\n\n*   **It's like finding the right path in a giant maze super fast.** Instead of trying every single path one by one like a normal computer, a quantum computer can explore many paths at the same time. Then, it uses the rules of the maze (called interference) to make the wrong answers cancel out and the right answer get louder, so it finds the solution much quicker.",
-          "latencyMs": 6858,
+          "response": "*   **Superpowers for Bits:** Regular computers use tiny switches called bits that are either ON (1) or OFF (0), like a light switch. Quantum computers use special bits called \"qubits\" that can be ON, OFF, or **both at the same time**, which lets them try many answers to a problem all at once.\n*   **Like a Maze:** Imagine you are in a giant maze. A regular computer has to try one path at a time, starting from the beginning if it hits a dead end. A quantum computer is like having a magic copy of itself that can explore **every path in the maze simultaneously** to find the exit much faster.\n*   **Fragile Magic:** These quantum bits are very delicate and can easily get confused if they are looked at or disturbed. So, scientists have to keep them super cold and quiet, like protecting a very fragile egg, to make sure they work correctly.",
+          "latencyMs": 881,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 10,
+            "formatting": 10,
+            "logic": 10,
+            "conciseness": 9,
+            "overallScore": 9.75
+          },
+          "judgeReasoning": "Model A did an excellent job tailoring the explanation to a 10-year-old using clear, engaging analogies (light switches, mazes, magic copies). Model B used overly complex jargon (superposition, entanglement, interference) that is not suitable for a child. Furthermore, Model B incorrectly attributed superposition ('being both 0 and 1 at the same time') to quantum entanglement."
+        },
+        {
+          "promptId": "code_1",
+          "category": "Coding",
+          "title": "Algorithm Implementation",
+          "response": "```python\ndef binary_search(sorted_list: list, target) -> int:\n    \"\"\"\n    Perform binary search on a sorted list to find the index of the target.\n\n    Args:\n        sorted_list: A list of elements sorted in ascending order.\n        target: The element to search for in the list.\n\n    Returns:\n        The index of the target in the list if found, otherwise -1.\n\n    Examples:\n        >>> binary_search([1, 3, 5, 7, 9], 5)\n        2\n        >>> binary_search([1, 3, 5, 7, 9], 4)\n        -1\n        >>> binary_search([], 1)\n        -1\n    \"\"\"\n    if not sorted_list:\n        return -1\n\n    left = 0\n    right = len(sorted_list) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n        if sorted_list[mid] == target:\n            return mid\n        elif sorted_list[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return -1\n```",
+          "latencyMs": 795,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 8,
+            "formatting": 10,
+            "logic": 8,
+            "conciseness": 7,
+            "overallScore": 8.25
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "math_1",
+          "category": "Math",
+          "title": "Multi-Step Word Problem",
+          "response": "Here is the step-by-step calculation to determine the final price of the jacket.\n\n### Step 1: Calculate the Discount Amount\nFirst, determine how much money is taken off the original price due to the 20% discount.\n\n$$ \\text{Discount Amount} = \\text{Original Price} \\times \\text{Discount Rate} $$\n$$ \\text{Discount Amount} = 150 \\times 0.20 $$\n$$ \\text{Discount Amount} = 30 $$\n\nThe discount is **$30.00**.\n\n### Step 2: Calculate the Discounted Price\nSubtract the discount amount from the original price to find the price before tax.\n\n$$ \\text{Discounted Price} = \\text{Original Price} - \\text{Discount Amount} $$\n$$ \\text{Discounted Price} = 150 - 30 $$\n$$ \\text{Discounted Price} = 120 $$\n\nThe price after the discount is **$120.00**.\n\n### Step 3: Calculate the Sales Tax\nCalculate the 8% sales tax based on the discounted price.\n\n$$ \\text{Sales Tax} = \\text{Discounted Price} \\times \\text{Tax Rate} $$\n$$ \\text{Sales Tax} = 120 \\times 0.08 $$\n$$ \\text{Sales Tax} = 9.60 $$\n\nThe sales tax is **$9.60**.\n\n### Step 4: Calculate the Final Price\nAdd the sales tax to the discounted price to find the total amount to be paid.\n\n$$ \\text{Final Price} = \\text{Discounted Price} + \\text{Sales Tax} $$\n$$ \\text{Final Price} = 120 + 9.60 $$\n$$ \\text{Final Price} = 129.60 $$\n\n### Conclusion\nThe final price of the jacket is **$129.60**.",
+          "latencyMs": 1240,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 9,
+            "formatting": 8,
+            "logic": 10,
+            "conciseness": 6,
+            "overallScore": 8.25
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "reason_1",
+          "category": "Reasoning",
+          "title": "Logical Deduction",
+          "response": "To determine who is sitting in the middle, we can analyze the constraints step by step using logical deduction.\n\n**Step 1: Analyze the positions**\nThere are three people (Alice, Bob, Charlie) and three seats in a row. Let's label the seats from left to right as Position 1, Position 2, and Position 3.\n*   Position 1: Left\n*   Position 2: Middle\n*   Position 3: Right\n\n**Step 2: Apply the constraint \"Charlie is to the right of Alice\"**\nThis implies that Alice cannot be in Position 3 (the rightmost seat), because there is no seat to her right for Charlie.\nTherefore, Alice must be in either Position 1 or Position 2.\n\n*   **Case A:** Alice is in Position 1.\n    *   Since Charlie is to the right of Alice, Charlie can be in Position 2 or Position 3.\n*   **Case B:** Alice is in Position 2.\n    *   Since Charlie is to the right of Alice, Charlie must be in Position 3.\n\n**Step 3: Apply the constraint \"Alice is not next to Bob\"**\nLet's test the cases from Step 2 against this constraint.\n\n*   **Testing Case B (Alice is in Position 2):**\n    *   If Alice is in the middle (Position 2), she is next to both Position 1 and Position 3.\n    *   From Step 2, if Alice is in Position 2, Charlie is in Position 3.\n    *   This leaves Bob for Position 1.\n    *   In this arrangement (Bob - Alice - Charlie), Alice is next to Bob.\n    *   This violates the constraint \"Alice is not next to Bob.\"\n    *   Therefore, **Case B is invalid**. Alice cannot be in the middle.\n\n*   **Testing Case A (Alice is in Position 1):**\n    *   Alice is in Position 1 (Left).\n    *   Alice is only next to Position 2.\n    *   The constraint says Alice is *not* next to Bob. Therefore, Bob cannot be in Position 2.\n    *   This means Bob must be in Position 3 (Right).\n    *   This leaves only one seat remaining for Charlie, which is Position 2 (Middle).\n    *   Let's verify if this arrangement works:\n        *   Arrangement: **Alice (1) - Charlie (2) - Bob (3)**\n        *   Is Charlie to the right of Alice? Yes (Position 2 is right of Position 1).\n        *   Is Alice next to Bob? No (Alice is at 1, Bob is at 3; they are separated by Charlie).\n\n**Conclusion**\nThe only valid arrangement is:\n1.  Alice (Left)\n2.  **Charlie (Middle)**\n3.  Bob (Right)\n\nTherefore, **Charlie** is sitting in the middle.",
+          "latencyMs": 1738,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 10,
+            "formatting": 10,
+            "logic": 10,
+            "conciseness": 9,
+            "overallScore": 9.75
+          },
+          "judgeReasoning": "Model A correctly solved the logic puzzle with clear, step-by-step reasoning, concluding that Charlie is in the middle (Arrangement: Alice - Charlie - Bob). Model B failed logically, hallucinated duplicate options in its breakdown, and incorrectly concluded that the puzzle could not be solved."
+        }
+      ],
+      "rank": 2
+    },
+    {
+      "modelId": 57,
+      "name": "OpenAI GPT-OSS 20B",
+      "provider": "groq",
+      "openRouterModelId": "openai/gpt-oss-20b",
+      "overallScore": 8.63,
+      "accuracy": 9,
+      "formatting": 8.5,
+      "logic": 9.3,
+      "conciseness": 7.8,
+      "avgLatencyMs": 1246,
+      "truncationCount": 1,
+      "totalPromptsTested": 4,
+      "evaluations": [
+        {
+          "promptId": "gen_1",
+          "category": "General",
+          "title": "Explanation & Analogy",
+          "response": "- **Bits vs. Qubits**  \n  *A normal computer uses tiny switches called bits that are either “on” (1) or “off” (0). A quantum computer uses qubits, which can be on, off, or both at the same time—like a coin spinning in the air that’s both heads and tails until you look.*\n\n- **Super‑powers from “both at once”**  \n  *Because qubits can be in many states at once, a quantum computer can try many answers at the same time, making it super fast at solving certain puzzles that would take a regular computer a long time.*\n\n- **Entanglement: qubits that talk to each other**  \n  *When qubits become entangled, what happens to one instantly affects the other, no matter how far apart they are. This lets quantum computers link their “both‑at‑once” power together to solve problems that are impossible for ordinary computers.*",
+          "latencyMs": 973,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 9,
+            "formatting": 8,
+            "logic": 9,
+            "conciseness": 8,
+            "overallScore": 8.5
+          },
+          "judgeReasoning": "Both models followed all instructions, providing 3 bullet points tailored to a 10-year-old. Model B is slightly better because its maze analogy in the second bullet point is an exceptional way to explain quantum parallelism to a child."
+        },
+        {
+          "promptId": "code_1",
+          "category": "Coding",
+          "title": "Algorithm Implementation",
+          "response": "```python\nfrom typing import List, Optional, Any\n\ndef binary_search(sorted_list: List[Any], target: Any) -> Optional[int]:\n    \"\"\"\n    Perform a binary search on a sorted list.\n\n    Parameters\n    ----------\n    sorted_list : list\n        A list that is sorted in ascending order.  The elements must be\n        comparable with the ``target`` using the ``<`` and ``>`` operators.\n    target : Any\n        The value to search for.\n\n    Returns\n    -------\n    int or None\n        The index of ``target`` in ``sorted_list`` if it is present;\n        otherwise ``None``.\n\n    Notes\n    -----\n    * The function works for empty lists – it simply returns ``None``.\n    * The algorithm runs in O(log n) time and uses O(1) additional space.\n\n    Examples\n    --------\n    >>> binary_search([1, 3, 5, 7, 9], 5)\n    2\n    >>> binary_search([1, 3, 5, 7, 9], 4)\n    None\n    >>> binary_search([], 1)\n    None\n    \"\"\"\n    left, right = 0, len(sorted_list) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n        mid_val = sorted_list[mid]\n\n        if mid_val == target:\n            return mid\n        elif mid_val < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return None\n```\n\nThis function is concise, type‑annotated, and includes a comprehensive docstring that explains its behavior, parameters, return value, and provides usage examples. It gracefully handles the empty‑list edge case by returning `None`.",
+          "latencyMs": 1159,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 8,
+            "formatting": 10,
+            "logic": 8,
+            "conciseness": 6,
+            "overallScore": 8
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "math_1",
+          "category": "Math",
+          "title": "Multi-Step Word Problem",
+          "response": "**Step‑by‑step calculation**\n\n| Step | Description | Calculation | Result |\n|------|-------------|-------------|--------|\n| 1 | **Original price** | – | \\$150.00 |\n| 2 | **Discount amount** | 20 % of \\$150 | \\(0.20 \\times 150 = 30\\) |\n| 3 | **Discounted price** | Original price – discount | \\(150 - 30 = 120\\) |\n| 4 | **Sales tax** | 8 % of discounted price | \\(0.08 \\times 120 = 9.60\\) |\n| 5 | **Final price** | Discounted price + sales tax | \\(120 + 9.60 = 129.60\\) |\n\n**Final price:** **\\$129.60**",
+          "latencyMs": 1012,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 9,
+            "formatting": 8,
+            "logic": 10,
+            "conciseness": 8,
+            "overallScore": 8.75
+          },
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
+        },
+        {
+          "promptId": "reason_1",
+          "category": "Reasoning",
+          "title": "Logical Deduction",
+          "response": "**Step‑by‑step logical deduction**\n\n1. **Label the positions**  \n   In a row of three people we have three positions:  \n   - Position 1 (leftmost)  \n   - Position 2 (middle)  \n   - Position 3 (rightmost)\n\n2. **Translate the clues into constraints**  \n   - *“Charlie is to the right of Alice.”*  \n     → The index of Charlie’s seat must be greater than the index of Alice’s seat.  \n   - *“Alice is not next to Bob.”*  \n     → Alice and Bob cannot occupy adjacent positions (1–2 or 2–3).\n\n3. **Consider where Alice can sit**  \n   - If Alice were in the **rightmost** position (3), there would be no seat to her right, so Charlie could not be “to the right of Alice.”  \n     → **Alice cannot be in position 3.**\n\n   - Therefore Alice must be in either **position 1 (leftmost)** or **position 2 (middle)**.\n\n4. **Case 1: Alice in position 1 (leftmost)**  \n   - Charlie must be to the right of Alice, so Charlie can be in position 2 or 3.  \n   - Alice cannot be next to Bob, so Bob cannot be in position 2 (the seat adjacent to Alice).  \n   - The only remaining seat for Bob is position 3.  \n   - Since Bob occupies position 3, Charlie cannot also be there, so Charlie must be in the only free seat: position 2.  \n   - **Result for this case:**  \n     - Position 1: Alice  \n     - Position 2: Charlie  \n     - Position 3: Bob  \n     All constraints are satisfied.\n\n5. **Case 2: Alice in position 2 (middle)**  \n   - Charlie must be to the right of Alice, so Charlie must occupy position 3 (the only seat to the right).  \n   - Bob must occupy the remaining seat, which is position 1.  \n   - But Alice (position 2) is adjacent to Bob (position 1), violating the rule that Alice is not next to Bob.  \n   - **Result for this case:** Contradiction – this arrangement is impossible.\n\n6. **Conclusion**  \n   The only arrangement that satisfies both clues is the one from Case 1.  \n   In that arrangement, the **middle seat (position 2) is occupied by Charlie",
+          "latencyMs": 1841,
+          "isTruncated": true,
+          "score": {
+            "accuracy": 10,
+            "formatting": 8,
+            "logic": 10,
+            "conciseness": 9,
+            "overallScore": 9.25
+          },
+          "judgeReasoning": "Both models successfully deduced the correct answer (Charlie) using sound, step-by-step logic. Model B wins slightly on formatting because Model A cut off its final markdown tag at the very end (`**middle seat (position 2) is occupied by Charlie`)."
+        }
+      ],
+      "rank": 3
+    },
+    {
+      "modelId": 55,
+      "name": "Gemini 3.5 Flash Lite",
+      "provider": "gemini",
+      "openRouterModelId": "gemini-3.5-flash-lite",
+      "overallScore": 8.51,
+      "accuracy": 8.5,
+      "formatting": 9.3,
+      "logic": 8.8,
+      "conciseness": 7.8,
+      "avgLatencyMs": 2116,
+      "truncationCount": 0,
+      "totalPromptsTested": 4,
+      "evaluations": [
+        {
+          "promptId": "gen_1",
+          "category": "General",
+          "title": "Explanation & Analogy",
+          "response": "Here is how quantum computing works in 3 simple points:\n\n* **Regular computers use \"bits\" (like light switches):** Normal computers think in a binary code of 1s and 0s—like a light switch that is either turned ON (1) or OFF (0). \n* **Quantum computers use \"qubits\" (like spinning coins):** Quantum computers use special bits called **qubits**. Instead of just being 1 or 0, a qubit can act like a spinning coin—it's like it is *both* heads and tails at the exact same time until you look at it.\n* **They solve huge puzzles super fast:** Because these qubits can be in many states at once, quantum computers can try millions of different answers to a hard puzzle all at the exact same time, making them mind-bogglingly fast!",
+          "latencyMs": 1693,
+          "isTruncated": false,
+          "score": {
+            "accuracy": 9,
+            "formatting": 10,
+            "logic": 10,
+            "conciseness": 9,
+            "overallScore": 9.5
+          },
+          "judgeReasoning": "Both models followed all instructions, including the constraint of 3 bullet points. Response A is slightly better because its logical flow (Regular bits -> Quantum qubits -> Resulting speed) builds a clearer foundation for a 10-year-old. Response B includes entanglement, but describes it as 'talking to each other instantly', which introduces a common misconception about quantum mechanics."
+        },
+        {
+          "promptId": "code_1",
+          "category": "Coding",
+          "title": "Algorithm Implementation",
+          "response": "Here is a clean, well-documented Python function for binary search that correctly handles empty lists and other edge cases.\n\n```python\nfrom typing import List, Optional\n\n\ndef binary_search(arr: List[int], target: int) -> Optional[int]:\n    \"\"\"Perform binary search on a sorted list to find the index of a target value.\n\n    Parameters:\n    arr (List[int]): A sorted list of integers (ascending order).\n    target (int): The value to search for.\n\n    Returns:\n    Optional[int]: The index of the target if found, otherwise None.\n    \"\"\"\n    left = 0\n    right = len(arr) - 1\n\n    while left <= right:\n        # Prevent potential integer overflow (though Python handles large ints automatically)\n        mid = left + (right - left) // 2\n\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return None\n```\n\n### Example Usage:\n\n```python\n# Sorted list\nnumbers = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]\n\nprint(binary_search(numbers, 23))  # Output: 5\nprint(binary_search(numbers, 100))  # Output: None\nprint(binary_search([], 5))  # Output: None (Edge case: empty list)\n```",
+          "latencyMs": 1525,
           "isTruncated": false,
           "score": {
             "accuracy": 8,
@@ -201,151 +298,54 @@
             "conciseness": 7,
             "overallScore": 8
           },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
-        },
-        {
-          "promptId": "code_1",
-          "category": "Coding",
-          "title": "Algorithm Implementation",
-          "response": "\n\nHere's a clean Python function that implements binary search with proper documentation and edge case handling:\n\n```python\ndef binary_search(sorted_list, target):\n    \"\"\"\n    Perform binary search on a sorted list to find the target value.\n\n    Args:\n        sorted_list: A list sorted in ascending order (must be sorted for correct results)\n        target: The value to search for in the list\n\n    Returns:\n        int: The index of the target if found, otherwise -1\n\n    Examples:\n        >>> binary_search([1, 2, 3, 4, 5], 3)\n        2\n        >>> binary_search([1, 2, 3, 4, 5], 6)\n        -1\n        >>> binary_search([], 1)\n        -1\n    \"\"\"\n    # Handle empty list case\n    if not sorted_list:\n        return -1\n    \n    left = 0\n    right = len(sorted_list) - 1\n    \n    while left <= right:\n        mid = (left + right) // 2\n        \n        if sorted_list[mid] == target:\n            return mid\n        elif sorted_list[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    \n    return -1\n```\n\nKey features of this implementation:\n1. **Docstring**: Includes description, parameters, return value, and examples\n2. **Edge Case Handling**: Explicitly checks for empty list input\n3. **Type Safety**: Works with any comparable data types (numbers, strings, etc.)\n4. **Efficiency**: O(log n) time complexity and O(1) space complexity\n5. **Clear Logic**: Uses standard iterative approach with left/right pointers\n\nExample usage:\n```python\nnumbers = [1, 3, 5, 7, 9, 11]\nprint(binary_search(numbers, 7))  # Output: 3\nprint(binary_search(numbers, 2))  # Output: -1\nprint(binary_search([], 5))       # Output: -1\n```",
-          "latencyMs": 6741,
-          "isTruncated": false,
-          "score": {
-            "accuracy": 8,
-            "formatting": 10,
-            "logic": 8,
-            "conciseness": 6,
-            "overallScore": 8
-          },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
         },
         {
           "promptId": "math_1",
           "category": "Math",
           "title": "Multi-Step Word Problem",
-          "response": "\n\n**Step‑by‑step calculation**\n\n1. **Find the discount amount**  \n   \\[\n   20\\% \\text{ of } \\$150 = 0.20 \\times 150 = \\$30\n   \\]\n\n2. **Subtract the discount from the original price**  \n   \\[\n   \\$150 - \\$30 = \\$120\n   \\]\n   This is the discounted price before tax.\n\n3. **Calculate the sales tax on the discounted price**  \n   \\[\n   8\\% \\text{ of } \\$120 = 0.08 \\times 120 = \\$9.60\n   \\]\n\n4. **Add the tax to the discounted price**  \n   \\[\n   \\$120 + \\$9.60 = \\$129.60\n   \\]\n\n**Final price:** \\(\\boxed{\\$129.60}\\)",
-          "latencyMs": 7540,
+          "response": "Here are the step-by-step calculations to find the final price of the jacket:\n\n**Step 1: Calculate the discount amount.**\n* Original price = $150\n* Discount rate = 20% (or 0.20)\n* Discount amount = $150 × 0.20 = $30\n\n**Step 2: Calculate the discounted price.**\n* Discounted price = Original price - Discount amount\n* Discounted price = $150 - $30 = $120\n\n**Step 3: Calculate the sales tax on the discounted price.**\n* Sales tax rate = 8% (or 0.08)\n* Sales tax = $120 × 0.08 = $9.60\n\n**Step 4: Calculate the final price.**\n* Final price = Discounted price + Sales tax\n* Final price = $120 + $9.60 = $129.60\n\nThe final price of the jacket is **$129.60**.",
+          "latencyMs": 2127,
           "isTruncated": false,
           "score": {
             "accuracy": 9,
             "formatting": 9,
             "logic": 10,
-            "conciseness": 8,
-            "overallScore": 9
-          },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
-        },
-        {
-          "promptId": "reason_1",
-          "category": "Reasoning",
-          "title": "Logical Deduction",
-          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
-          "isTruncated": false,
-          "score": {
-            "accuracy": 2,
-            "formatting": 3,
-            "logic": 2,
-            "conciseness": 4,
-            "overallScore": 2.75
-          },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
-        }
-      ],
-      "rank": 3
-    },
-    {
-      "modelId": 41,
-      "name": "Ling 3.0 Flash Fin (Free)",
-      "provider": "openrouter",
-      "openRouterModelId": "inclusionai/ling-3.0-flash-fin:free",
-      "overallScore": 5.81,
-      "accuracy": 5.5,
-      "formatting": 6.3,
-      "logic": 6,
-      "conciseness": 5.5,
-      "avgLatencyMs": 2715,
-      "truncationCount": 0,
-      "totalPromptsTested": 4,
-      "evaluations": [
-        {
-          "promptId": "gen_1",
-          "category": "General",
-          "title": "Explanation & Analogy",
-          "response": "* **Normal computers are like light switches that are either on or off, but quantum computers are like spinning coins—they can be heads, tails, or *both* at the same time!** \n* Because they can be multiple things at once, quantum computers can try out lots of different answers at the same time, like solving a giant maze by trying every path at once instead of going down one hallway at a time. \n* This makes them super powerful for solving really tricky puzzles—like finding new medicines or cracking secret codes—that would take a normal computer forever to figure out!",
-          "latencyMs": 7168,
-          "isTruncated": false,
-          "score": {
-            "accuracy": 9,
-            "formatting": 9,
-            "logic": 10,
-            "conciseness": 8,
-            "overallScore": 9
-          },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
-        },
-        {
-          "promptId": "code_1",
-          "category": "Coding",
-          "title": "Algorithm Implementation",
-          "response": "```python\ndef binary_search(arr, target):\n    \"\"\"\n    Performs binary search on a sorted list to find the index of a target value.\n\n    Args:\n        arr (list): A sorted list of elements to search through.\n        target: The value to search for in the list.\n\n    Returns:\n        int: The index of the target if found, otherwise -1.\n    \"\"\"\n    # Handle the empty list edge case\n    if not arr:\n        return -1\n\n    left, right = 0, len(arr) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return -1\n```\n\n### How it works:\n1. **Edge Case Handling:** The function first checks if the list is empty using `if not arr`. If it is, it immediately returns `-1`.\n2. **Pointers:** It initializes two pointers, `left` (starting at index 0) and `right` (starting at the last index).\n3. **Loop:** It enters a `while` loop that continues as long as `left` is less than or equal to `right`.\n4. **Midpoint:** It calculates the middle index `mid`.\n5. **Comparison:**\n   * If the middle element equals the target, it returns the index `mid`.\n   * If the middle element is less than the target, it discards the left half by moving `left` to `mid + 1`.\n   * If the middle element is greater than the target, it discards the right half by moving `right` to `mid - 1`.\n6. **Not Found:** If the loop exits without finding the target, the function returns `-1`.",
-          "latencyMs": 3690,
-          "isTruncated": false,
-          "score": {
-            "accuracy": 9,
-            "formatting": 10,
-            "logic": 10,
-            "conciseness": 6,
+            "conciseness": 7,
             "overallScore": 8.75
           },
           "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
         },
         {
-          "promptId": "math_1",
-          "category": "Math",
-          "title": "Multi-Step Word Problem",
-          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
-          "isTruncated": false,
-          "score": {
-            "accuracy": 2,
-            "formatting": 3,
-            "logic": 2,
-            "conciseness": 4,
-            "overallScore": 2.75
-          },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
-        },
-        {
           "promptId": "reason_1",
           "category": "Reasoning",
           "title": "Logical Deduction",
-          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
+          "response": "**Charlie** is sitting in the middle. \n\nHere is the step-by-step logical deduction:\n\n1. **Understand the seating arrangement:** There are three positions in a row: Left, Middle, and Right.\n2. **Analyze the first clue (\"Charlie is to the right of Alice\"):** This means Alice cannot be in the rightmost position (since there would be no space to her right), and Charlie cannot be in the leftmost position. \n   * Therefore, Alice must be either on the Left or in the Middle.\n   * Charlie must be either in the Middle or on the Right.\n3. **Analyze the second clue (\"Alice is not next to Bob\"):** \n   * If Alice were in the **Middle**, the only available seats next to her would be the Left and the Right. Since Alice cannot be next to Bob, *both* the Left and Right seats would have to be empty of Bob, which is impossible because Bob has to sit somewhere! \n   * Therefore, Alice **cannot** be in the middle.\n4. **Determine final positions:** \n   * Since Alice cannot be in the middle, she must be on the **Left**.\n   * Since Charlie is to the right of Alice, and the Left is taken by Alice, Charlie must take the **Middle**.\n   * By elimination, Bob must take the remaining seat on the **Right**. (Notice that Alice on the Left and Bob on the Right are separated by Charlie, satisfying the rule that Alice is not next to Bob).\n\n**Final Order (Left to Right):** Alice, Charlie, Bob. \n**Middle person:** Charlie.",
+          "latencyMs": 3117,
           "isTruncated": false,
           "score": {
-            "accuracy": 2,
-            "formatting": 3,
-            "logic": 2,
-            "conciseness": 4,
-            "overallScore": 2.75
+            "accuracy": 8,
+            "formatting": 9,
+            "logic": 7,
+            "conciseness": 8,
+            "overallScore": 7.8
           },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
+          "judgeReasoning": "Response B provides a completely airtight, step-by-step logical deduction by considering all sub-cases. Response A contains a logical flaw in step 4: it claims that if Alice is on the left, Charlie *must* be in the middle, skipping the sub-case where Charlie is on the right and Bob is in the middle (which would have to be ruled out because Bob would be adjacent to Alice)."
         }
       ],
       "rank": 4
     },
     {
-      "modelId": 39,
-      "name": "Nemotron 3.5 Lightning (Free)",
-      "provider": "openrouter",
-      "openRouterModelId": "nvidia/nemotron-3.5-lightning:free",
-      "overallScore": 2.75,
-      "accuracy": 2,
-      "formatting": 3,
-      "logic": 2,
-      "conciseness": 4,
-      "avgLatencyMs": 0,
+      "modelId": 59,
+      "name": "Allam 2 7B",
+      "provider": "groq",
+      "openRouterModelId": "allam-2-7b",
+      "overallScore": 8.25,
+      "accuracy": 8.3,
+      "formatting": 9,
+      "logic": 9,
+      "conciseness": 6.8,
+      "avgLatencyMs": 750,
       "truncationCount": 0,
       "totalPromptsTested": 4,
       "evaluations": [
@@ -353,65 +353,65 @@
           "promptId": "gen_1",
           "category": "General",
           "title": "Explanation & Analogy",
-          "response": "[Error generating response: AI model failed to generate a response. Please check backend integration or try again later.]",
-          "latencyMs": 0,
+          "response": "1. Traditional computers use bits to store and process information, representing data as 0s and 1s. Quantum computers use quantum bits or qubits, which can represent information in different states at the same time.\n\n2. Qubits can exist in a superposition of states, meaning they can be both 0 and 1 at the same time due to a phenomenon called quantum entanglement. This allows quantum computers to perform multiple calculations simultaneously, potentially making them much faster than classical computers for certain tasks.\n\n3. Quantum computers use a principle called quantum interference to combine and weigh the results of different possible calculations. This enables them to solve problems faster than classical computers, especially those involving large amounts of data or complex simulations.",
+          "latencyMs": 577,
           "isTruncated": false,
           "score": {
-            "accuracy": 2,
-            "formatting": 3,
-            "logic": 2,
-            "conciseness": 4,
-            "overallScore": 2.75
+            "accuracy": 6,
+            "formatting": 9,
+            "logic": 6,
+            "conciseness": 7,
+            "overallScore": 7
           },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+          "judgeReasoning": "Model B did a fantastic job tailoring the explanation to a 10-year-old using clear, relatable analogies (light switches, spinning coins). Model A used overly complex jargon (superposition, quantum entanglement, quantum interference) without explaining them simply, making it inappropriate for the target audience. Model A also incorrectly stated that superposition is caused by quantum entanglement."
         },
         {
           "promptId": "code_1",
           "category": "Coding",
           "title": "Algorithm Implementation",
-          "response": "[Error generating response: AI model failed to generate a response. Please check backend integration or try again later.]",
-          "latencyMs": 0,
+          "response": "Sure, I can help you with that. Here's a Python function that implements binary search algorithm:\n\n```python\ndef binary_search(arr, target):\n    # Base cases\n    if not arr or not len(arr):\n        return -1  # Empty list edge case: target not found\n    if not arr or not len(arr):\n        return 0  # Empty list edge case: target present (index 0)\n\n    low = 0\n    high = len(arr) - 1\n\n    while low <= high:\n        mid = (low + high) // 2\n        if arr[mid] == target:\n            return mid\n        elif target < arr[mid]:\n            high = mid - 1\n        else:\n            low = mid + 1\n\n    return -1  # Target not found\n\n# Example usage:\narr = [1, 3, 5, 7, 9, 11, 13, 15]\ntarget = 7\nresult = binary_search(arr, target)\nprint(f\"Target '{target}' found at index {result}\")\n```\n\nIn this function, we first check for empty lists and return -1 to indicate that the target is not present. Then we initialize the lower and upper bounds (low and high) and continue with the binary search loop.\n\nInside the loop, we calculate the middle index (mid) and compare the element at that index with the target. If they are equal, we return the middle index. If the target is smaller, we update high to be mid - 1. Otherwise, we update low to be mid + 1.\n\nIf the target is not found after the loop, we return -1.\n\nLet me know if you need further explanation or testing with different input lists and targets!",
+          "latencyMs": 637,
           "isTruncated": false,
           "score": {
-            "accuracy": 2,
-            "formatting": 3,
-            "logic": 2,
-            "conciseness": 4,
-            "overallScore": 2.75
+            "accuracy": 9,
+            "formatting": 9,
+            "logic": 10,
+            "conciseness": 6,
+            "overallScore": 8.5
           },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
         },
         {
           "promptId": "math_1",
           "category": "Math",
           "title": "Multi-Step Word Problem",
-          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
+          "response": "Let's break this down step by step:\n\n1. First, calculate the discount amount on the original price of $150:\n   Discount = (Discount Percentage / 100) * Original Price\n   Discount = (20 / 100) * $150\n   Discount = 0.20 * $150\n   Discount = $30\n\n2. Now, subtract the discount from the original price to find the discounted price:\n   Discounted Price = Original Price - Discount\n   Discounted Price = $150 - $30\n   Discounted Price = $120\n\n3. Next, calculate the sales tax on the discounted price:\n   Sales Tax = (Sales Tax Rate / 100) * Discounted Price\n   Sales Tax = (8 / 100) * $120\n   Sales Tax = 0.08 * $120\n   Sales Tax = $9.60\n\n4. Finally, add the sales tax to the discounted price to find the final price:\n   Final Price = Discounted Price + Sales Tax\n   Final Price = $120 + $9.60\n   Final Price = $129.60\n\nSo, the final price of the jacket after the discount and sales tax is $129.60.",
+          "latencyMs": 632,
           "isTruncated": false,
           "score": {
-            "accuracy": 2,
-            "formatting": 3,
-            "logic": 2,
-            "conciseness": 4,
-            "overallScore": 2.75
+            "accuracy": 9,
+            "formatting": 9,
+            "logic": 10,
+            "conciseness": 7,
+            "overallScore": 8.75
           },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Model B demonstrated higher structural quality, clarity, and reasoning completeness."
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
         },
         {
           "promptId": "reason_1",
           "category": "Reasoning",
           "title": "Logical Deduction",
-          "response": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
+          "response": "Let's analyze the information step by step:\n\n1. Alice is not next to Bob, which means either Alice is to the left of Bob or they are on opposite ends of the row.\n2. Charlie is to the right of Alice, which means Charlie cannot be on Alice's left. So, Alice and Bob can either be on opposite ends or Alice is to the left of Bob.\n3. Now, let's consider the possible arrangements:\n   a. Alice, Bob, Charlie: In this case, Alice is to the left of Bob, and Charlie is to the right of Alice.\n   b. Alice, Bob, Charlie (reversed): In this case, Alice is to the left of Bob, and Charlie is to the right of Alice.\n4. Both arrangements satisfy the given conditions: Alice is not next to Bob, and Charlie is to the right of Alice.\n5. Since we have two possible arrangements that satisfy all conditions, we cannot determine the exact position of each person without additional information.\n\nTherefore, with the provided information, we cannot definitively determine who is sitting in the middle.",
+          "latencyMs": 1153,
           "isTruncated": false,
           "score": {
-            "accuracy": 2,
-            "formatting": 3,
-            "logic": 2,
-            "conciseness": 4,
-            "overallScore": 2.75
+            "accuracy": 9,
+            "formatting": 9,
+            "logic": 10,
+            "conciseness": 7,
+            "overallScore": 8.75
           },
-          "judgeReasoning": "Deterministic Heuristic Evaluation: Both models provided balanced, well-structured completions"
+          "judgeReasoning": "Deterministic Heuristic Evaluation: Model A demonstrated higher structural quality, clarity, and reasoning completeness."
         }
       ],
       "rank": 5
@@ -424,40 +424,39 @@
       "title": "Explanation & Analogy",
       "prompt": "Explain how quantum computing works to a 10-year-old in 3 simple bullet points.",
       "modelOutputs": {
-        "39": {
-          "modelId": 39,
-          "name": "Nemotron 3.5 Lightning (Free)",
-          "text": "[Error generating response: AI model failed to generate a response. Please check backend integration or try again later.]",
-          "latencyMs": 0,
-          "isTruncated": false,
-          "error": "AI model failed to generate a response. Please check backend integration or try again later."
-        },
-        "40": {
-          "modelId": 40,
-          "name": "Liquid LFM 2.5 (Free)",
-          "text": "Here is how quantum computing works, explained simply:\n\n*   **Spinning Coins:** Regular computers use switches that are either ON or OFF (like a light switch). Quantum computers use \"qubits\" that are like spinning coins—they can be heads **and** tails at the same time!\n*   **Many Paths at Once:** Because these spinning qubits can be in two places at once, a quantum computer can try millions of different answers to a puzzle all at the same time, instead of one by one.\n*   **Super Fast Solutions:** This means they can solve really hard math problems—like finding the fastest route through a giant maze—much faster than any normal computer ever could.",
-          "latencyMs": 2901,
+        "55": {
+          "modelId": 55,
+          "name": "Gemini 3.5 Flash Lite",
+          "text": "Here is how quantum computing works in 3 simple points:\n\n* **Regular computers use \"bits\" (like light switches):** Normal computers think in a binary code of 1s and 0s—like a light switch that is either turned ON (1) or OFF (0). \n* **Quantum computers use \"qubits\" (like spinning coins):** Quantum computers use special bits called **qubits**. Instead of just being 1 or 0, a qubit can act like a spinning coin—it's like it is *both* heads and tails at the exact same time until you look at it.\n* **They solve huge puzzles super fast:** Because these qubits can be in many states at once, quantum computers can try millions of different answers to a hard puzzle all at the exact same time, making them mind-bogglingly fast!",
+          "latencyMs": 1693,
           "isTruncated": false
         },
-        "41": {
-          "modelId": 41,
-          "name": "Ling 3.0 Flash Fin (Free)",
-          "text": "* **Normal computers are like light switches that are either on or off, but quantum computers are like spinning coins—they can be heads, tails, or *both* at the same time!** \n* Because they can be multiple things at once, quantum computers can try out lots of different answers at the same time, like solving a giant maze by trying every path at once instead of going down one hallway at a time. \n* This makes them super powerful for solving really tricky puzzles—like finding new medicines or cracking secret codes—that would take a normal computer forever to figure out!",
-          "latencyMs": 7168,
+        "56": {
+          "modelId": 56,
+          "name": "OpenAI GPT-OSS 120B",
+          "text": "- **Qubits are like magical coins:** A regular computer uses bits that are either heads (1) or tails (0). A quantum computer uses qubits, which can be heads, tails, or both at the same time—like a coin that spins so fast you can’t tell which side it’s on until you look.\n\n- **They can talk to each other instantly:** When qubits get “entangled,” changing one instantly affects the other, no matter how far apart they are. It’s like having two dice that always show matching numbers even if you roll them in different rooms.\n\n- **They try many possibilities at once:** Because each qubit can be many things at once, a quantum computer can test a huge number of solutions all at the same time, kind of like trying every key on a giant keyring simultaneously to open a lock. This makes some problems solve much faster than a regular computer.",
+          "latencyMs": 1368,
           "isTruncated": false
         },
-        "42": {
-          "modelId": 42,
-          "name": "Cohere North Mini Code (Free)",
-          "text": "- **Tiny Super‑Dice:** A normal computer uses bits that are either 0 or 1 (like a regular dice). A quantum computer uses “qubits” that can be 0, 1, or both at the same time (like a magical dice that shows every number at once).  \n- **Working Together:** Because qubits can be many possibilities at once, the computer can try lots of solutions all at the same time, finding the right answer much faster for tricky problems like cracking codes or exploring molecules.  \n- **Very Fragile:** Qubits need to stay super cold and be protected from tiny disturbances (like vibrations or heat), otherwise they “collapse” back to a single 0 or 1 and lose their special powers.",
-          "latencyMs": 7472,
+        "57": {
+          "modelId": 57,
+          "name": "OpenAI GPT-OSS 20B",
+          "text": "- **Bits vs. Qubits**  \n  *A normal computer uses tiny switches called bits that are either “on” (1) or “off” (0). A quantum computer uses qubits, which can be on, off, or both at the same time—like a coin spinning in the air that’s both heads and tails until you look.*\n\n- **Super‑powers from “both at once”**  \n  *Because qubits can be in many states at once, a quantum computer can try many answers at the same time, making it super fast at solving certain puzzles that would take a regular computer a long time.*\n\n- **Entanglement: qubits that talk to each other**  \n  *When qubits become entangled, what happens to one instantly affects the other, no matter how far apart they are. This lets quantum computers link their “both‑at‑once” power together to solve problems that are impossible for ordinary computers.*",
+          "latencyMs": 973,
           "isTruncated": false
         },
-        "43": {
-          "modelId": 43,
-          "name": "Dots 3 Note Preview (Free)",
-          "text": "\n\nOf course! Here's how quantum computing works, explained for a 10-year-old.\n\n*   **It uses \"spinning coins\" instead of regular switches.** Regular computers use bits that are like a coin that is either heads (0) or tails (1). Quantum computers use \"qubits,\" which are like spinning coins that can be both heads *and* tails at the same time! This lets them try many possibilities all at once.\n\n*   **The coins can be magic and connected.** These spinning quantum coins can be \"entangled.\" That's a magic link where if you make one coin spin a certain way, the other one instantly knows and spins the matching way, even if it's far away. This helps them work together on a problem.\n\n*   **It's like finding the right path in a giant maze super fast.** Instead of trying every single path one by one like a normal computer, a quantum computer can explore many paths at the same time. Then, it uses the rules of the maze (called interference) to make the wrong answers cancel out and the right answer get louder, so it finds the solution much quicker.",
-          "latencyMs": 6858,
+        "58": {
+          "modelId": 58,
+          "name": "Qwen 3.8 27B",
+          "text": "*   **Superpowers for Bits:** Regular computers use tiny switches called bits that are either ON (1) or OFF (0), like a light switch. Quantum computers use special bits called \"qubits\" that can be ON, OFF, or **both at the same time**, which lets them try many answers to a problem all at once.\n*   **Like a Maze:** Imagine you are in a giant maze. A regular computer has to try one path at a time, starting from the beginning if it hits a dead end. A quantum computer is like having a magic copy of itself that can explore **every path in the maze simultaneously** to find the exit much faster.\n*   **Fragile Magic:** These quantum bits are very delicate and can easily get confused if they are looked at or disturbed. So, scientists have to keep them super cold and quiet, like protecting a very fragile egg, to make sure they work correctly.",
+          "latencyMs": 881,
+          "isTruncated": false
+        },
+        "59": {
+          "modelId": 59,
+          "name": "Allam 2 7B",
+          "text": "1. Traditional computers use bits to store and process information, representing data as 0s and 1s. Quantum computers use quantum bits or qubits, which can represent information in different states at the same time.\n\n2. Qubits can exist in a superposition of states, meaning they can be both 0 and 1 at the same time due to a phenomenon called quantum entanglement. This allows quantum computers to perform multiple calculations simultaneously, potentially making them much faster than classical computers for certain tasks.\n\n3. Quantum computers use a principle called quantum interference to combine and weigh the results of different possible calculations. This enables them to solve problems faster than classical computers, especially those involving large amounts of data or complex simulations.",
+          "latencyMs": 577,
           "isTruncated": false
         }
       }
@@ -468,40 +467,39 @@
       "title": "Algorithm Implementation",
       "prompt": "Write a clean Python function that performs binary search on a sorted list. Include docstring and handle empty list edge cases.",
       "modelOutputs": {
-        "39": {
-          "modelId": 39,
-          "name": "Nemotron 3.5 Lightning (Free)",
-          "text": "[Error generating response: AI model failed to generate a response. Please check backend integration or try again later.]",
-          "latencyMs": 0,
-          "isTruncated": false,
-          "error": "AI model failed to generate a response. Please check backend integration or try again later."
-        },
-        "40": {
-          "modelId": 40,
-          "name": "Liquid LFM 2.5 (Free)",
-          "text": "\n\n```python\ndef binary_search(sorted_list, target):\n    \"\"\"\n    Performs binary search on a sorted list to locate a target value.\n    \n    Assumes the input list is sorted in ascending order. Returns the index \n    of the target if found, or -1 if",
-          "latencyMs": 4292,
-          "isTruncated": true
-        },
-        "41": {
-          "modelId": 41,
-          "name": "Ling 3.0 Flash Fin (Free)",
-          "text": "```python\ndef binary_search(arr, target):\n    \"\"\"\n    Performs binary search on a sorted list to find the index of a target value.\n\n    Args:\n        arr (list): A sorted list of elements to search through.\n        target: The value to search for in the list.\n\n    Returns:\n        int: The index of the target if found, otherwise -1.\n    \"\"\"\n    # Handle the empty list edge case\n    if not arr:\n        return -1\n\n    left, right = 0, len(arr) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return -1\n```\n\n### How it works:\n1. **Edge Case Handling:** The function first checks if the list is empty using `if not arr`. If it is, it immediately returns `-1`.\n2. **Pointers:** It initializes two pointers, `left` (starting at index 0) and `right` (starting at the last index).\n3. **Loop:** It enters a `while` loop that continues as long as `left` is less than or equal to `right`.\n4. **Midpoint:** It calculates the middle index `mid`.\n5. **Comparison:**\n   * If the middle element equals the target, it returns the index `mid`.\n   * If the middle element is less than the target, it discards the left half by moving `left` to `mid + 1`.\n   * If the middle element is greater than the target, it discards the right half by moving `right` to `mid - 1`.\n6. **Not Found:** If the loop exits without finding the target, the function returns `-1`.",
-          "latencyMs": 3690,
+        "55": {
+          "modelId": 55,
+          "name": "Gemini 3.5 Flash Lite",
+          "text": "Here is a clean, well-documented Python function for binary search that correctly handles empty lists and other edge cases.\n\n```python\nfrom typing import List, Optional\n\n\ndef binary_search(arr: List[int], target: int) -> Optional[int]:\n    \"\"\"Perform binary search on a sorted list to find the index of a target value.\n\n    Parameters:\n    arr (List[int]): A sorted list of integers (ascending order).\n    target (int): The value to search for.\n\n    Returns:\n    Optional[int]: The index of the target if found, otherwise None.\n    \"\"\"\n    left = 0\n    right = len(arr) - 1\n\n    while left <= right:\n        # Prevent potential integer overflow (though Python handles large ints automatically)\n        mid = left + (right - left) // 2\n\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return None\n```\n\n### Example Usage:\n\n```python\n# Sorted list\nnumbers = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]\n\nprint(binary_search(numbers, 23))  # Output: 5\nprint(binary_search(numbers, 100))  # Output: None\nprint(binary_search([], 5))  # Output: None (Edge case: empty list)\n```",
+          "latencyMs": 1525,
           "isTruncated": false
         },
-        "42": {
-          "modelId": 42,
-          "name": "Cohere North Mini Code (Free)",
-          "text": "```python\ndef binary_search(arr, target):\n    \"\"\"\n    Perform binary search on a sorted list to find the index of target.\n\n    Parameters:\n    arr (list): A sorted list of elements (ascending order).\n    target: The element to search for.\n\n    Returns:\n    int: The index of target if found, otherwise -1.\n    \"\"\"\n    if not arr:\n        return -1\n\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n```",
-          "latencyMs": 8385,
+        "56": {
+          "modelId": 56,
+          "name": "OpenAI GPT-OSS 120B",
+          "text": "Here is a compact, well‑documented implementation of binary search that works on any sorted list (or any sequence that supports indexing and length).  \nIt returns the index of the target value, or `-1` when the value is not present – including the special case of an empty list.\n\n```python\nfrom typing import List, Sequence, TypeVar, Optional\n\nT = TypeVar(\"T\")\n\n\ndef binary_search(seq: Sequence[T], target: T) -> int:\n    \"\"\"\n    Perform a binary search for ``target`` in a sorted sequence.\n\n    Parameters\n    ----------\n    seq : Sequence[T]\n        A **sorted** sequence (list, tuple, array, etc.) that supports\n        ``len()`` and element access via ``seq[index]``.  The elements must be\n        comparable with the ``target`` using the ``<`` and ``>`` operators.\n    target : T\n        The value to locate in ``seq``.\n\n    Returns\n    -------\n    int\n        The index of ``target`` in ``seq`` if it is present; otherwise ``-1``.\n        An empty ``seq`` also yields ``-1``.\n\n    Notes\n    -----\n    * The algorithm runs in O(log n) time and O(1) extra space.\n    * The function is *iterative* to avoid the recursion depth limit.\n    * If the list contains duplicate values, the index of **any** matching\n      element may be returned (the one found first by the algorithm).\n\n    Examples\n    --------\n    >>> binary_search([1, 3, 5, 7, 9], 5)\n    2\n    >>> binary_search([1, 3, 5, 7, 9], 6)\n    -1\n    >>> binary_search([], 42)\n    -1\n    \"\"\"\n    # Fast‑path for the empty‑list edge case.\n    if not seq:\n        return -1\n\n    left, right = 0, len(seq) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n        mid_val = seq[mid]\n\n        if mid_val == target:\n            return mid\n        elif mid_val < target:\n            left = mid + 1\n        else:               # mid_val > target\n            right = mid - 1\n\n    # Target not found.\n    return -1\n```\n\n### How it works\n1. **Empty list check** – `if not seq:` returns `-1` immediately, handling the edge case without entering the loop.\n2. **Loop invariant** – the search interval `[left, right]` always contains the possible location of `target`.  \n   Each iteration halves the interval by comparing `target` with the middle element.\n3. **Termination** – when `left` exceeds `right` the interval is empty, meaning the value is absent.\n\nFeel free to drop this function into any module and use it directly. If you prefer a version that returns `None` instead of `-1`, just replace the final `return -1` with `return None` and adjust the type hint accordingly.",
+          "latencyMs": 2177,
           "isTruncated": false
         },
-        "43": {
-          "modelId": 43,
-          "name": "Dots 3 Note Preview (Free)",
-          "text": "\n\nHere's a clean Python function that implements binary search with proper documentation and edge case handling:\n\n```python\ndef binary_search(sorted_list, target):\n    \"\"\"\n    Perform binary search on a sorted list to find the target value.\n\n    Args:\n        sorted_list: A list sorted in ascending order (must be sorted for correct results)\n        target: The value to search for in the list\n\n    Returns:\n        int: The index of the target if found, otherwise -1\n\n    Examples:\n        >>> binary_search([1, 2, 3, 4, 5], 3)\n        2\n        >>> binary_search([1, 2, 3, 4, 5], 6)\n        -1\n        >>> binary_search([], 1)\n        -1\n    \"\"\"\n    # Handle empty list case\n    if not sorted_list:\n        return -1\n    \n    left = 0\n    right = len(sorted_list) - 1\n    \n    while left <= right:\n        mid = (left + right) // 2\n        \n        if sorted_list[mid] == target:\n            return mid\n        elif sorted_list[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    \n    return -1\n```\n\nKey features of this implementation:\n1. **Docstring**: Includes description, parameters, return value, and examples\n2. **Edge Case Handling**: Explicitly checks for empty list input\n3. **Type Safety**: Works with any comparable data types (numbers, strings, etc.)\n4. **Efficiency**: O(log n) time complexity and O(1) space complexity\n5. **Clear Logic**: Uses standard iterative approach with left/right pointers\n\nExample usage:\n```python\nnumbers = [1, 3, 5, 7, 9, 11]\nprint(binary_search(numbers, 7))  # Output: 3\nprint(binary_search(numbers, 2))  # Output: -1\nprint(binary_search([], 5))       # Output: -1\n```",
-          "latencyMs": 6741,
+        "57": {
+          "modelId": 57,
+          "name": "OpenAI GPT-OSS 20B",
+          "text": "```python\nfrom typing import List, Optional, Any\n\ndef binary_search(sorted_list: List[Any], target: Any) -> Optional[int]:\n    \"\"\"\n    Perform a binary search on a sorted list.\n\n    Parameters\n    ----------\n    sorted_list : list\n        A list that is sorted in ascending order.  The elements must be\n        comparable with the ``target`` using the ``<`` and ``>`` operators.\n    target : Any\n        The value to search for.\n\n    Returns\n    -------\n    int or None\n        The index of ``target`` in ``sorted_list`` if it is present;\n        otherwise ``None``.\n\n    Notes\n    -----\n    * The function works for empty lists – it simply returns ``None``.\n    * The algorithm runs in O(log n) time and uses O(1) additional space.\n\n    Examples\n    --------\n    >>> binary_search([1, 3, 5, 7, 9], 5)\n    2\n    >>> binary_search([1, 3, 5, 7, 9], 4)\n    None\n    >>> binary_search([], 1)\n    None\n    \"\"\"\n    left, right = 0, len(sorted_list) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n        mid_val = sorted_list[mid]\n\n        if mid_val == target:\n            return mid\n        elif mid_val < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return None\n```\n\nThis function is concise, type‑annotated, and includes a comprehensive docstring that explains its behavior, parameters, return value, and provides usage examples. It gracefully handles the empty‑list edge case by returning `None`.",
+          "latencyMs": 1159,
+          "isTruncated": false
+        },
+        "58": {
+          "modelId": 58,
+          "name": "Qwen 3.8 27B",
+          "text": "```python\ndef binary_search(sorted_list: list, target) -> int:\n    \"\"\"\n    Perform binary search on a sorted list to find the index of the target.\n\n    Args:\n        sorted_list: A list of elements sorted in ascending order.\n        target: The element to search for in the list.\n\n    Returns:\n        The index of the target in the list if found, otherwise -1.\n\n    Examples:\n        >>> binary_search([1, 3, 5, 7, 9], 5)\n        2\n        >>> binary_search([1, 3, 5, 7, 9], 4)\n        -1\n        >>> binary_search([], 1)\n        -1\n    \"\"\"\n    if not sorted_list:\n        return -1\n\n    left = 0\n    right = len(sorted_list) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n        if sorted_list[mid] == target:\n            return mid\n        elif sorted_list[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return -1\n```",
+          "latencyMs": 795,
+          "isTruncated": false
+        },
+        "59": {
+          "modelId": 59,
+          "name": "Allam 2 7B",
+          "text": "Sure, I can help you with that. Here's a Python function that implements binary search algorithm:\n\n```python\ndef binary_search(arr, target):\n    # Base cases\n    if not arr or not len(arr):\n        return -1  # Empty list edge case: target not found\n    if not arr or not len(arr):\n        return 0  # Empty list edge case: target present (index 0)\n\n    low = 0\n    high = len(arr) - 1\n\n    while low <= high:\n        mid = (low + high) // 2\n        if arr[mid] == target:\n            return mid\n        elif target < arr[mid]:\n            high = mid - 1\n        else:\n            low = mid + 1\n\n    return -1  # Target not found\n\n# Example usage:\narr = [1, 3, 5, 7, 9, 11, 13, 15]\ntarget = 7\nresult = binary_search(arr, target)\nprint(f\"Target '{target}' found at index {result}\")\n```\n\nIn this function, we first check for empty lists and return -1 to indicate that the target is not present. Then we initialize the lower and upper bounds (low and high) and continue with the binary search loop.\n\nInside the loop, we calculate the middle index (mid) and compare the element at that index with the target. If they are equal, we return the middle index. If the target is smaller, we update high to be mid - 1. Otherwise, we update low to be mid + 1.\n\nIf the target is not found after the loop, we return -1.\n\nLet me know if you need further explanation or testing with different input lists and targets!",
+          "latencyMs": 637,
           "isTruncated": false
         }
       }
@@ -512,41 +510,39 @@
       "title": "Multi-Step Word Problem",
       "prompt": "A store has a 20% discount on a $150 jacket. Sales tax of 8% is applied to the discounted price. What is the final price? Show step-by-step calculations.",
       "modelOutputs": {
-        "39": {
-          "modelId": 39,
-          "name": "Nemotron 3.5 Lightning (Free)",
-          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
-          "isTruncated": false,
-          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
-        },
-        "40": {
-          "modelId": 40,
-          "name": "Liquid LFM 2.5 (Free)",
-          "text": "Here are the step-by-step calculations to find the final price:\n\n**Step 1: Calculate the discount amount**\nFirst, find 20% of the original price of $150.\n$$150 \\times 0.20 = \\$30$$\nThe discount is **$30**.\n\n**Step 2: Calculate the discounted price**\nSubtract the discount from the original price.\n$$150 - 30 = \\$120$$\nThe price after the discount is **$120**.\n\n**Step 3: Calculate the sales tax**\nNext, apply the 8% sales tax to the discounted price of $120.\n$$120 \\times 0.08 = \\$9.60$$\nThe sales tax is **$9.60**.\n\n**Step 4: Calculate the final price**\nAdd the sales tax to the discounted price.\n$$120 + 9.60 = \\$129.60$$\n\n**Answer:**\nThe final price of the jacket is **$129.60**.",
-          "latencyMs": 1823,
+        "55": {
+          "modelId": 55,
+          "name": "Gemini 3.5 Flash Lite",
+          "text": "Here are the step-by-step calculations to find the final price of the jacket:\n\n**Step 1: Calculate the discount amount.**\n* Original price = $150\n* Discount rate = 20% (or 0.20)\n* Discount amount = $150 × 0.20 = $30\n\n**Step 2: Calculate the discounted price.**\n* Discounted price = Original price - Discount amount\n* Discounted price = $150 - $30 = $120\n\n**Step 3: Calculate the sales tax on the discounted price.**\n* Sales tax rate = 8% (or 0.08)\n* Sales tax = $120 × 0.08 = $9.60\n\n**Step 4: Calculate the final price.**\n* Final price = Discounted price + Sales tax\n* Final price = $120 + $9.60 = $129.60\n\nThe final price of the jacket is **$129.60**.",
+          "latencyMs": 2127,
           "isTruncated": false
         },
-        "41": {
-          "modelId": 41,
-          "name": "Ling 3.0 Flash Fin (Free)",
-          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
-          "isTruncated": false,
-          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
-        },
-        "42": {
-          "modelId": 42,
-          "name": "Cohere North Mini Code (Free)",
-          "text": "**Step‑by‑step calculation**\n\n1. **Original price of the jacket**  \n   \\[\n   P_{\\text{original}} = \\$150\n   \\]\n\n2. **Calculate the 20 % discount**  \n   \\[\n   \\text{Discount amount} = 20\\% \\times \\$150 = 0.20 \\times 150 = \\$30\n   \\]\n\n3. **Subtract the discount to get the discounted price**  \n   \\[\n   P_{\\text{discounted}} = \\$150 - \\$30 = \\$120\n   \\]\n\n4. **Calculate the sales tax (8 %) on the discounted price**  \n   \\[\n   \\text{Sales tax} = 8\\% \\times \\$120 = 0.08 \\times 120 = \\$9.60\n   \\]\n\n5. **Add the tax to the discounted price to obtain the final price**  \n   \\[\n   P_{\\text{final}} = \\$120 + \\$9.60 = \\$129.60\n   \\]\n\n---\n\n\\[\n\\boxed{\\text{Final price of the jacket} = \\$129.60}\n\\]",
-          "latencyMs": 2482,
+        "56": {
+          "modelId": 56,
+          "name": "OpenAI GPT-OSS 120B",
+          "text": "**Step‑by‑step calculation**\n\n| Step | What we do | Calculation | Result |\n|------|------------|-------------|--------|\n| 1 | Find the amount of the discount (20 % of \\$150) | \\(0.20 \\times 150 = 30\\) | \\$30 |\n| 2 | Subtract the discount from the original price | \\(150 - 30 = 120\\) | **Discounted price = \\$120** |\n| 3 | Compute the sales tax (8 % of the discounted price) | \\(0.08 \\times 120 = 9.60\\) | \\$9.60 |\n| 4 | Add the tax to the discounted price to get the final amount | \\(120 + 9.60 = 129.60\\) | **Final price = \\$129.60** |\n\n**Answer:** The jacket will cost **\\$129.60** after the 20 % discount and the 8 % sales tax.",
+          "latencyMs": 1219,
           "isTruncated": false
         },
-        "43": {
-          "modelId": 43,
-          "name": "Dots 3 Note Preview (Free)",
-          "text": "\n\n**Step‑by‑step calculation**\n\n1. **Find the discount amount**  \n   \\[\n   20\\% \\text{ of } \\$150 = 0.20 \\times 150 = \\$30\n   \\]\n\n2. **Subtract the discount from the original price**  \n   \\[\n   \\$150 - \\$30 = \\$120\n   \\]\n   This is the discounted price before tax.\n\n3. **Calculate the sales tax on the discounted price**  \n   \\[\n   8\\% \\text{ of } \\$120 = 0.08 \\times 120 = \\$9.60\n   \\]\n\n4. **Add the tax to the discounted price**  \n   \\[\n   \\$120 + \\$9.60 = \\$129.60\n   \\]\n\n**Final price:** \\(\\boxed{\\$129.60}\\)",
-          "latencyMs": 7540,
+        "57": {
+          "modelId": 57,
+          "name": "OpenAI GPT-OSS 20B",
+          "text": "**Step‑by‑step calculation**\n\n| Step | Description | Calculation | Result |\n|------|-------------|-------------|--------|\n| 1 | **Original price** | – | \\$150.00 |\n| 2 | **Discount amount** | 20 % of \\$150 | \\(0.20 \\times 150 = 30\\) |\n| 3 | **Discounted price** | Original price – discount | \\(150 - 30 = 120\\) |\n| 4 | **Sales tax** | 8 % of discounted price | \\(0.08 \\times 120 = 9.60\\) |\n| 5 | **Final price** | Discounted price + sales tax | \\(120 + 9.60 = 129.60\\) |\n\n**Final price:** **\\$129.60**",
+          "latencyMs": 1012,
+          "isTruncated": false
+        },
+        "58": {
+          "modelId": 58,
+          "name": "Qwen 3.8 27B",
+          "text": "Here is the step-by-step calculation to determine the final price of the jacket.\n\n### Step 1: Calculate the Discount Amount\nFirst, determine how much money is taken off the original price due to the 20% discount.\n\n$$ \\text{Discount Amount} = \\text{Original Price} \\times \\text{Discount Rate} $$\n$$ \\text{Discount Amount} = 150 \\times 0.20 $$\n$$ \\text{Discount Amount} = 30 $$\n\nThe discount is **$30.00**.\n\n### Step 2: Calculate the Discounted Price\nSubtract the discount amount from the original price to find the price before tax.\n\n$$ \\text{Discounted Price} = \\text{Original Price} - \\text{Discount Amount} $$\n$$ \\text{Discounted Price} = 150 - 30 $$\n$$ \\text{Discounted Price} = 120 $$\n\nThe price after the discount is **$120.00**.\n\n### Step 3: Calculate the Sales Tax\nCalculate the 8% sales tax based on the discounted price.\n\n$$ \\text{Sales Tax} = \\text{Discounted Price} \\times \\text{Tax Rate} $$\n$$ \\text{Sales Tax} = 120 \\times 0.08 $$\n$$ \\text{Sales Tax} = 9.60 $$\n\nThe sales tax is **$9.60**.\n\n### Step 4: Calculate the Final Price\nAdd the sales tax to the discounted price to find the total amount to be paid.\n\n$$ \\text{Final Price} = \\text{Discounted Price} + \\text{Sales Tax} $$\n$$ \\text{Final Price} = 120 + 9.60 $$\n$$ \\text{Final Price} = 129.60 $$\n\n### Conclusion\nThe final price of the jacket is **$129.60**.",
+          "latencyMs": 1240,
+          "isTruncated": false
+        },
+        "59": {
+          "modelId": 59,
+          "name": "Allam 2 7B",
+          "text": "Let's break this down step by step:\n\n1. First, calculate the discount amount on the original price of $150:\n   Discount = (Discount Percentage / 100) * Original Price\n   Discount = (20 / 100) * $150\n   Discount = 0.20 * $150\n   Discount = $30\n\n2. Now, subtract the discount from the original price to find the discounted price:\n   Discounted Price = Original Price - Discount\n   Discounted Price = $150 - $30\n   Discounted Price = $120\n\n3. Next, calculate the sales tax on the discounted price:\n   Sales Tax = (Sales Tax Rate / 100) * Discounted Price\n   Sales Tax = (8 / 100) * $120\n   Sales Tax = 0.08 * $120\n   Sales Tax = $9.60\n\n4. Finally, add the sales tax to the discounted price to find the final price:\n   Final Price = Discounted Price + Sales Tax\n   Final Price = $120 + $9.60\n   Final Price = $129.60\n\nSo, the final price of the jacket after the discount and sales tax is $129.60.",
+          "latencyMs": 632,
           "isTruncated": false
         }
       }
@@ -557,45 +553,40 @@
       "title": "Logical Deduction",
       "prompt": "Alice, Bob, and Charlie are sitting in a row. Alice is not next to Bob. Charlie is to the right of Alice. Who is sitting in the middle? Explain your logical deduction step by step.",
       "modelOutputs": {
-        "39": {
-          "modelId": 39,
-          "name": "Nemotron 3.5 Lightning (Free)",
-          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
-          "isTruncated": false,
-          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+        "55": {
+          "modelId": 55,
+          "name": "Gemini 3.5 Flash Lite",
+          "text": "**Charlie** is sitting in the middle. \n\nHere is the step-by-step logical deduction:\n\n1. **Understand the seating arrangement:** There are three positions in a row: Left, Middle, and Right.\n2. **Analyze the first clue (\"Charlie is to the right of Alice\"):** This means Alice cannot be in the rightmost position (since there would be no space to her right), and Charlie cannot be in the leftmost position. \n   * Therefore, Alice must be either on the Left or in the Middle.\n   * Charlie must be either in the Middle or on the Right.\n3. **Analyze the second clue (\"Alice is not next to Bob\"):** \n   * If Alice were in the **Middle**, the only available seats next to her would be the Left and the Right. Since Alice cannot be next to Bob, *both* the Left and Right seats would have to be empty of Bob, which is impossible because Bob has to sit somewhere! \n   * Therefore, Alice **cannot** be in the middle.\n4. **Determine final positions:** \n   * Since Alice cannot be in the middle, she must be on the **Left**.\n   * Since Charlie is to the right of Alice, and the Left is taken by Alice, Charlie must take the **Middle**.\n   * By elimination, Bob must take the remaining seat on the **Right**. (Notice that Alice on the Left and Bob on the Right are separated by Charlie, satisfying the rule that Alice is not next to Bob).\n\n**Final Order (Left to Right):** Alice, Charlie, Bob. \n**Middle person:** Charlie.",
+          "latencyMs": 3117,
+          "isTruncated": false
         },
-        "40": {
-          "modelId": 40,
-          "name": "Liquid LFM 2.5 (Free)",
-          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
-          "isTruncated": false,
-          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+        "56": {
+          "modelId": 56,
+          "name": "OpenAI GPT-OSS 120B",
+          "text": "**Step‑by‑step deduction**\n\n1. **Label the three seats**  \n   - Seat 1 = leftmost  \n   - Seat 2 = middle  \n   - Seat 3 = rightmost  \n\n2. **Use the clue “Charlie is to the right of Alice.”**  \n   - This means Alice cannot be in the rightmost seat (Seat 3), because there would be no seat to her right.  \n   - So Alice can be only in Seat 1 (leftmost) or Seat 2 (middle).\n\n3. **Consider each possible place for Alice.**\n\n   ---\n   **Case A: Alice in Seat 1**  \n   - Charlie must be somewhere to the right of Alice, i.e. Seat 2 **or** Seat 3.  \n\n   *Sub‑case A1:* Charlie in Seat 2.  \n   - The only remaining person, Bob, must sit in Seat 3.  \n   - Check the other condition: “Alice is **not** next to Bob.”  \n     - Alice (Seat 1) and Bob (Seat 3) are two seats apart → they are **not** adjacent.  \n   - **All conditions are satisfied.**  \n\n   *Sub‑case A2:* Charlie in Seat 3.  \n   - Bob would have to sit in Seat 2.  \n   - Now Alice (Seat 1) and Bob (Seat 2) are adjacent, violating “Alice is not next to Bob.”  \n   - **This arrangement is impossible.**\n\n   ---\n   **Case B: Alice in Seat 2**  \n   - Charlie must be to the right of Alice, so Charlie can only be in Seat 3.  \n   - Bob would then have to sit in Seat 1.  \n   - Alice (Seat 2) and Bob (Seat 1) are adjacent → violates “Alice is not next to Bob.”  \n   - **This arrangement is impossible.**\n\n4. **Only one arrangement survives all constraints:**  \n\n   | Seat 1 | Seat 2 | Seat 3 |\n   |--------|--------|--------|\n   | Alice  | Charlie| Bob    |\n\n5. **Identify the middle seat.**  \n   - The middle seat (Seat 2) is occupied by **Charlie**.\n\n---\n\n**Answer:** **Charlie is sitting in the middle.** The logical steps above show that every other placement either puts Alice next to Bob or makes it impossible for Charlie to be to the right of Alice.",
+          "latencyMs": 2621,
+          "isTruncated": false
         },
-        "41": {
-          "modelId": 41,
-          "name": "Ling 3.0 Flash Fin (Free)",
-          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
-          "isTruncated": false,
-          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+        "57": {
+          "modelId": 57,
+          "name": "OpenAI GPT-OSS 20B",
+          "text": "**Step‑by‑step logical deduction**\n\n1. **Label the positions**  \n   In a row of three people we have three positions:  \n   - Position 1 (leftmost)  \n   - Position 2 (middle)  \n   - Position 3 (rightmost)\n\n2. **Translate the clues into constraints**  \n   - *“Charlie is to the right of Alice.”*  \n     → The index of Charlie’s seat must be greater than the index of Alice’s seat.  \n   - *“Alice is not next to Bob.”*  \n     → Alice and Bob cannot occupy adjacent positions (1–2 or 2–3).\n\n3. **Consider where Alice can sit**  \n   - If Alice were in the **rightmost** position (3), there would be no seat to her right, so Charlie could not be “to the right of Alice.”  \n     → **Alice cannot be in position 3.**\n\n   - Therefore Alice must be in either **position 1 (leftmost)** or **position 2 (middle)**.\n\n4. **Case 1: Alice in position 1 (leftmost)**  \n   - Charlie must be to the right of Alice, so Charlie can be in position 2 or 3.  \n   - Alice cannot be next to Bob, so Bob cannot be in position 2 (the seat adjacent to Alice).  \n   - The only remaining seat for Bob is position 3.  \n   - Since Bob occupies position 3, Charlie cannot also be there, so Charlie must be in the only free seat: position 2.  \n   - **Result for this case:**  \n     - Position 1: Alice  \n     - Position 2: Charlie  \n     - Position 3: Bob  \n     All constraints are satisfied.\n\n5. **Case 2: Alice in position 2 (middle)**  \n   - Charlie must be to the right of Alice, so Charlie must occupy position 3 (the only seat to the right).  \n   - Bob must occupy the remaining seat, which is position 1.  \n   - But Alice (position 2) is adjacent to Bob (position 1), violating the rule that Alice is not next to Bob.  \n   - **Result for this case:** Contradiction – this arrangement is impossible.\n\n6. **Conclusion**  \n   The only arrangement that satisfies both clues is the one from Case 1.  \n   In that arrangement, the **middle seat (position 2) is occupied by Charlie",
+          "latencyMs": 1841,
+          "isTruncated": true
         },
-        "42": {
-          "modelId": 42,
-          "name": "Cohere North Mini Code (Free)",
-          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
-          "isTruncated": false,
-          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+        "58": {
+          "modelId": 58,
+          "name": "Qwen 3.8 27B",
+          "text": "To determine who is sitting in the middle, we can analyze the constraints step by step using logical deduction.\n\n**Step 1: Analyze the positions**\nThere are three people (Alice, Bob, Charlie) and three seats in a row. Let's label the seats from left to right as Position 1, Position 2, and Position 3.\n*   Position 1: Left\n*   Position 2: Middle\n*   Position 3: Right\n\n**Step 2: Apply the constraint \"Charlie is to the right of Alice\"**\nThis implies that Alice cannot be in Position 3 (the rightmost seat), because there is no seat to her right for Charlie.\nTherefore, Alice must be in either Position 1 or Position 2.\n\n*   **Case A:** Alice is in Position 1.\n    *   Since Charlie is to the right of Alice, Charlie can be in Position 2 or Position 3.\n*   **Case B:** Alice is in Position 2.\n    *   Since Charlie is to the right of Alice, Charlie must be in Position 3.\n\n**Step 3: Apply the constraint \"Alice is not next to Bob\"**\nLet's test the cases from Step 2 against this constraint.\n\n*   **Testing Case B (Alice is in Position 2):**\n    *   If Alice is in the middle (Position 2), she is next to both Position 1 and Position 3.\n    *   From Step 2, if Alice is in Position 2, Charlie is in Position 3.\n    *   This leaves Bob for Position 1.\n    *   In this arrangement (Bob - Alice - Charlie), Alice is next to Bob.\n    *   This violates the constraint \"Alice is not next to Bob.\"\n    *   Therefore, **Case B is invalid**. Alice cannot be in the middle.\n\n*   **Testing Case A (Alice is in Position 1):**\n    *   Alice is in Position 1 (Left).\n    *   Alice is only next to Position 2.\n    *   The constraint says Alice is *not* next to Bob. Therefore, Bob cannot be in Position 2.\n    *   This means Bob must be in Position 3 (Right).\n    *   This leaves only one seat remaining for Charlie, which is Position 2 (Middle).\n    *   Let's verify if this arrangement works:\n        *   Arrangement: **Alice (1) - Charlie (2) - Bob (3)**\n        *   Is Charlie to the right of Alice? Yes (Position 2 is right of Position 1).\n        *   Is Alice next to Bob? No (Alice is at 1, Bob is at 3; they are separated by Charlie).\n\n**Conclusion**\nThe only valid arrangement is:\n1.  Alice (Left)\n2.  **Charlie (Middle)**\n3.  Bob (Right)\n\nTherefore, **Charlie** is sitting in the middle.",
+          "latencyMs": 1738,
+          "isTruncated": false
         },
-        "43": {
-          "modelId": 43,
-          "name": "Dots 3 Note Preview (Free)",
-          "text": "[Error generating response: OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day]",
-          "latencyMs": 0,
-          "isTruncated": false,
-          "error": "OpenRouter API failure: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day"
+        "59": {
+          "modelId": 59,
+          "name": "Allam 2 7B",
+          "text": "Let's analyze the information step by step:\n\n1. Alice is not next to Bob, which means either Alice is to the left of Bob or they are on opposite ends of the row.\n2. Charlie is to the right of Alice, which means Charlie cannot be on Alice's left. So, Alice and Bob can either be on opposite ends or Alice is to the left of Bob.\n3. Now, let's consider the possible arrangements:\n   a. Alice, Bob, Charlie: In this case, Alice is to the left of Bob, and Charlie is to the right of Alice.\n   b. Alice, Bob, Charlie (reversed): In this case, Alice is to the left of Bob, and Charlie is to the right of Alice.\n4. Both arrangements satisfy the given conditions: Alice is not next to Bob, and Charlie is to the right of Alice.\n5. Since we have two possible arrangements that satisfy all conditions, we cannot determine the exact position of each person without additional information.\n\nTherefore, with the provided information, we cannot definitively determine who is sitting in the middle.",
+          "latencyMs": 1153,
+          "isTruncated": false
         }
       }
     }

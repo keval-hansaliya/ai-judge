@@ -59,7 +59,13 @@ const NAV_TABS = [
  */
 function App() {
   const [activeTab, setActiveTab] = useState('arena');
+  const [navigationContext, setNavigationContext] = useState(null);
   const [configuredProviders, setConfiguredProviders] = useState(['openrouter', 'groq', 'gemini']);
+
+  const handleNavigate = (tab, context = null) => {
+    setNavigationContext(context);
+    setActiveTab(tab);
+  };
 
   const {
     user,
@@ -203,7 +209,10 @@ function App() {
                 key={tab.id}
                 type="button"
                 className={`nav-dock-tab tab-${tab.id} ${isActive ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setNavigationContext(null);
+                  setActiveTab(tab.id);
+                }}
               >
                 <span className="tab-icon">{tab.icon}</span>
                 <div className="tab-label-group">
@@ -219,10 +228,22 @@ function App() {
 
       {/* ── Page Routing with Smooth View Render ── */}
       <main className="page-view" key={activeTab}>
-        {activeTab === 'arena' && <ArenaPage />}
+        {activeTab === 'arena' && (
+          <ArenaPage
+            initialPrompt={navigationContext?.prompt}
+            initialCategory={navigationContext?.category}
+          />
+        )}
         {activeTab === 'benchmark' && <BenchmarkReport />}
-        {activeTab === 'playground' && <PlaygroundPage />}
-        {activeTab === 'leaderboard' && <LeaderboardPage />}
+        {activeTab === 'playground' && (
+          <PlaygroundPage
+            initialModelId={navigationContext?.modelId}
+            initialPrompt={navigationContext?.prompt}
+          />
+        )}
+        {activeTab === 'leaderboard' && (
+          <LeaderboardPage onNavigate={handleNavigate} />
+        )}
         {activeTab === 'history' && <HistoryPage currentUser={user} />}
       </main>
     </div>

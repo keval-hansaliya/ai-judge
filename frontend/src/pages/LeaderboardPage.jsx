@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getLeaderboard } from '../api.js';
 import { LB_CATEGORIES, CATEGORY_ICONS } from '../constants.js';
 import { addToast } from '../components/Toast.jsx';
+import { ModelMatchmaker } from '../components/ModelMatchmaker.jsx';
 import './LeaderboardPage.css';
 
 /**
@@ -9,15 +10,41 @@ import './LeaderboardPage.css';
  *
  * Displays global and domain-specific Elo ratings, podium showcase for the
  * top 3 competitors, win-rate analytics, tier badges, search filtering,
- * and live refresh capabilities.
+ * AI Model Matchmaker workload advisor, and live refresh capabilities.
  */
-export function LeaderboardPage() {
+export function LeaderboardPage({ onNavigate }) {
   const [selectedLbCategory, setSelectedLbCategory] = useState('All');
   const [leaderboard, setLeaderboard] = useState([]);
   const [loadingLb, setLoadingLb] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('elo');
+  const [highlightedModelId, setHighlightedModelId] = useState(null);
+
+  const handleHighlightModel = (databaseId, modelId, modelName) => {
+    setSearchQuery('');
+    const target = leaderboard.find(
+      (m) =>
+        (databaseId && m.id === databaseId) ||
+        (modelId && m.modelId === modelId) ||
+        (modelName && m.name.toLowerCase() === modelName.toLowerCase())
+    );
+    const targetId = target ? target.id : databaseId;
+
+    if (targetId) {
+      setHighlightedModelId(targetId);
+      setTimeout(() => {
+        const rowElem = document.getElementById(`model-row-${targetId}`);
+        if (rowElem) {
+          rowElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 120);
+
+      setTimeout(() => {
+        setHighlightedModelId((prev) => (prev === targetId ? null : prev));
+      }, 5000);
+    }
+  };
 
   useEffect(() => {
     fetchLeaderboard(selectedLbCategory);
@@ -114,8 +141,10 @@ export function LeaderboardPage() {
             <div className="kpi-icon-box">🏆</div>
             <div className="kpi-text-block">
               <span className="kpi-label">Arena Champion</span>
-              <span className="kpi-value">{topModel ? topModel.name : 'Awaiting Data'}</span>
-              <span className="kpi-caption">
+              <span className="kpi-value" title={topModel ? topModel.name : 'Awaiting Data'}>
+                {topModel ? topModel.name : 'Awaiting Data'}
+              </span>
+              <span className="kpi-caption" title={topModel ? `Elo ${topModel.elo} · Rank #1` : 'No matches'}>
                 {topModel ? `Elo ${topModel.elo} · Rank #1` : 'No matches'}
               </span>
             </div>
@@ -125,7 +154,9 @@ export function LeaderboardPage() {
             <div className="kpi-icon-box">⚔️</div>
             <div className="kpi-text-block">
               <span className="kpi-label">Completed Battles</span>
-              <span className="kpi-value">{uniqueBattlesEstimated} Matches</span>
+              <span className="kpi-value" title={`${uniqueBattlesEstimated} Matches (${totalBattlesCount} evaluations)`}>
+                {uniqueBattlesEstimated} Matches
+              </span>
               <span className="kpi-caption">{totalBattlesCount} total evaluations</span>
             </div>
           </div>
@@ -134,7 +165,9 @@ export function LeaderboardPage() {
             <div className="kpi-icon-box">🤖</div>
             <div className="kpi-text-block">
               <span className="kpi-label">Evaluated Models</span>
-              <span className="kpi-value">{leaderboard.length} Contenders</span>
+              <span className="kpi-value" title={`${leaderboard.length} Tier-ranked Contenders`}>
+                {leaderboard.length} Models
+              </span>
               <span className="kpi-caption">Tier-ranked LLMs</span>
             </div>
           </div>
@@ -146,7 +179,7 @@ export function LeaderboardPage() {
               <span className="kpi-value">
                 {bestWinRateModel ? `${bestWinRatePercent}%` : 'N/A'}
               </span>
-              <span className="kpi-caption">
+              <span className="kpi-caption" title={bestWinRateModel ? bestWinRateModel.name : 'Pending battles'}>
                 {bestWinRateModel ? bestWinRateModel.name : 'Pending battles'}
               </span>
             </div>
@@ -239,6 +272,12 @@ export function LeaderboardPage() {
           </div>
         </div>
       )}
+
+      {/* ── 2.5. AI Model Matchmaker Workload Advisor ── */}
+      <ModelMatchmaker
+        onHighlightModel={handleHighlightModel}
+        onNavigate={onNavigate}
+      />
 
       {/* ── 3. Filters, Search & Action Controls ── */}
       <div className="leaderboard-controls-card">
@@ -384,8 +423,21 @@ export function LeaderboardPage() {
                 const fillClass = winRate >= 60 ? 'fill-high' : winRate >= 35 ? 'fill-med' : 'fill-low';
                 const rateColor = winRate >= 60 ? '#34d399' : winRate >= 35 ? '#fbbf24' : '#f87171';
 
+                const isHighlighted = highlightedModelId === model.id;
+                const providerText = model.provider
+                  ? model.provider.toLowerCase() === 'groq'
+                    ? '⚡ Groq LPU'
+                    : model.provider.toLowerCase() === 'gemini'
+                    ? '♊ Google DeepMind'
+                    : '🌐 OpenRouter'
+                  : 'Verified Model';
+
                 return (
-                  <tr key={model.id || idx} className={isChampion ? 'row-champion' : ''}>
+                  <tr
+                    key={model.id || idx}
+                    id={`model-row-${model.id}`}
+                    className={`${isChampion ? 'row-champion' : ''} ${isHighlighted ? 'row-matchmaker-highlight' : ''}`}
+                  >
                     {/* Rank */}
                     <td>
                       <div className="rank-badge-cell">
@@ -399,9 +451,10 @@ export function LeaderboardPage() {
                         <div className="model-name-title">
                           <span>{model.name}</span>
                           {isChampion && <span className="champion-crown-tag">👑 #1</span>}
+                          {isHighlighted && <span className="matchmaker-focus-tag">🎯 MATCH</span>}
                         </div>
                         <div className="model-provider-sub">
-                          OpenRouter · ID: {model.id}
+                          {providerText} · ID: {model.id}
                         </div>
                       </div>
                     </td>
