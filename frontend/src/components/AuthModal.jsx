@@ -85,7 +85,7 @@ export function AuthModal({
               <span>🔐</span> ARENA IDENTITY
             </div>
             <h2 className="auth-modal-title">
-              {mode === 'login' ? 'Sign in to LM Arena' : 'Create an Account'}
+              {mode === 'login' ? 'Sign in to AI Judge' : 'Create an Account'}
             </h2>
             <p className="auth-modal-subtitle">
               {mode === 'login'

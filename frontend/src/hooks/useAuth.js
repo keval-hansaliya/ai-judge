@@ -53,7 +53,7 @@ export function useAuth() {
       const data = await registerUser({ name, email, password });
       setUser({ ...data.user, isGuest: false });
       setIsAuthModalOpen(false);
-      addToast(`Account created! Welcome to LM Arena, ${data.user.name}!`, 'success');
+      addToast(`Account created! Welcome to AI Judge, ${data.user.name}!`, 'success');
       return data;
     } catch (err) {
       addToast(err.message || 'Registration failed', 'error');

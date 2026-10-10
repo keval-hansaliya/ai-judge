@@ -1,6 +1,4 @@
-# ==============================================================================
-# Multi-stage Dockerfile for LM Arena Frontend
-# ==============================================================================
+# Multi-stage Dockerfile for AI Judge Frontend
 
 FROM node:20-alpine AS builder
 

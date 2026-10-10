@@ -2,7 +2,7 @@ import { prisma } from '../config/db.js';
 import { FREE_MODELS } from '../config/freeModels.js';
 import { generateResponse } from './ai.service.js';
 
-const RECOMMENDER_SYSTEM_PROMPT = `You are the AI Model Matchmaker for LM Arena (AI Judge).
+const RECOMMENDER_SYSTEM_PROMPT = `You are the AI Model Matchmaker for AI Judge.
 Your job is to recommend the best Large Language Model(s) from our active platform catalog for a user's specific use case and engineering constraints.
 
 You will receive:

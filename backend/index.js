@@ -101,7 +101,7 @@ app.get(['/health', '/api/v1/health'], async (req, res) => {
 // Root welcome endpoint
 app.get('/', (req, res) => {
   res.status(200).json(
-    new ApiResponse(200, null, "LM Arena — AI Judge API is up and running")
+    new ApiResponse(200, null, "AI Judge API is up and running")
   );
 });
 
@@ -117,7 +117,7 @@ app.use(errorHandler);
 // 8. Server Startup & Graceful Shutdown
 const PORT = env.PORT || 3000;
 const server = app.listen(PORT, () => {
-  console.log(`\n🚀 LM Arena Backend listening on port ${PORT} [${env.NODE_ENV} mode]`);
+  console.log(`\n🚀 AI Judge Backend listening on port ${PORT} [${env.NODE_ENV} mode]`);
   console.log(`   Health check available at http://localhost:${PORT}/health\n`);
 });
 

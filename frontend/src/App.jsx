@@ -130,8 +130,8 @@ function App() {
             </div>
             <div className="brand-text-group">
               <div className="brand-title-row">
-                <span className="brand-title">LM ARENA</span>
-                <span className="brand-badge-pill">AI JUDGE</span>
+                <span className="brand-title">AI JUDGE</span>
+                <span className="brand-badge-pill">EVALUATION PLATFORM</span>
               </div>
               <span className="brand-tagline">
                 Autonomous LLM Evaluation &amp; Community Elo Matrix
