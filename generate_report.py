@@ -392,8 +392,7 @@ def build_report():
         ("    7.1 Conclusions", "43"),
         ("    7.2 Future Scope & Research Directions", "44"),
         ("References", "46"),
-        ("Research Paper Draft (IEEE Format)", "48"),
-        ("Curriculum Vitae", "53")
+        ("Curriculum Vitae", "48")
     ]
 
     toc_table = doc.add_table(rows=0, cols=2)
@@ -1053,48 +1052,6 @@ def build_report():
         r = p_ref.add_run(r_text)
         r.font.name = 'Times New Roman'
         r.font.size = Pt(10)
-
-    doc.add_page_break()
-
-    # =========================================================================
-    # RESEARCH PAPER (FULL IEEE FORMAT DRAFT)
-    # =========================================================================
-    p_h1("Research Paper", space_before=10)
-    p_body("As stipulated by the Department of Information Technology project curriculum guidelines, the following represents the camera-ready research paper draft prepared from this dissertation work:")
-
-    p = doc.add_paragraph()
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.paragraph_format.space_before = Pt(14)
-    p.paragraph_format.space_after = Pt(4)
-    r_pt = p.add_run("AI Judge: Scalable Multi-Model LLM Evaluation with Real-Time Streaming and Bradley-Terry Elo Scoring\n")
-    r_pt.bold = True
-    r_pt.font.name = 'Times New Roman'
-    r_pt.font.size = Pt(14)
-
-    p_auth = doc.add_paragraph()
-    p_auth.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_auth.paragraph_format.space_after = Pt(12)
-    p_auth.add_run("Hansaliya Keval Sudhirbhai, Shah Aray Niteshbhai, and Prof. Anand K. Patel\n").bold = True
-    p_auth.add_run("Department of Information Technology, Faculty of Technology\nDharmsinh Desai University, Nadiad, Gujarat, India\n{kevalhansaliya@gmail.com, 24ituos912@ddu.ac.in, anandpatel.it@ddu.ac.in}")
-
-    p_abs = doc.add_paragraph()
-    p_abs.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    p_abs.paragraph_format.left_indent = Inches(0.4)
-    p_abs.paragraph_format.right_indent = Inches(0.4)
-    p_abs.paragraph_format.space_after = Pt(10)
-    r_ab_title = p_abs.add_run("Abstract—")
-    r_ab_title.bold = True
-    r_ab_title.font.name = 'Times New Roman'
-    r_ab_title.font.size = Pt(10)
-    r_ab_body = p_abs.add_run("Evaluating Large Language Models (LLMs) across heterogeneous architectures remains a challenging problem due to data contamination in static benchmarks and subjective variance in human scoring. This paper presents AI Judge, an open, full-stack evaluation ecosystem unifying live blind 1v1 human preference battles, automated multi-dimension LLM judges, and deterministic zero-temperature benchmarking. Leveraging Server-Sent Events (SSE), the system streams parallel token outputs across Groq LPUs, Google Gemini, and OpenRouter backends. Match outcomes are aggregated into continuous rankings via the Bradley-Terry Elo algorithm. Empirical results across 100+ rounds show an 84.6% agreement rate between automated rubrics and human consensus, with Groq LPUs providing sub-400ms time-to-first-token inference. The system includes an intelligent workload matchmaker that accurately routes developers to Pareto-optimal models based on speed, reasoning depth, and cost.")
-    r_ab_body.font.name = 'Times New Roman'
-    r_ab_body.font.size = Pt(10)
-
-    p_body("The development of Large Language Models has necessitated rigorous, real-time evaluation frameworks. Existing benchmarks like MMLU and GSM8K are susceptible to memorization. Our platform addresses this through dynamic human-in-the-loop pairing, automated rubrics, and latency-aware scoring.", bold_prefix="I. INTRODUCTION: ")
-    p_body("The platform comprises an asynchronous React presentation tier and a Node.js streaming gateway. A randomized pairing algorithm samples models without leaking identities. Responses stream via SSE. Following turn completion, evaluators cast votes, triggering an atomic Bradley-Terry Elo update with K=32.", bold_prefix="II. ARCHITECTURE & STREAMING PROTOCOL: ")
-    p_body("Automated judging executes on frozen zero-temperature evaluator models across four orthogonal dimensions: Factuality, Reasoning, Formatting, and Brevity. The composite harmonic mean score ensures strict penalties for hallucinations.", bold_prefix="III. MULTI-DIMENSION EVALUATION METRICS: ")
-    p_body("Table 4 and Table 5 summarize experimental findings. Groq LPU hardware demonstrated 285 tokens/sec throughput with 380ms TTFT. GPT-OSS 120B led composite rubric scoring (9.19/10), while Gemini Flash Lite proved most cost-efficient (9.12/10 at sub-600ms latency).", bold_prefix="IV. EXPERIMENTAL VALIDATION: ")
-    p_body("AI Judge delivers a transparent, scalable, and reproducible evaluation ecosystem. Future work will extend the platform to multi-modal vision-language evaluations.", bold_prefix="V. CONCLUSION: ")
 
     doc.add_page_break()
 
