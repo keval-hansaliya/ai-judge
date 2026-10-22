@@ -24,7 +24,11 @@ app.use(helmet({
 const corsOptions = {
   origin: (origin, callback) => {
     // Allow non-browser requests (curl, server-to-server, postman) or matching allowed origins
-    if (!origin || env.ALLOWED_ORIGINS.includes(origin) || env.NODE_ENV === 'development') {
+    const isAllowed = !origin || 
+      env.ALLOWED_ORIGINS.includes(origin) || 
+      (env.NODE_ENV === 'development' && /^http:\/\/localhost(:\d+)?$/.test(origin));
+
+    if (isAllowed) {
       callback(null, true);
     } else {
       callback(new Error(`Origin ${origin} not allowed by CORS`));
