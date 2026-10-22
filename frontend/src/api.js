@@ -1,9 +1,18 @@
-// Dynamically resolve API Base from env, defaulting to relative /api/v1 (in production/proxy) or localhost:3000
-const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE) || (
-  typeof window !== 'undefined' && window.location.hostname !== 'localhost'
-    ? `${window.location.origin}/api/v1`
-    : 'http://localhost:3000/api/v1'
-);
+// Dynamically resolve API Base from env, guaranteeing trimmed trailing slashes and uniform /api/v1 prefix
+const resolveApiBase = () => {
+  let base = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE) || (
+    typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+      ? `${window.location.origin}/api/v1`
+      : 'http://localhost:3000/api/v1'
+  );
+  base = base.trim().replace(/\/+$/, '');
+  if (!base.endsWith('/api/v1')) {
+    base = `${base}/api/v1`;
+  }
+  return base;
+};
+
+const API_BASE = resolveApiBase();
 
 let authToken = localStorage.getItem('ai_judge_token') || null;
 

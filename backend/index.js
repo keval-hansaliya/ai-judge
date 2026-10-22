@@ -23,10 +23,13 @@ app.use(helmet({
 // 2. Production CORS Configuration
 const corsOptions = {
   origin: (origin, callback) => {
+    // Normalize incoming origin by trimming and removing trailing slash
+    const normalizedOrigin = origin ? origin.trim().replace(/\/+$/, '') : origin;
+
     // Allow non-browser requests (curl, server-to-server, postman) or matching allowed origins
     const isAllowed = !origin || 
-      env.ALLOWED_ORIGINS.includes(origin) || 
-      (env.NODE_ENV === 'development' && /^http:\/\/localhost(:\d+)?$/.test(origin));
+      env.ALLOWED_ORIGINS.includes(normalizedOrigin) || 
+      (env.NODE_ENV === 'development' && /^http:\/\/localhost(:\d+)?$/.test(normalizedOrigin));
 
     if (isAllowed) {
       callback(null, true);
@@ -39,6 +42,7 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // 3. Body Parsers with Safe Limits
 app.use(express.json({ limit: '2mb' }));
@@ -56,7 +60,7 @@ const globalLimiter = rateLimit({
     message: "Too many requests from this IP, please try again after 15 minutes."
   }
 });
-app.use('/api/', globalLimiter);
+app.use(['/api', '/api/v1'], globalLimiter);
 
 // Specific stricter limit for auth routes to prevent brute-force attacks
 const authLimiter = rateLimit({
@@ -70,7 +74,7 @@ const authLimiter = rateLimit({
     message: "Too many authentication attempts, please try again after 15 minutes."
   }
 });
-app.use('/api/v1/auth', authLimiter);
+app.use(['/api/v1/auth', '/auth'], authLimiter);
 
 // 5. Health Check & Diagnostics Endpoint
 app.get(['/health', '/api/v1/health'], async (req, res) => {
@@ -109,11 +113,11 @@ app.get('/', (req, res) => {
   );
 });
 
-// 6. Application Routes
-app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/battles', battleRouter);
-app.use('/api/v1/leaderboard', leaderboardRouter);
-app.use('/api/v1/evaluations', evaluationRouter);
+// 6. Application Routes (supports both /api/v1 prefix and root paths)
+app.use(['/api/v1/auth', '/auth'], authRouter);
+app.use(['/api/v1/battles', '/battles'], battleRouter);
+app.use(['/api/v1/leaderboard', '/leaderboard'], leaderboardRouter);
+app.use(['/api/v1/evaluations', '/evaluations'], evaluationRouter);
 
 // 7. Centralized Error Handler (must be registered last)
 app.use(errorHandler);
